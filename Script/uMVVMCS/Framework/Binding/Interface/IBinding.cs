@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2016 Sun Ning
+ * Copyright 2016 Sun Ning（Joey1258）
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -69,6 +69,11 @@ namespace uMVVMCS.DIContainer
         /// 将多个 object 添加到 binding 的所存储的 Info 实例中的 value 属性中
         /// </summary>
         IBinding To(System.Collections.Generic.IList<object> value);
+
+        /// <summary>
+        /// 直接设置一个值给 binding 的所存储的 Info 实例,但没有进行兼容检查
+        /// </summary>
+        IBinding SetValue(object obj);
 
         /// <summary>
         /// 设置 binding 所存储的 Info 实例中的 name 属性

@@ -9,7 +9,8 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-
+        object o = 1;
+        print(o as Type);
     }
 
     // Update is called once per frame

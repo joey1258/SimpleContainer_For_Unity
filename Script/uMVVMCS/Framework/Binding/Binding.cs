@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2016 Sun Ning
+ * Copyright 2016 Sun Ning（Joey1258）
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -200,6 +200,22 @@ namespace uMVVMCS.DIContainer
                 }
                 AddValue(osi);
             }
+
+            if (storing != null) { storing(this); }
+
+            return this;
+        }
+
+        /// <summary>
+        /// 直接设置一个值给 binding 的所存储的 Info 实例而不进行兼容检查
+        /// </summary>
+        virtual public IBinding SetValue(object o)
+        {
+            if (bindingInfo.valueConstraint != ConstraintType.MULTIPLE)
+            {
+                bindingInfo.value = o;
+            }
+            else { AddValue(o); }
 
             if (storing != null) { storing(this); }
 
