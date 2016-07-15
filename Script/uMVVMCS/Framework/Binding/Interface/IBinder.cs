@@ -63,22 +63,22 @@ namespace uMVVMCS.DIContainer
         #region GetBinding
 
         /// <summary>
-        /// 根据类型获取 nullIdBindings 字典中的所有同类型 Binding
+        /// 根据类型获取 typeBindings 字典中的所有同类型 Binding
         /// </summary>
         IList<IBinding> GetNullIdBindingsByType<T>();
 
         /// <summary>
-        /// 根据类型获取 nullIdBindings 字典中的所有同类型 Binding
+        /// 根据类型获取 typeBindings 字典中的所有同类型 Binding
         /// </summary>
 		IList<IBinding> GetNullIdBindingsByType(Type type);
 
         /// <summary>
-        /// 根据类型获取 nullIdBindings 字典和 bindingStorage 中的所有同类型 Binding
+        /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
         /// </summary>
         IList<IBinding> GetBindingsByType<T>();
 
         /// <summary>
-        /// 根据类型获取 nullIdBindings 字典和 bindingStorage 中的所有同类型 Binding
+        /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
         /// </summary>
 		IList<IBinding> GetBindingsByType(Type type);
 
@@ -98,7 +98,7 @@ namespace uMVVMCS.DIContainer
 		IList<IBinding> GetAllBindings();
 
         /// <summary>
-        /// 返回 nullIdBindings 中除自身以外所有 type 和值都相同的 binding
+        /// 返回 typeBindings 中除自身以外所有 type 和值都相同的 binding
         /// </summary>
         IList<IBinding> GetSameNullIdBinding(IBinding binding);
 
@@ -117,12 +117,12 @@ namespace uMVVMCS.DIContainer
         #region Unbind
 
         /// <summary>
-        /// 根据类型从 bindingStorage 和 nullIdBindings 中删除所有同类型 Binding
+        /// 根据类型从 bindingStorage 和 typeBindings 中删除所有同类型 Binding
         /// </summary>
         void UnbindByType<T>();
 
         /// <summary>
-        /// 根据类型从 bindingStorage 和 nullIdBindings 中删除所有同类型 Binding
+        /// 根据类型从 bindingStorage 和 typeBindings 中删除所有同类型 Binding
         /// </summary>
         void UnbindByType(Type type);
 
@@ -137,12 +137,12 @@ namespace uMVVMCS.DIContainer
         void UnbindBindingStorageByType(Type type);
 
         /// <summary>
-        /// 根据类型从 nullIdBindings 中删除所有同类型 Binding
+        /// 根据类型从 typeBindings 中删除所有同类型 Binding
         /// </summary>
         void UnbindNullIdBindingByType<T>();
 
         /// <summary>
-        /// 根据类型从 nullIdBindings 中删除所有同类型 Binding
+        /// 根据类型从 typeBindings 中删除所有同类型 Binding
         /// </summary>
         void UnbindNullIdBindingByType(Type type);
 

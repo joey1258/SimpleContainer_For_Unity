@@ -9,7 +9,7 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        object o = 1;
+        object o = new ren();
         print(o as Type);
     }
 

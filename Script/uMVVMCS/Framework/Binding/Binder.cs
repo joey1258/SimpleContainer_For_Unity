@@ -28,7 +28,8 @@ namespace uMVVMCS.DIContainer
         public delegate void BindingStoring(IBinding binding);
 
         protected Storage<IBinding> bindingStorage;
-        protected Dictionary<Type, IList<IBinding>> nullIdBindings;
+        protected Dictionary<Type, IList<IBinding>> typeBindings;
+        protected Dictionary<object, IList<IBinding>> idBindings;
         protected IBindingFactory bindingFactory;
 
         #region constructor
@@ -36,7 +37,8 @@ namespace uMVVMCS.DIContainer
         public Binder()
         {
             bindingStorage = new Storage<IBinding>();
-            nullIdBindings = new Dictionary<Type, IList<IBinding>>();
+            typeBindings = new Dictionary<Type, IList<IBinding>>();
+            idBindings = new Dictionary<object, IList<IBinding>>();
             bindingFactory = new BindingFactory();
         }
 
@@ -115,7 +117,7 @@ namespace uMVVMCS.DIContainer
         #region GetBinding
 
         /// <summary>
-        /// 根据类型获取 nullIdBindings 字典中的所有同类型 Binding
+        /// 根据类型获取 typeBindings 字典中的所有同类型 Binding
         /// </summary>
         virtual public IList<IBinding> GetNullIdBindingsByType<T>()
         {
@@ -123,15 +125,15 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型获取 nullIdBindings 字典中的所有同类型 Binding
+        /// 根据类型获取 typeBindings 字典中的所有同类型 Binding
         /// </summary>
 		virtual public IList<IBinding> GetNullIdBindingsByType(Type type)
         {
-            return nullIdBindings[type];
+            return typeBindings[type];
         }
 
         /// <summary>
-        /// 根据类型获取 nullIdBindings 字典和 bindingStorage 中的所有同类型 Binding
+        /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
         /// </summary>
         virtual public IList<IBinding> GetBindingsByType<T>()
         {
@@ -139,11 +141,11 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型获取 nullIdBindings 字典和 bindingStorage 中的所有同类型 Binding
+        /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
         /// </summary>
 		virtual public IList<IBinding> GetBindingsByType(Type type)
         {
-            List<IBinding> bindings = new List<IBinding>(nullIdBindings[type]);
+            List<IBinding> bindings = new List<IBinding>(typeBindings[type]);
             bindings.AddRange(bindingStorage[type].Values);
             return bindings;
         }
@@ -173,13 +175,13 @@ namespace uMVVMCS.DIContainer
         {
             List<IBinding> bindingList = new List<IBinding>();
 
-            // 获取 nullIdBindings 中所有的 binding
-            List<Type> nullIdKeys = new List<Type>(nullIdBindings.Keys);
+            // 获取 typeBindings 中所有的 binding
+            List<Type> nullIdKeys = new List<Type>(typeBindings.Keys);
 
-            int length = nullIdBindings.Count;
+            int length = typeBindings.Count;
             for (int i = 0; i < length; i++)
             {
-                bindingList.AddRange(nullIdBindings[nullIdKeys[i]]);
+                bindingList.AddRange(typeBindings[nullIdKeys[i]]);
             }
 
             return bindingList;
@@ -201,48 +203,48 @@ namespace uMVVMCS.DIContainer
                 bindingList.AddRange(bindingStorage[keys[i]].Values);
             }
 
-            // 获取 nullIdBindings 中所有的 binding
-            List<Type> nullIdKeys = new List<Type>(nullIdBindings.Keys);
+            // 获取 typeBindings 中所有的 binding
+            List<Type> nullIdKeys = new List<Type>(typeBindings.Keys);
 
-            length = nullIdBindings.Count;
+            length = typeBindings.Count;
             for (int i = 0; i < length; i++)
             {
-                bindingList.AddRange(nullIdBindings[nullIdKeys[i]]);
+                bindingList.AddRange(typeBindings[nullIdKeys[i]]);
             }
 
             return bindingList;
         }
 
         /// <summary>
-        /// 返回 nullIdBindings 中除自身以外所有 type 和值都相同的 binding
+        /// 返回 typeBindings 中除自身以外所有 type 和值都相同的 binding
         /// </summary>
         virtual public IList<IBinding> GetSameNullIdBinding(IBinding binding)
         {
             List<IBinding> bindingList = new List<IBinding>();
 
-            int length = nullIdBindings[binding.type].Count;
+            int length = typeBindings[binding.type].Count;
             for (int i = 0; i < length; i++)
             {
-                if(nullIdBindings[binding.type][i].constraint != binding.constraint) { continue; }
+                if(typeBindings[binding.type][i].constraint != binding.constraint) { continue; }
 
                 if (binding.constraint == ConstraintType.MULTIPLE)
                 {
                     if (CompareUtils.isSameValueArray(
-                        nullIdBindings[binding.type][i].valueArray,
+                        typeBindings[binding.type][i].valueArray,
                         binding.valueArray) &&
-                        !CompareUtils.isSameObject(nullIdBindings[binding.type][i], binding))
+                        !CompareUtils.isSameObject(typeBindings[binding.type][i], binding))
                     {
-                        bindingList.Add(nullIdBindings[binding.type][i]);
+                        bindingList.Add(typeBindings[binding.type][i]);
                     }
                 }
                 else
                 {
                     if (CompareUtils.isSameObject(
-                        nullIdBindings[binding.type][i].value,
+                        typeBindings[binding.type][i].value,
                         binding.value) &&
-                        !CompareUtils.isSameObject(nullIdBindings[binding.type][i], binding))
+                        !CompareUtils.isSameObject(typeBindings[binding.type][i], binding))
                     {
-                        bindingList.Add(nullIdBindings[binding.type][i]);
+                        bindingList.Add(typeBindings[binding.type][i]);
                     }
                 }
             }
@@ -271,7 +273,7 @@ namespace uMVVMCS.DIContainer
         #region Unbind
 
         /// <summary>
-        /// 根据类型从 bindingStorage 和 nullIdBindings 中删除所有同类型 Binding
+        /// 根据类型从 bindingStorage 和 typeBindings 中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindByType<T>()
         {
@@ -279,7 +281,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型从 bindingStorage 和 nullIdBindings 中删除所有同类型 Binding
+        /// 根据类型从 bindingStorage 和 typeBindings 中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindByType(Type type)
         {
@@ -292,7 +294,7 @@ namespace uMVVMCS.DIContainer
             }
 
             bindingStorage.Remove(type);
-            nullIdBindings.Remove(type);
+            typeBindings.Remove(type);
 
             // 如果 AOT 后置委托不为空就执行它
             if (afterRemoveBinding != null)
@@ -332,7 +334,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型从 nullIdBindings 中删除所有同类型 Binding
+        /// 根据类型从 typeBindings 中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindNullIdBindingByType<T>()
         {
@@ -340,11 +342,11 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型从 nullIdBindings 中删除所有同类型 Binding
+        /// 根据类型从 typeBindings 中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindNullIdBindingByType(Type type)
         {
-            var bindings = nullIdBindings[type];
+            var bindings = typeBindings[type];
 
             // 如果 AOT 前置委托不为空就执行它
             if (beforeRemoveBinding != null)
@@ -352,7 +354,7 @@ namespace uMVVMCS.DIContainer
                 beforeRemoveBinding(this, bindings);
             }
 
-            nullIdBindings.Remove(type);
+            typeBindings.Remove(type);
 
             // 如果 AOT 后置委托不为空就执行它
             if (afterRemoveBinding != null)
@@ -492,7 +494,7 @@ namespace uMVVMCS.DIContainer
             // 如果参数 binding 为空，就直接退出
             if (binding == null) { return; }
 
-            // 如果 binding 的 id 为空，就移除 nullIdBindings 中HashCode相同的 binding
+            // 如果 binding 的 id 为空，就移除 typeBindings 中HashCode相同的 binding
             if (binding.id == null)
             {
                 RemoveSameNullIdBinding(binding);
@@ -513,34 +515,34 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 移除 nullIdBindings 中所有 type 和值都相同的 binding (如没有则不做修改)
+        /// 移除 typeBindings 中所有 type 和值都相同的 binding (如没有则不做修改)
         /// </summary>
         virtual public void RemoveSameNullIdBinding(IBinding binding)
         {
-            int length = nullIdBindings[binding.type].Count;
+            int length = typeBindings[binding.type].Count;
 
             for (int i = 0; i < length; i++)
             {
-                if (nullIdBindings[binding.type][i].constraint != binding.constraint) { continue; }
+                if (typeBindings[binding.type][i].constraint != binding.constraint) { continue; }
 
                 if (binding.constraint == ConstraintType.MULTIPLE)
                 {
                     if (CompareUtils.isSameValueArray(
-                        nullIdBindings[binding.type][i].valueArray,
+                        typeBindings[binding.type][i].valueArray,
                         binding.valueArray))
                     {
-                        nullIdBindings[binding.type].Remove(nullIdBindings[binding.type][i]);
-                        length = nullIdBindings[binding.type].Count;
+                        typeBindings[binding.type].Remove(typeBindings[binding.type][i]);
+                        length = typeBindings[binding.type].Count;
                     }
                 }
                 else
                 {
                     if (CompareUtils.isSameObject(
-                    nullIdBindings[binding.type][i].value,
+                    typeBindings[binding.type][i].value,
                     binding.value))
                     {
-                        nullIdBindings[binding.type].Remove(nullIdBindings[binding.type][i]);
-                        length = nullIdBindings[binding.type].Count;
+                        typeBindings[binding.type].Remove(typeBindings[binding.type][i]);
+                        length = typeBindings[binding.type].Count;
                     }
                 }
             }
@@ -579,18 +581,18 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public void AddBinding(IBinding binding)
         {
-            // 如果 id 为空且未添加过相同的binding，就储存到 nullIdBindings
+            // 如果 id 为空且未添加过相同的binding，就储存到 typeBindings
             if (binding.id == null)
             {
-                if (!nullIdBindings.ContainsKey(binding.type))
+                if (!typeBindings.ContainsKey(binding.type))
                 {
-                    nullIdBindings.Add(binding.type, new List<IBinding>());
+                    typeBindings.Add(binding.type, new List<IBinding>());
                 }
 
                 // 如果 type 和值都相同的 binding 不存在才进行添加
                 if (GetSameNullIdBinding(binding).Count == 0)
                 {
-                    nullIdBindings[binding.type].Add(binding);
+                    typeBindings[binding.type].Add(binding);
                 }
             }
             // 不为空就储存到 bindingStorage
@@ -605,7 +607,7 @@ namespace uMVVMCS.DIContainer
 
                 bindingStorage[binding.type][binding.id] = binding;
                 
-                // 如果无 nullIdBindings 中有相同的 binding 则移除 nullIdBindings 中相同的 binding
+                // 如果无 typeBindings 中有相同的 binding 则移除 typeBindings 中相同的 binding
                 RemoveSameNullIdBinding(binding);
             }
         }
