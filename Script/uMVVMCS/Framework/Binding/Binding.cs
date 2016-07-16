@@ -160,7 +160,12 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding To(object o)
         {
-            if (!PassToAdd(ref o))
+            if (bindingType == BindingType.TEMP && !(o is Type))
+            {
+                throw new BindingSystemException(BindingSystemException.VALUE_NOT_TYPR);
+            }
+
+            if (!PassToAdd(o))
             {
                 throw new BindingSystemException(BindingSystemException.VALUE_NOT_ASSIGNABLE);
             }
@@ -194,7 +199,7 @@ namespace uMVVMCS.DIContainer
             for (int i = 0; i < length; i++)
             {
                 var osi = os[i];
-                if (!PassToAdd(ref osi))
+                if (!PassToAdd(osi))
                 {
                     throw new BindingSystemException(BindingSystemException.VALUE_NOT_ASSIGNABLE);
                 }
@@ -359,21 +364,12 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 返回 是否符合添加当前要求
         /// </summary>
-        virtual public bool PassToAdd(ref object v)
+        virtual public bool PassToAdd(object v)
         {
             // 如果是 TEMP 类型且 value 是值类型的值，返回 false；否则如果是实例，获取实例的类型替代原值
             if (bindingInfo.bindingType == BindingType.TEMP)
             {
-                if (v is Type)
-                {
-                    return TypeUtils.IsAssignable(bindingInfo.type, (v as Type));
-                }
-                else
-                {
-                    if (v is ValueType) { return false; }
-                    v = v.GetType();
-                    return TypeUtils.IsAssignable(bindingInfo.type, (v as Type));
-                }
+                return TypeUtils.IsAssignable(bindingInfo.type, (v as Type));
             }
 
             // 如果是工厂类型，返回参数 v 是否继承 IInjectionFactory

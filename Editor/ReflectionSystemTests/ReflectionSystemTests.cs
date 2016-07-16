@@ -153,7 +153,6 @@ namespace uMVVMCS_NUitTests
         {
             //Arrange 
             ReflectionCache reflectionCache = new ReflectionCache();
-            ReflectionInfo reflectionInfo = reflectionCache.GetInfo(typeof(someClass_f));
             //Act
             reflectionCache.Remove(typeof(someClass_f));
             //Assert

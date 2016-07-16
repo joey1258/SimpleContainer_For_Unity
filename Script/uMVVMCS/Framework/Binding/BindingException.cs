@@ -23,6 +23,7 @@ namespace uMVVMCS.DIContainer
         public const string SAME_BINDING = "The binding with the same key and id already exists.";
         public const string NULL_PARAMETER = "The parameter {0} of method {1} cannot be null.";
         public const string VALUE_NOT_ASSIGNABLE = "The type or instance is not assignable to binding";
+        public const string VALUE_NOT_TYPR = "TEMP binding value must be Type.";
         public const string WRONGTYPE = "not assignable type.";
         public const string TYPE_NOT_FACTORY = "The type doesn't implement IFactory.";
         public const string CONSTRAINTYPE_NOT_ASSIGNABLE = "Method {0} does not allow for {1} type of binding.";

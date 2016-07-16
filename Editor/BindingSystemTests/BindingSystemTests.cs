@@ -35,15 +35,14 @@ namespace uMVVMCS_NUitTests
         {
             //Arrange 
             IBinder binder = new Binder();
-            object testObj = new object();
             //Act
-            binder.Bind<object>().To(testObj);
-            binder.Bind<object>().To(testObj);
+            binder.Bind<object>().To(typeof(object));
+            binder.Bind<object>().To(typeof(object));
             //Assert
             Assert.AreEqual(1, binder.GetAllBindings().Count);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// 测试绑定实例的值到 TEMP 类型的 binding 其值是否会自动转换为 Type 类型
         /// </summary>
         [Test]
@@ -56,7 +55,7 @@ namespace uMVVMCS_NUitTests
             binder.Bind<Info>().To(testInfo).As("test");
             //Assert
             Assert.AreEqual(true, binder.GetBinding<Info>("test").value is Type);
-        }
+        }*/
 
         /// <summary>
         /// 测试绑定3个同样的值到 TEMP 类型的有 id binding 会全部保留
@@ -66,7 +65,6 @@ namespace uMVVMCS_NUitTests
         {
             //Arrange 
             IBinder binder = new Binder();
-            Info testInfo = new Info(typeof(Binding), BindingType.TEMP);
             //Act
             binder.Bind<Info>().ToSelf().As("test1");
             binder.Bind<Info>().ToSelf().As("test2");
@@ -138,7 +136,7 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(10086, num);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// 测试 RemoveValue 是否正确的删除 binding 的值
         /// TEMP 类型的 binding 会将实例值转换为类型，移除后应该剩下 someClass_b
         /// </summary>
@@ -158,7 +156,7 @@ namespace uMVVMCS_NUitTests
                 .RemoveValue(typeof(someClass_c));
             //Assert
             Assert.AreEqual(typeof(someClass_b), binding.value);
-        }
+        }*/
 
         /// <summary>
         /// 测试 BindSingleton To 多个值，后赋的值是否正确覆盖之前的值 

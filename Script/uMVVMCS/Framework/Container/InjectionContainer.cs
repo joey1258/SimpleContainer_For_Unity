@@ -210,22 +210,6 @@ namespace uMVVMCS.DIContainer
         #region GetBinding
 
         /// <summary>
-        /// 根据类型获取 typeBindings 字典中的所有同类型 Binding
-        /// </summary>
-        virtual public IList<IBinding> GetNullIdBindingsByType<T>()
-        {
-            return binder.GetNullIdBindingsByType(typeof(T));
-        }
-
-        /// <summary>
-        /// 根据类型获取 typeBindings 字典中的所有同类型 Binding
-        /// </summary>
-        virtual public IList<IBinding> GetNullIdBindingsByType(Type type)
-        {
-            return binder.GetNullIdBindingsByType(type);
-        }
-
-        /// <summary>
         /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
         /// </summary>
         virtual public IList<IBinding> GetBindingsByType<T>()
@@ -247,14 +231,6 @@ namespace uMVVMCS.DIContainer
         virtual public IList<IBinding> GetBindingsById(object id)
         {
             return binder.GetBindingsById(id);
-        }
-
-        /// <summary>
-        /// 获取 binder 中所有无 id 的 Binding
-        /// </summary>
-        virtual public IList<IBinding> GetAllNullIdBindings()
-        {
-            return binder.GetAllNullIdBindings();
         }
 
         /// <summary>
