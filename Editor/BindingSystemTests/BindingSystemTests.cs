@@ -66,9 +66,9 @@ namespace uMVVMCS_NUitTests
             //Arrange 
             IBinder binder = new Binder();
             //Act
-            binder.Bind<Info>().ToSelf().As("test1");
-            binder.Bind<Info>().ToSelf().As("test2");
-            binder.Bind<Info>().ToSelf().As("test3");
+            binder.Bind<Binding>().ToSelf().As("test1");
+            binder.Bind<Binding>().ToSelf().As("test2");
+            binder.Bind<Binding>().ToSelf().As("test3");
             //Assert
             Assert.AreEqual(3, binder.GetAllBindings().Count);
         }
