@@ -472,7 +472,7 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
-        #endregion
+        #endregion 
 
         /// <summary>
         /// 储存binding

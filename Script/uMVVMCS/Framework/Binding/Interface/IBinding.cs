@@ -111,8 +111,13 @@ namespace uMVVMCS.DIContainer
         IBinding RemoveValues(System.Collections.Generic.IList<object> values);
 
         /// <summary>
-        /// 直接设置一个值给 binding,但没有进行兼容检查
+        /// 设置 binding 的 ConstraintType
         /// </summary>
-        IBinding SetValue(object obj);
+        IBinding SetConstraint(ConstraintType ct);
+
+        /// <summary>
+        /// 设置 binding 的 BindingType
+        /// </summary>
+        IBinding SetBindingType(BindingType bt);
     }
 }

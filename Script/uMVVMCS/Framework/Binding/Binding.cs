@@ -163,9 +163,10 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding To(object o)
         {
-            if (bindingType == BindingType.TEMP && !(o is Type))
+            if (_bindingType == BindingType.TEMP && !(o is Type))
             {
-                throw new BindingSystemException(BindingSystemException.VALUE_NOT_TYPR);
+                _bindingType = BindingType.SINGLETON;
+                _constraint = ConstraintType.SINGLE;
             }
 
             if (!PassToAdd(o))
@@ -328,11 +329,6 @@ namespace uMVVMCS.DIContainer
             int osi = 0;
             for (int i = 0; i < length; i++)
             {
-                if (_bindingType == BindingType.TEMP && !(os[osi] is Type))
-                {
-                    throw new BindingSystemException(BindingSystemException.VALUE_NOT_TYPR);
-                }
-
                 list.Remove(os[i]);
                 length--;
                 osi++;
@@ -453,15 +449,20 @@ namespace uMVVMCS.DIContainer
         #region set binding property
 
         /// <summary>
-        /// 直接设置一个值给 binding 的所存储的 Info 实例而不进行兼容检查
+        /// 设置 binding 的 ConstraintType
         /// </summary>
-        virtual public IBinding SetValue(object o)
+        virtual public IBinding SetConstraint(ConstraintType ct)
         {
-            if (_constraint != ConstraintType.MULTIPLE) { _value = o; }
-            else { AddValue(o); }
+            _constraint = ct;
+            return this;
+        }
 
-            if (storing != null) { storing(this); }
-
+        /// <summary>
+        /// 设置 binding 的 BindingType
+        /// </summary>
+        virtual public IBinding SetBindingType(BindingType bt)
+        {
+            _bindingType = bt;
             return this;
         }
 
