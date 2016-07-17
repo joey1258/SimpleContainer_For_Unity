@@ -90,7 +90,7 @@ namespace uMVVMCS.DIContainer.Extensions
             // 如果参数 type 是 GameObject 类型,就将 gameObject 作为 binding 的值
             if (isGameObject)
             {
-                bindingInfo.value = gameObject;
+                _value = gameObject;
 
                 if (storing != null) { storing(this); }
 
@@ -106,7 +106,7 @@ namespace uMVVMCS.DIContainer.Extensions
                     component = gameObject.AddComponent(type);
                 }
 
-                bindingInfo.value = component;
+                _value = component;
 
                 if (storing != null) { storing(this); }
 

@@ -62,9 +62,8 @@ namespace uMVVMCS
         {
             if (a == null && b == null) { return true; }
 
-            if ((a == null && b != null) || (a != null && b == null)) { return false; }
-
-            return a.Equals(b);
+            if (a == null) { return b.Equals(a); }
+            else { return a.Equals(b); }
         }
 
         /// <summary>

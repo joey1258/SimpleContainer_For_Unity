@@ -27,7 +27,7 @@ namespace uMVVMCS_NUitTests
     [TestFixture]
     public class InjectionTests : MonoBehaviour
     {
-        /// <summary>
+        /*/// <summary>
         /// 测试 ReflectionFactory.Create 方法创建的 type 属性是否正确创建
         /// </summary>
         [Test]
@@ -42,7 +42,7 @@ namespace uMVVMCS_NUitTests
             injector.Inject(tvm);
             //Assert
             //Assert.AreEqual(typeof(someClass_d), reflectionInfo.type);
-        }
+        }*/
     }
 
     public class testV

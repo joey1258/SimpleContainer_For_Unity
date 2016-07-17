@@ -9,8 +9,15 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        object o = 1;
-        print(o as Type);
+        object o1 = 1;
+        object o2 = 1;
+        print(o1.Equals(o2));
+        object o3 = new ren();
+        object o4 = new ren();
+        object o5 = o3;
+        object o6 = o3;
+        print(o3.Equals(o4));
+        print(o5.Equals(o6));
     }
 
     // Update is called once per frame
