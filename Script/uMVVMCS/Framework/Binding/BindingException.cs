@@ -22,8 +22,7 @@ namespace uMVVMCS.DIContainer
     {
         public const string SAME_BINDING = "The binding with the same key and id already exists.";
         public const string NULL_PARAMETER = "The parameter {0} of method {1} cannot be null.";
-        public const string VALUE_NOT_ASSIGNABLE = "The type or instance is not assignable to binding";
-        public const string WRONGTYPE = "not assignable type.";
+        public const string TYPE_NOT_ASSIGNABLE = "The type or instance is not assignable to binding";
         public const string TYPE_NOT_FACTORY = "The type doesn't implement IFactory.";
         public const string CONSTRAINTYPE_NOT_ASSIGNABLE = "Method {0} does not allow for {1} type of binding.";
         public const string COUNT_VALUE_ERROR = "Error value constraint";
@@ -32,7 +31,6 @@ namespace uMVVMCS.DIContainer
         public const string GAMEOBJECT_IS_NULL = "GameObject is null";
         public const string PREFAB_IS_NULL = "prefab is null";
         public const string RESOURCE_IS_NULL = "resource is null";
-        public const string NO_SINGLETON = "this binding is no singleton";
 
         public BindingSystemException() : base() { }
         public BindingSystemException(string message) : base(message) { }

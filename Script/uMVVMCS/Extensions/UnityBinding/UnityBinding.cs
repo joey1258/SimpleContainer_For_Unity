@@ -19,16 +19,8 @@ using UnityEngine;
 
 namespace uMVVMCS.DIContainer.Extensions
 {
-    public class UnityBinding : Binding
+    public static class UnityBinding
     {
-        #region constructor
-
-        public UnityBinding(Binder.BindingStoring s, Type t, BindingType bt) : base(s, t, bt) { }
-
-        public UnityBinding(Binder.BindingStoring s, Type t, BindingType bt, ConstraintType c) : base(s, t, bt, c) { }
-
-        #endregion
-
         #region To
 
         /// <summary>
@@ -51,18 +43,19 @@ namespace uMVVMCS.DIContainer.Extensions
         /// <param name="type">The component type.</param>
         /// <param name="name">The GameObject name.</param>
         /// <returns>The binding condition object related to this binding.</returns>
-        public IBinding ToGameObject(Type type, string name)
-        {   
-            // 如果 bindingType 不是单例就抛出异常
-            if (bindingType != BindingType.SINGLETON)
+        public static IBinding ToGameObject(this IBinding binding, Type type, string name)
+        {
+            if (binding.bindingType != BindingType.SINGLETON)
             {
-                throw new BindingSystemException(BindingSystemException.NO_SINGLETON);
+                binding
+                    .SetBindingType(BindingType.SINGLETON)
+                    .SetConstraint(ConstraintType.SINGLE);
             }
 
             // binding.type 和 type 不兼容就抛出异常
-            if (!TypeUtils.IsAssignable(this.type, type))
+            if (!TypeUtils.IsAssignable(binding.type, type))
             {
-                throw new BindingSystemException(BindingSystemException.WRONGTYPE);
+                throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
             }
 
             // 如果参数 type 既不是 GameObject 也不是 Component 同样抛出异常
@@ -90,7 +83,7 @@ namespace uMVVMCS.DIContainer.Extensions
             // 如果参数 type 是 GameObject 类型,就将 gameObject 作为 binding 的值
             if (isGameObject)
             {
-                _value = gameObject;
+                binding.value = gameObject;
 
                 if (storing != null) { storing(this); }
 

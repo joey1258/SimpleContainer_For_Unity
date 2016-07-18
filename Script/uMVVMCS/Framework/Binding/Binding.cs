@@ -171,7 +171,7 @@ namespace uMVVMCS.DIContainer
 
             if (!PassToAdd(o))
             {
-                throw new BindingSystemException(BindingSystemException.VALUE_NOT_ASSIGNABLE);
+                throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
             }
             
             if (_constraint != ConstraintType.MULTIPLE)
@@ -205,7 +205,7 @@ namespace uMVVMCS.DIContainer
                 var osi = os[i];
                 if (!PassToAdd(osi))
                 {
-                    throw new BindingSystemException(BindingSystemException.VALUE_NOT_ASSIGNABLE);
+                    throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
                 }
                 AddValue(osi);
             }
