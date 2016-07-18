@@ -20,6 +20,13 @@ namespace uMVVMCS.DIContainer
 {
     public interface IBinding
     {
+        #region property
+
+        /// <summary>
+        /// binder 属性
+        /// </summary>
+        IBinder binder { get; }
+
         /// <summary>
         /// type 属性
         /// </summary>
@@ -51,6 +58,10 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         Condition condition { get; set; }
 
+        #endregion
+
+        #region To
+
         /// <summary>
         /// 将 value 属性设为其自身的 type
         IBinding ToSelf();
@@ -70,6 +81,10 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         IBinding To(System.Collections.Generic.IList<object> value);
 
+        #endregion
+
+        #region As
+
         /// <summary>
         /// 设置 binding 的 name 属性
         /// </summary>
@@ -80,10 +95,18 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         IBinding As(object name);
 
+        #endregion
+
+        #region When
+
         /// <summary>
         /// 设置 binding 的 condition 属性
         /// </summary>
         IBinding When(Condition condition);
+
+        #endregion
+
+        #region Into
 
         /// <summary>
         /// 设置 binding 的 condition 属性为 context.parentType 与参数 T 相等
@@ -94,6 +117,29 @@ namespace uMVVMCS.DIContainer
         /// 设置 binding 的 condition 属性 context.parentType 与指定类型相等
         /// </summary>
         IBinding Into(Type type);
+
+        #endregion
+
+        #region ReBind
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
+        /// </summary>
+        IBinding Bind<T>();
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        IBinding BindSingleton<T>();
+
+        /// <summary>
+        ///  返回一个新的Binding实例，并设置指定类型给 type 属性和 BindingType 属性为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        IBinding BindFactory<T>();
+
+        #endregion
+
+        #region RemoveValue
 
         /// <summary>
         /// 设置 binding 的 condition 属性为返回 context.parentInstance 与参数 instance 相等
@@ -110,6 +156,15 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         IBinding RemoveValues(System.Collections.Generic.IList<object> values);
 
+        #endregion
+
+        #region SetProperty
+
+        /// <summary>
+        /// 设置 binding 的值
+        /// </summary>
+        IBinding SetValue(object obj);
+
         /// <summary>
         /// 设置 binding 的 ConstraintType
         /// </summary>
@@ -119,5 +174,7 @@ namespace uMVVMCS.DIContainer
         /// 设置 binding 的 BindingType
         /// </summary>
         IBinding SetBindingType(BindingType bt);
+
+        #endregion
     }
 }

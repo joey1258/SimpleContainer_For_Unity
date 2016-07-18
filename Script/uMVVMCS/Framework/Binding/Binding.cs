@@ -15,20 +15,8 @@
  */
 
 /*
- * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类 但不建议将 value 直接设为
- * 值类型的具体值,如：
- * ==================
- * bind<int>().to(1);
- * ==================
- * 等,容易导致查找相同无 id binding 时将类型相同、值也恰好相同的两个不同用途的 binding 被认为是相同的
- * 一个，同时TEMP 类型的 Binding 也不可以储存值类型的实际值，在该类型中也不存在任何存实际值的意义
- *
- * 如需要储存值类型的实际值，可以使用 SINGLETON 类型，如要储存多个，可以配合如数组等结构转为 object 储存
- *
- * Binding 默认 value 属性同样的值只能有1个，如果需要多个同样的值，可以将值约束设为 POOL（目前尚未实现）
- *
- * 当 bind TEMP 类型 binding 时，即使 To 了多个同类型的不同实例给多个 binding，binder最终也只会保持1个
- * 因为 TEMP 类型 binding 在保存时实例会自动被替换为其自身 Type（值类型）而被判断为相同而只保留1个
+ * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类
+ * TEMP 类型的 Binding 只能储存类型值，同时不会被储存到 binder
  */
 
 using System;
@@ -38,25 +26,27 @@ namespace uMVVMCS.DIContainer
 {
     public class Binding : IBinding
     {
-        /// <summary>
-        /// 用于储存 binding 到 binder 字典的委托
-        /// </summary>
-        public Binder.BindingStoring storing;
-
         #region constructor
 
-        public Binding(Binder.BindingStoring s, Type t, BindingType bt)
+        public Binding(IBinder b, Type t)
         {
-            storing = s;
+            _binder = b;
+
+            _type = t;
+        }
+
+        public Binding(IBinder b, Type t, BindingType bt)
+        {
+            _binder = b;
 
             _type = t;
 
             _bindingType = bt;
         }
 
-        public Binding(Binder.BindingStoring s, Type t, BindingType bt, ConstraintType c)
+        public Binding(IBinder b, Type t, BindingType bt, ConstraintType c)
         {
-            storing = s;
+            _binder = b;
 
             _type = t;
 
@@ -70,6 +60,15 @@ namespace uMVVMCS.DIContainer
         #region IBinding implementation 
 
         #region property
+
+        /// <summary>
+        /// binder 属性
+        /// </summary>
+        public IBinder binder
+        {
+            get { return _binder; }
+        }
+        protected IBinder _binder;
 
         /// <summary>
         /// type 属性
@@ -144,8 +143,7 @@ namespace uMVVMCS.DIContainer
             // 每个 binding 只有一个 type，所以绑定到自身也必然只有一个值
             _constraint = ConstraintType.SINGLE;
             _value = _type;
-
-            if (storing != null) { storing(this); }
+            binder.Storing(this);
 
             return this;
         }
@@ -180,7 +178,7 @@ namespace uMVVMCS.DIContainer
             }
             else { AddValue(o); }
 
-            if (storing != null) { storing(this); }
+            binder.Storing(this);
 
             return this;
         }
@@ -210,7 +208,7 @@ namespace uMVVMCS.DIContainer
                 AddValue(osi);
             }
 
-            if (storing != null) { storing(this); }
+            binder.Storing(this);
 
             return this;
         }
@@ -233,8 +231,7 @@ namespace uMVVMCS.DIContainer
         virtual public IBinding As(object o)
         {
             _id = (o == null) ? null : o;
-
-            if (storing != null) { storing(this); }
+            binder.Storing(this);
 
             return this;
         }
@@ -275,6 +272,34 @@ namespace uMVVMCS.DIContainer
             condition = context => context.parentType == t;
 
             return this;
+        }
+
+        #endregion
+
+        #region ReBind
+
+        /// <summary>
+        /// 返回一个新的Binding实例,并设置指定类型给 type 属性, BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding Bind<T>()
+        {
+            return _binder.Bind<T>();
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindSingleton<T>()
+        {
+            return _binder.BindSingleton<T>();
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindFactory<T>()
+        {
+            return _binder.BindFactory<T>();
         }
 
         #endregion
@@ -445,6 +470,22 @@ namespace uMVVMCS.DIContainer
         }
 
         #region set binding property
+
+        /// <summary>
+        /// 设置 binding 的值
+        /// </summary>
+        virtual public IBinding SetValue(object o)
+        {
+            if (_constraint != ConstraintType.MULTIPLE)
+            {
+                _value = o;
+            }
+            else { AddValue(o); }
+
+            binder.Storing(this);
+
+            return this;
+        }
 
         /// <summary>
         /// 设置 binding 的 ConstraintType
