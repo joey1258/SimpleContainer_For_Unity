@@ -25,12 +25,12 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 MULTIPLE
         /// </summary>
-        IBinding Create<T>(Binder.BindingStoring storing, BindingType bindingType);
+        IBinding Create<T>(IBinder binder, BindingType bindingType);
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 MULTIPLE
         /// </summary>
-        IBinding Create(Binder.BindingStoring storing, Type type, BindingType bindingType);
+        IBinding Create(IBinder binder, Type type, BindingType bindingType);
 
         #endregion
 
@@ -39,12 +39,12 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
         /// </summary>
-        IBinding CreateSingle<T>(Binder.BindingStoring storing, BindingType bindingType);
+        IBinding CreateSingle<T>(IBinder binder, BindingType bindingType);
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
         /// </summary>
-        IBinding CreateSingle(Binder.BindingStoring storing, Type type, BindingType bindingType);
+        IBinding CreateSingle(IBinder binder, Type type, BindingType bindingType);
 
         #endregion
 
@@ -53,12 +53,12 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        IBinding CreatePool<T>(Binder.BindingStoring storing, BindingType bindingType);
+        IBinding CreatePool<T>(IBinder binder, BindingType bindingType);
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        IBinding CreatePool(Binder.BindingStoring storing, Type type, BindingType bindingType);
+        IBinding CreatePool(IBinder binder, Type type, BindingType bindingType);
 
         #endregion
     }

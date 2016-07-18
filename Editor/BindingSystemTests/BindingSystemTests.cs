@@ -165,6 +165,31 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(scb, binding.value);
         }
+
+        /// <summary>
+        /// 测试链式 Bind 各种类型 To 各种值，最后 binder 中储存的 binding 是否正确
+        /// 绑定的第一个值是 TEMP 类型且没有 id，因此不被 binder 储存，所以总数应该是3
+        /// </summary>
+        [Test]
+        public void BindChain_EveryType_BinderCountCorrect()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.Bind<someClass>()
+                .ToSelf()
+                .Bind<int>()
+                .To(1)
+                .BindSingleton<someClass>()
+                .To(new someClass() { id = 10086 })
+                .As("A")
+                .BindFactory< someClass_b>()
+                .To(new someClass() { id = 110 })
+                .As("b");
+            //Act
+            int num = binder.GetAllBindings().Count;
+            //Assert
+            Assert.AreEqual(3, num);
+        }
     }
 
     public class someClass : IInjectionFactory

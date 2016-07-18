@@ -9,18 +9,25 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        /*//Arrange 
+        //Arrange 
         IBinder binder = new Binder();
-        //Act
-        IBinding binding1 = binder.Bind<object>().ToSelf();
-        IBinding binding2 = binder.Bind<object>().To<object>();
+        binder.Bind<someClass>()
+            .ToSelf()
+            .Bind<int>()
+            .To(1)
+            .BindSingleton<someClass>()
+            .To(new someClass() { id = 10086 })
+            .As("A")
+            .BindFactory<someClass_b>()
+            .To(new someClass() { id = 110 })
+            .As("b");
 
-        print(binding1.bindingType);
-
-        print(TypeUtils.IsAssignable(typeof(p), typeof(ren2)));*/
-
-        ren1 ren = new ren1() { age = 18 };
-        ren.printAge();
+        IList<IBinding> bindings = binder.GetAllBindings();
+        print(bindings.Count);
+        foreach(IBinding binding in bindings)
+        {
+            print(binding.value);
+        }
     }
 
     // Update is called once per frame
@@ -40,6 +47,16 @@ public static class renKZ
 {
     public static void printAge(this ren r) { UnityEngine.Debug.Log(r.age); }
 }
+
+public class someClass : IInjectionFactory
+{
+    public int id;
+    public object Create(InjectionContext context) { return this; }
+}
+
+public class someClass_b : someClass { }
+
+public class someClass_c : someClass { }
 
 
 

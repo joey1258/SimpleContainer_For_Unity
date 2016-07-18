@@ -29,22 +29,22 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 MULTIPLE
         /// </summary>
-        virtual public IBinding Create<T>
-            (Binder.BindingStoring storing,
+        virtual public IBinding Create<T>(
+            IBinder binder,
             BindingType bindingType)
         {
-            return Create(storing, typeof(T), bindingType, ConstraintType.MULTIPLE);
+            return Create(binder, typeof(T), bindingType, ConstraintType.MULTIPLE);
         }
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 MULTIPLE
         /// </summary>
-        virtual public IBinding Create
-            (Binder.BindingStoring storing,
+        virtual public IBinding Create(
+            IBinder binder,
             Type type,
             BindingType bindingType)
         {
-            return Create(storing, type, bindingType, ConstraintType.MULTIPLE);
+            return Create(binder, type, bindingType, ConstraintType.MULTIPLE);
         }
 
         #endregion
@@ -54,22 +54,22 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
         /// </summary>
-        virtual public IBinding CreateSingle<T> (
-            Binder.BindingStoring storing,
+        virtual public IBinding CreateSingle<T>(
+            IBinder binder,
             BindingType bindingType)
         {
-            return Create(storing, typeof(T), bindingType, ConstraintType.SINGLE);
+            return Create(binder, typeof(T), bindingType, ConstraintType.SINGLE);
         }
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
         /// </summary>
-        virtual public IBinding CreateSingle (
-            Binder.BindingStoring storing,
+        virtual public IBinding CreateSingle(
+            IBinder binder,
             Type type,
             BindingType bindingType)
         {
-            return Create(storing, type, bindingType, ConstraintType.SINGLE);
+            return Create(binder, type, bindingType, ConstraintType.SINGLE);
         }
 
         #endregion
@@ -79,22 +79,22 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        virtual public IBinding CreatePool<T> (
-            Binder.BindingStoring storing,
+        virtual public IBinding CreatePool<T>(
+            IBinder binder,
             BindingType bindingType)
         {
-            return Create(storing, typeof(T), bindingType, ConstraintType.POOL);
+            return Create(binder, typeof(T), bindingType, ConstraintType.POOL);
         }
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        virtual public IBinding CreatePool (
-            Binder.BindingStoring storing,
+        virtual public IBinding CreatePool(
+            IBinder binder,
             Type type,
             BindingType bindingType)
         {
-            IBinding binding = new Binding(storing, type, bindingType, ConstraintType.POOL);
+            IBinding binding = new Binding(binder, type, bindingType, ConstraintType.POOL);
 
             return binding;
         }
@@ -104,30 +104,24 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        virtual public IBinding Create<T> (
-            Binder.BindingStoring storing,
+        virtual public IBinding Create<T>(
+            IBinder binder,
             BindingType bindingType,
             ConstraintType constraint)
         {
-            return Create(storing, typeof(T), bindingType, constraint);
+            return Create(binder, typeof(T), bindingType, constraint);
         }
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
         virtual public IBinding Create (
-            Binder.BindingStoring storing,
+            IBinder binder,
             Type type,
             BindingType bindingType,
             ConstraintType constraint)
         {
-            // 如果是接口或者虚类，抛出错误
-            /*if (type.IsInterface || type.IsAbstract)
-            {
-                throw new BindingSystemException(BindingSystemException.WRONGTYPE);
-            }*/
-
-            IBinding binding = new Binding(storing, type, bindingType, constraint);
+            IBinding binding = new Binding(binder, type, bindingType, constraint);
 
             return binding;
         }

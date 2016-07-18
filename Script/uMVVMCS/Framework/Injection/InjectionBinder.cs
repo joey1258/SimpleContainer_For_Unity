@@ -38,7 +38,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         override public IBinding BindSingleton<T>()
         {
-            return bindingFactory.CreateSingle(Storing, typeof(T), BindingType.SINGLETON);
+            return bindingFactory.CreateSingle(this, typeof(T), BindingType.SINGLETON);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         override public IBinding BindFactory<T>()
         {
-            return bindingFactory.CreateSingle(Storing, typeof(T), BindingType.FACTORY);
+            return bindingFactory.CreateSingle(this, typeof(T), BindingType.FACTORY);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         override public IBinding Bind(Type type, BindingType bindingType)
         {
-            return bindingFactory.CreateSingle(Storing, type, bindingType);
+            return bindingFactory.CreateSingle(this, type, bindingType);
         }
 
         #endregion

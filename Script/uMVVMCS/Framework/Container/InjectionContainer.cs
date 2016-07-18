@@ -379,6 +379,14 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
+        /// <summary>
+        /// 储存 binding
+        /// </summary>
+        public void Storing(IBinding binding)
+        {
+            binder.Storing(binding);
+        }
+
         #endregion
 
         /// <summary>

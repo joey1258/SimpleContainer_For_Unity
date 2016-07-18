@@ -32,6 +32,11 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public delegate void BindingStoring(IBinding binding);
 
+        /// <summary>
+        /// 用于从 binding 再次调用 bind 方法的委托
+        /// </summary>
+        public delegate void ReBind(Type type, BindingType bindingType);
+
         protected Storage<IBinding> bindingStorage;
         protected Dictionary<Type, IList<IBinding>> typeBindings;
         protected Dictionary<object, IList<IBinding>> idBindings;
@@ -71,11 +76,11 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 MULTIPLE
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindSingleton<T>()
         {
-            return bindingFactory.CreateSingle(Storing, typeof(T), BindingType.SINGLETON);
+            return bindingFactory.CreateSingle(this, typeof(T), BindingType.SINGLETON);
         }
 
         /// <summary>
@@ -83,7 +88,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding BindFactory<T>()
         {
-            return bindingFactory.CreateSingle(Storing, typeof(T), BindingType.FACTORY);
+            return bindingFactory.CreateSingle(this, typeof(T), BindingType.FACTORY);
         }
 
         /// <summary>
@@ -91,14 +96,14 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding Bind(Type type, BindingType bindingType)
         {
-            return bindingFactory.Create(Storing, type, bindingType);
+            return bindingFactory.Create(this, type, bindingType);
         }
 
         /// <summary>
         /// 未完成，待构思
         /// 返回多个新的Binding实例,并把设置参数分别给 type 属性和 BindingType 属性
         /// </summary>
-        virtual public IList<IBinding> Bind(Type[] types, BindingType[] bindingTypes)
+        virtual public IList<IBinding> MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
             var bindings = new List<IBinding>();
 
@@ -110,7 +115,7 @@ namespace uMVVMCS.DIContainer
                 int length = types.Length;
                 for (int i = 0; i < length; i++)
                 {
-                    bindings.Add(bindingFactory.Create(Storing, types[i], bindingTypes[i]));
+                    bindings.Add(bindingFactory.Create(this, types[i], bindingTypes[i]));
                 }
             }
 
@@ -475,9 +480,9 @@ namespace uMVVMCS.DIContainer
         #endregion 
 
         /// <summary>
-        /// 储存binding
+        /// 储存 binding
         /// </summary>
-        virtual protected void Storing(IBinding binding)
+        virtual public void Storing(IBinding binding)
         {
             // 如果参数为空,就抛出异常 (原此处的接口和虚类检查移至工厂的创建方法中)
             if (binding == null)
@@ -491,7 +496,7 @@ namespace uMVVMCS.DIContainer
             // 如果 AOT 前置委托不为空就执行它
             if (beforeAddBinding != null) { beforeAddBinding(this, ref binding); }
 
-            // 添加 binding 到相应的字典或 bindingStorage
+            // 储存或整理 binding 到对应的容器
             AddBinding(binding);
 
             // 如果 AOT 后置委托不为空就执行它
@@ -499,9 +504,9 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 添加 binding 到相应的字典或 bindingStorage
+        /// 添加或整理 binding 到相应的容器
         /// </summary>
-        virtual public void AddBinding(IBinding binding)
+        virtual protected void AddBinding(IBinding binding)
         {
             if (!typeBindings.ContainsKey(binding.type))
             {
@@ -521,7 +526,7 @@ namespace uMVVMCS.DIContainer
             else
             {
                 // 如果已有 type 和 id 都相同的 binding，且它们不是同一个对象,就抛出异常 
-                if (bindingStorage[binding.type].Contains(binding.id) && 
+                if (bindingStorage[binding.type].Contains(binding.id) &&
                     bindingStorage[binding.type][binding.id] != binding)
                 {
                     throw new BindingSystemException(BindingSystemException.SAME_BINDING);
@@ -529,14 +534,16 @@ namespace uMVVMCS.DIContainer
 
                 // 引用添加到 bindingStorage 以便根据 type 和 id 快速检索
                 bindingStorage[binding.type][binding.id] = binding;
-                // 引用添加到 typeBindings 以便获取所有 binding
-                typeBindings[binding.type].Add(binding);
+
                 // 引用添加到 idBindings 以便获取同 id 的所有 binding
                 if (!idBindings.ContainsKey(binding.id))
                 {
                     idBindings.Add(binding.id, new List<IBinding>());
                 }
-                idBindings[binding.id].Add(binding);
+                if (!idBindings[binding.id].Contains(binding))
+                {
+                    idBindings[binding.id].Add(binding);
+                }
             }
         }
     }

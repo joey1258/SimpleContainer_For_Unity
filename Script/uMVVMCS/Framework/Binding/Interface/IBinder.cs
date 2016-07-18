@@ -38,7 +38,7 @@ namespace uMVVMCS.DIContainer
         IBinding Bind<T>();
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 MULTIPLE
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         IBinding BindSingleton<T>();
 
@@ -166,5 +166,10 @@ namespace uMVVMCS.DIContainer
         void RemoveBinding(Type type, object id);
 
         #endregion
+
+        /// <summary>
+        /// 储存 binding
+        /// </summary>
+        void Storing(IBinding binding);
     }
 }
