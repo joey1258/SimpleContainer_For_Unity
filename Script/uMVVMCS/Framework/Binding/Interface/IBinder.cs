@@ -48,11 +48,6 @@ namespace uMVVMCS.DIContainer
         IBinding BindFactory<T>();
 
         /// <summary>
-        /// 返回一个新的Binding实例，并把设置参数分别给 type 和 BindingType，值约束为 MULTIPLE
-        /// </summary>
-        IBinding Bind(Type type, BindingType bindingType);
-
-        /// <summary>
         /// 未完成，待构思
         /// 返回多个新的Binding实例,并把设置参数分别给 type 和 BindingType 
         /// </summary>

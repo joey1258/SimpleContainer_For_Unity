@@ -279,15 +279,7 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
-        /// <summary>
-        /// 设置 binding 的 condition 属性为返回 context.parentInstance 与参数 i 相等
-        /// </summary>
-        virtual public IBinding ParentInstanceCondition(object i)
-        {
-            condition = context => context.parentInstance == i;
-
-            return this;
-        }
+        #region RemoveValue
 
         /// <summary>
         /// 从 binding 的 value 属性中移除指定的值
@@ -298,7 +290,7 @@ namespace uMVVMCS.DIContainer
             if (o == null) { return this; }
 
             // 值约束过滤
-            if(_constraint == ConstraintType.MULTIPLE)
+            if (_constraint == ConstraintType.MULTIPLE)
             {
                 if (_bindingType == BindingType.TEMP)
                 {
@@ -341,6 +333,18 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
+        /// <summary>
+        /// 设置 binding 的 condition 属性为返回 context.parentInstance 与参数 i 相等
+        /// </summary>
+        virtual public IBinding ParentInstanceCondition(object i)
+        {
+            condition = context => context.parentInstance == i;
+
+            return this;
+        }
+
+        #endregion
+
         #endregion
 
         /// <summary>
@@ -348,12 +352,6 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public bool PassToAdd(object v)
         {
-            // 如果是 TEMP 类型且 value 是值类型的值，返回 false；否则如果是实例，获取实例的类型替代原值
-            if (_bindingType == BindingType.TEMP)
-            {
-                return TypeUtils.IsAssignable(_type, (v as Type));
-            }
-
             // 如果是工厂类型，返回参数 v 是否继承 IInjectionFactory
             if (_bindingType == BindingType.FACTORY)
             {

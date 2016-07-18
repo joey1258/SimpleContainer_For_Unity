@@ -28,82 +28,91 @@ namespace uMVVMCS_NUitTests
     public class BindingSystemTests
     {
         /// <summary>
-        /// 测试绑定两个同样的值到 TEMP 类型的无 id binding 会否被过滤掉，只保留1个
+        /// 测试绑定到 TEMP 类型的无 id binding 会否被忽略，不保留在 binder 中
+        /// 既然是临时 binding，保存在字典中又没有高效的删除方法，不如即用即弃，让GC自然回收
+        /// 如需反复使用，不建议使用 TEMP 类型，或为其加上 id
         /// </summary>
         [Test]
-        public void BindTempNullIdTo_TwoSameValue_SameValueBeFiltered()
+        public void BindTempNullIdTo_ToSomeValue_BinderDoNotSave()
         {
             //Arrange 
             IBinder binder = new Binder();
             //Act
-            binder.Bind<object>().To(typeof(object));
-            binder.Bind<object>().To(typeof(object));
+            binder.Bind<object>().ToSelf();
+            binder.Bind<object>().ToSelf();
             //Assert
-            Assert.AreEqual(1, binder.GetAllBindings().Count);
-        }
-
-        /*/// <summary>
-        /// 测试绑定实例的值到 TEMP 类型的 binding 其值是否会自动转换为 Type 类型
-        /// </summary>
-        [Test]
-        public void BindTemp_ToInstanceValue_ConvertTOTypeValue()
-        {
-            //Arrange 
-            IBinder binder = new Binder();
-            IInfo testInfo = new Info(typeof(Binding), BindingType.TEMP);
-            //Act
-            binder.Bind<Info>().To(testInfo).As("test");
-            //Assert
-            Assert.AreEqual(true, binder.GetBinding<Info>("test").value is Type);
-        }*/
-
-        /// <summary>
-        /// 测试绑定3个同样的值到 TEMP 类型的有 id binding 会全部保留
-        /// </summary>
-        [Test]
-        public void BindTempToSelf_TwoSameValue_AllSave()
-        {
-            //Arrange 
-            IBinder binder = new Binder();
-            //Act
-            binder.Bind<Binding>().ToSelf().As("test1");
-            binder.Bind<Binding>().ToSelf().As("test2");
-            binder.Bind<Binding>().ToSelf().As("test3");
-            //Assert
-            Assert.AreEqual(3, binder.GetAllBindings().Count);
+            Assert.AreEqual(0, binder.GetAllBindings().Count);
         }
 
         /// <summary>
-        /// 测试绑定2个同样的值类型的值到 SINGLETON 类型的无 id binding 会否被过滤掉，只保留1个
-        /// （值类型只能用 BindSingleton 类型 binding 来储存）
+        /// 测试 ToSelf 方法是否使 TEMP 类型的 binding 的值约束转换为 SINGLE 类型
+        /// 由于绑定自身的type作为自己的值的缘故，自身的值只有一个，所以值的类型也没有必要保留为 MULTIPLE
         /// </summary>
         [Test]
-        public void BindSingletonNullIdTo_TwoSameValue_SameValueBeFiltered()
+        public void BindTempNullId_ToSelf_ConstraintChangeTOSingle()
         {
             //Arrange 
             IBinder binder = new Binder();
             //Act
-            binder.BindSingleton<int>().To(1);
-            binder.BindSingleton<int>().To(1);
+            IBinding binding = binder.Bind<object>().ToSelf();
             //Assert
-            Assert.AreEqual(1, binder.GetAllBindings().Count);
+            Assert.AreEqual(ConstraintType.SINGLE, binding.constraint);
         }
 
         /// <summary>
-        /// 测试绑定3个同样的值到 SINGLETON 类型的有 id binding 会全部保留
-        /// （值类型只能用 BindSingleton 类型 binding 来储存）
+        /// 测试绑定实例到 TEMP 类型的 binding，其值约束是否任保持为 MULTIPLE 类型
         /// </summary>
         [Test]
-        public void BindSingletonTo_TwoSameValue_AllSave()
+        public void BindTempNullIdTo_Type_ConstraintStayMultiple()
         {
             //Arrange 
             IBinder binder = new Binder();
             //Act
-            binder.BindSingleton<int>().To(1).As("test1");
-            binder.BindSingleton<int>().To(1).As("test2");
-            binder.BindSingleton<int>().To(1).As("test3");
+            IBinding binding = binder.Bind<object>().To<Binding>();
             //Assert
-            Assert.AreEqual(3, binder.GetAllBindings().Count);
+            Assert.AreEqual(ConstraintType.MULTIPLE, binding.constraint);
+        }
+
+        /// <summary>
+        /// 测试绑定实例的值到 TEMP 类型的 binding,binding 是否会自动转换为 SINGLETON 类型
+        /// </summary>
+        [Test]
+        public void BindTempNullIdTo_Instance_BindingChangeTOSingleton()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder.Bind<int>().To(1).As(1);
+            //Assert
+            Assert.AreEqual(BindingType.SINGLETON, binder.GetBinding<int>(1).bindingType);
+        }
+
+        /// <summary>
+        /// 测试绑定实例的值到 TEMP 类型的 binding,其值约束是否会自动转换为 SINGLE 类型
+        /// </summary>
+        [Test]
+        public void BindTempNullIdTo_Instance_ConstraintChangeTOSingle()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder.Bind<int>().To(1).As(1);
+            //Assert
+            Assert.AreEqual(ConstraintType.SINGLE, binder.GetBinding<int>(1).constraint);
+        }
+
+        /// <summary>
+        /// 测试 BindSingleton To 多个值，后赋的值是否正确覆盖之前的值 
+        /// </summary>
+        [Test]
+        public void BindSingletonTo_MultiValue_LastCoverBefore()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder.BindSingleton<string>().To("c").To("b").To("a").As("A");
+            //Assert
+            Assert.AreEqual("a", binder.GetBinding<string>("A").value);
         }
 
         /// <summary>
@@ -136,7 +145,7 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(10086, num);
         }
 
-        /*/// <summary>
+        /// <summary>
         /// 测试 RemoveValue 是否正确的删除 binding 的值
         /// TEMP 类型的 binding 会将实例值转换为类型，移除后应该剩下 someClass_b
         /// </summary>
@@ -145,31 +154,16 @@ namespace uMVVMCS_NUitTests
         {
             //Arrange 
             IBinder binder = new Binder();
+            someClass sc = new someClass();
+            someClass scb = new someClass();
+            someClass scc = new someClass();
             IBinding binding = binder.Bind<someClass>()
-                .To(new List<object>() {
-                    new someClass(),
-                    new someClass_b(),
-                    new someClass_c() })
-                .As("A");
+                .To(new List<object>() { sc, scb, scc }).As("A");
             //Act
-            binding.RemoveValues(new List<object>() { typeof(someClass) })
-                .RemoveValue(typeof(someClass_c));
+            binding.RemoveValues(new List<object>() { sc })
+                .RemoveValue(scc);
             //Assert
-            Assert.AreEqual(typeof(someClass_b), binding.value);
-        }*/
-
-        /// <summary>
-        /// 测试 BindSingleton To 多个值，后赋的值是否正确覆盖之前的值 
-        /// </summary>
-        [Test]
-        public void BindSingletonTo_MultiValue_LastCoverBefore()
-        {
-            //Arrange 
-            IBinder binder = new Binder();
-            //Act
-            binder.BindSingleton<string>().To("c").To("b").To("a").As("A");
-            //Assert
-            Assert.AreEqual("a", binder.GetBinding<string>("A").value);
+            Assert.AreEqual(scb, binding.value);
         }
     }
 

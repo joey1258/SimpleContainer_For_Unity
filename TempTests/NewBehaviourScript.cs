@@ -9,15 +9,14 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        object o1 = 1;
-        object o2 = 1;
-        print(o1.Equals(o2));
-        object o3 = new ren();
-        object o4 = new ren();
-        object o5 = o3;
-        object o6 = o3;
-        print(o3.Equals(o4));
-        print(o5.Equals(o6));
+        //Arrange 
+        IBinder binder = new Binder();
+        //Act
+        IBinding binding1 = binder.Bind<object>().ToSelf();
+        IBinding binding2 = binder.Bind<object>().To<object>();
+
+        print(binding1.bindingType);
+        print(binder.GetAllBindings().Count);
     }
 
     // Update is called once per frame
