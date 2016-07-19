@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace uMVVMCS.DIContainer
 {
@@ -136,6 +137,11 @@ namespace uMVVMCS.DIContainer
         ///  返回一个新的Binding实例，并设置指定类型给 type 属性和 BindingType 属性为 FACTORY，值约束为 SINGLE
         /// </summary>
         IBinding BindFactory<T>();
+
+        /// <summary>
+        /// 创建多个指定类型的 binding，并返回 IBindingFactory
+        /// </summary>
+        IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes);
 
         #endregion
 

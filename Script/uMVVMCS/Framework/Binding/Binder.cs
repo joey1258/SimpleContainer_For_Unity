@@ -90,15 +90,14 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 未完成，待构思
-        /// 返回多个新的Binding实例,并把设置参数分别给 type 属性和 BindingType 属性
+        /// 创建多个指定类型的 binding，并返回 IBindingFactory
         /// </summary>
-        virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
+        virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
         {
             bool notNull = (types != null && 
                 bindingTypes != null &&
-                types.Length != 0 && 
-                bindingTypes.Length != 0);
+                types.Count != 0 && 
+                bindingTypes.Count != 0);
 
             if (!notNull)
             {
@@ -108,12 +107,12 @@ namespace uMVVMCS.DIContainer
                     "[types] || [bindingTypes]"));
             }
 
-            if(types.Length != bindingTypes.Length)
+            if(types.Count != bindingTypes.Count)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }
 
-            return null;
+            return bindingFactory.MultipleCreate(types, bindingTypes);
         }
 
         #endregion

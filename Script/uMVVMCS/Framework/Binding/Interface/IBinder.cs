@@ -48,10 +48,9 @@ namespace uMVVMCS.DIContainer
         IBinding BindFactory<T>();
 
         /// <summary>
-        /// 未完成，待构思
-        /// 返回多个新的Binding实例,并把设置参数分别给 type 和 BindingType 
+        /// 创建多个指定类型的 binding，并返回 IBindingFactory
         /// </summary>
-        //  IList<IBinding> Bind(Type[] types, BindingType[] bindingTypes);
+        IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes);
 
         #endregion
 

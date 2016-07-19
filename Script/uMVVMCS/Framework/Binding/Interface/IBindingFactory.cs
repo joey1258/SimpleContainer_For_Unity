@@ -38,11 +38,6 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         IBinding Create(Type type, BindingType bindingType);
 
-        /// <summary>
-        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
-        /// </summary>
-        IBindingFactory MultipleCreate(IList<Type> types, IList<BindingType> bindingType);
-
         #endregion
 
         #region Create SINGLE
@@ -56,11 +51,6 @@ namespace uMVVMCS.DIContainer
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
         /// </summary>
         IBinding CreateSingle(Type type, BindingType bindingType);
-
-        /// <summary>
-        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 SINGLE，并返回 IBindingFactory
-        /// </summary>
-        IBindingFactory MultipleCreateSingle(IList<Type> types, IList<BindingType> bindingType);
 
         #endregion
 
@@ -76,12 +66,12 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         IBinding CreatePool(Type type, BindingType bindingType);
 
-        /// <summary>
-        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 POOL，并返回 IBindingFactory
-        /// </summary>
-        IBindingFactory MultipleCreatePool(IList<Type> types, IList<BindingType> bindingType);
-
         #endregion
+
+        /// <summary>
+        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
+        /// </summary>
+        IBindingFactory MultipleCreate(IList<Type> types, IList<BindingType> bindingType);
 
         #region Binding System Function
 
@@ -106,6 +96,26 @@ namespace uMVVMCS.DIContainer
         /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
         /// </summary>
         IBindingFactory Into(IList<Type> ts);
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
+        /// </summary>
+        IBinding Bind<T>();
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        IBinding BindSingleton<T>();
+
+        /// <summary>
+        ///  返回一个新的Binding实例，并设置指定类型给 type 属性和 BindingType 属性为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        IBinding BindFactory<T>();
+
+        /// <summary>
+        /// 创建多个指定类型的 binding，并返回 IBindingFactory
+        /// </summary>
+        IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes);
 
         #endregion
     }

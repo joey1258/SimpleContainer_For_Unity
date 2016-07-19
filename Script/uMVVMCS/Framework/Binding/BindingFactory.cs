@@ -62,27 +62,6 @@ namespace uMVVMCS.DIContainer
             return Create(type, bindingType, ConstraintType.MULTIPLE);
         }
 
-        /// <summary>
-        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
-        /// </summary>
-        virtual public IBindingFactory MultipleCreate(
-            IList<Type> types,
-            IList<BindingType> bindingType)
-        {
-            int length = types.Count;
-            _bindings = new IBinding[length];
-
-            for (int i = 0; i < length; i++)
-            {
-                bindings[i] = Create(
-                    types[i],
-                    bindingType[i],
-                    ConstraintType.MULTIPLE);
-            }
-
-            return this;
-        }
-
         #endregion
 
         #region Create SINGLE
@@ -101,27 +80,6 @@ namespace uMVVMCS.DIContainer
         virtual public IBinding CreateSingle(Type type, BindingType bindingType)
         {
             return Create(type, bindingType, ConstraintType.SINGLE);
-        }
-
-        /// <summary>
-        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 SINGLE，并返回 IBindingFactory
-        /// </summary>
-        virtual public IBindingFactory MultipleCreateSingle(
-            IList<Type> types,
-            IList<BindingType> bindingType)
-        {
-            int length = types.Count;
-            _bindings = new IBinding[length];
-
-            for (int i = 0; i < length; i++)
-            {
-                bindings[i] = Create(
-                    types[i],
-                    bindingType[i],
-                    ConstraintType.SINGLE);
-            }
-
-            return this;
         }
 
         #endregion
@@ -144,10 +102,12 @@ namespace uMVVMCS.DIContainer
             return Create(type, bindingType, ConstraintType.POOL);
         }
 
+        #endregion
+
         /// <summary>
-        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 POOL，并返回 IBindingFactory
+        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
         /// </summary>
-        virtual public IBindingFactory MultipleCreatePool(
+        virtual public IBindingFactory MultipleCreate(
             IList<Type> types,
             IList<BindingType> bindingType)
         {
@@ -156,16 +116,17 @@ namespace uMVVMCS.DIContainer
 
             for (int i = 0; i < length; i++)
             {
+                ConstraintType cti = ConstraintType.MULTIPLE;
+                if (bindingType[i] != BindingType.TEMP) { cti = ConstraintType.SINGLE; }
+
                 bindings[i] = Create(
                     types[i],
                     bindingType[i],
-                    ConstraintType.POOL);
+                    cti);
             }
 
             return this;
         }
-
-        #endregion
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例
@@ -284,6 +245,56 @@ namespace uMVVMCS.DIContainer
             }
 
             return this;
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例,并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding Bind<T>()
+        {
+            return binder.Bind<T>();
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindSingleton<T>()
+        {
+            return binder.Bind<T>();
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindFactory<T>()
+        {
+            return binder.Bind<T>();
+        }
+
+        /// <summary>
+        /// 创建多个指定类型的 binding，并返回 IBindingFactory
+        /// </summary>
+        virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
+        {
+            bool notNull = (types != null &&
+                bindingTypes != null &&
+                types.Count != 0 &&
+                bindingTypes.Count != 0);
+
+            if (!notNull)
+            {
+                throw new BindingSystemException(
+                    string.Format(BindingSystemException.NULL_PARAMETER,
+                    "[IBinding MultipleBind]",
+                    "[types] || [bindingTypes]"));
+            }
+
+            if (types.Count != bindingTypes.Count)
+            {
+                throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
+            }
+
+            return MultipleCreate(types, bindingTypes);
         }
 
         #endregion

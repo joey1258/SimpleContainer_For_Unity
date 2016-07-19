@@ -302,6 +302,14 @@ namespace uMVVMCS.DIContainer
             return _binder.BindFactory<T>();
         }
 
+        /// <summary>
+        /// 创建多个指定类型的 binding，并返回 IBindingFactory
+        /// </summary>
+        virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
+        {
+            return _binder.MultipleBind(types, bindingTypes);
+        }
+
         #endregion
 
         #region RemoveValue
