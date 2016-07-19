@@ -47,10 +47,6 @@ namespace uMVVMCS.DIContainer
         /// 约束Segment可以携带多个值
         /// </summary>
         MULTIPLE,
-        /// <summary>
-        /// 约束Binding接受Segment的对象池
-        /// </summary>
-        POOL,
     }
 
     /// <summary>

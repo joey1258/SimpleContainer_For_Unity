@@ -561,29 +561,19 @@ namespace uMVVMCS.DIContainer
                 binding.bindingType == BindingType.FACTORY)
             {
                 // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
-                switch (binding.constraint)
+                int length = binding.valueArray.Length;
+                for (int i = 0; i < length; i++)
                 {
-                    case ConstraintType.SINGLE:
-                    case ConstraintType.MULTIPLE:
-                        int length = binding.valueArray.Length;
-                        for (int i = 0; i < length; i++)
-                        {
-                            if (binding.valueArray[i] is Type)
-                            {
-                                var value = this.Resolve(binding.valueArray[i] as Type);
-                                binding.To(value);
-                            }
-                            else
-                            {
-                                // hasBeenInjected 判断放在容器类中更为合适，所以这里不做注入状态检查
-                                Inject(binding.valueArray[i]);
-                            }
-                        }
-                        break;
-
-                    case ConstraintType.POOL:
-                        // 待补充
-                        break;
+                    if (binding.valueArray[i] is Type)
+                    {
+                        var value = this.Resolve(binding.valueArray[i] as Type);
+                        binding.To(value);
+                    }
+                    else
+                    {
+                        // hasBeenInjected 判断放在容器类中更为合适，所以这里不做注入状态检查
+                        Inject(binding.valueArray[i]);
+                    }
                 }
             }
         }

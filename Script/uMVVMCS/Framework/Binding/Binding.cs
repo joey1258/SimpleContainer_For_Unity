@@ -17,6 +17,7 @@
 /*
  * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类
  * TEMP 类型的 Binding 只能储存类型值，同时不会被储存到 binder
+ * 值约束只保留单列与复数两个类型，去除同样必须保存为单例的 POOL 类型
  */
 
 using System;

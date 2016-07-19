@@ -27,6 +27,8 @@ namespace uMVVMCS_NUitTests
     [TestFixture]
     public class BindingSystemTests
     {
+        #region Bind & To
+
         /// <summary>
         /// 测试绑定到 TEMP 类型的无 id binding 会否被忽略，不保留在 binder 中
         /// 既然是临时 binding，保存在字典中又没有高效的删除方法，不如即用即弃，让GC自然回收
@@ -102,6 +104,31 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
+        /// 测试一次绑定多个 binding 后 binder 保存数量是否正确
+        /// </summary>
+        [Test]
+        public void MultipleBind_MultipleBindings_CountCorrect()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.MultipleBind(
+                new List<Type>() { typeof(bool), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { false, 1, new someClass() });
+            //Act
+            int num = binder.GetAllBindings().Count;
+            //Assert
+            Assert.AreEqual(2, num);
+        }
+
+        #endregion
+
+        #region To Chain 
+
+        /// <summary>
         /// 测试 BindSingleton To 多个值，后赋的值是否正确覆盖之前的值 
         /// </summary>
         [Test]
@@ -114,6 +141,39 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual("a", binder.GetBinding<string>("A").value);
         }
+
+        /// <summary>
+        /// 测试链式 Bind 各种类型 To 各种值，最后 binder 中储存的 binding 是否正确
+        /// 绑定的第一个值是 TEMP 类型且没有 id，因此不被 binder 储存，所以总数应该是3
+        /// </summary>
+        [Test]
+        public void BindChain_EveryType_BinderCountCorrect()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.Bind<someClass>()
+                .ToSelf()
+                .Bind<int>()
+                .To(1)
+                .BindSingleton<someClass>()
+                .To(new someClass() { id = 10086 })
+                .As("A")
+                .BindFactory<someClass_b>()
+                .To(new someClass() { id = 110 })
+                .As("b");
+            //Act
+            int num = binder.GetAllBindings().Count;
+            //Assert
+            Assert.AreEqual(3, num);
+        }
+
+        #endregion
+
+        #region Bind Chain
+
+        #endregion
+
+        #region Get
 
         /// <summary>
         /// 测试 BindSingleton、To 方法绑定的值取回后是否正确
@@ -145,6 +205,10 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(10086, num);
         }
 
+        #endregion
+
+        #region ReMove & UnBInd
+
         /// <summary>
         /// 测试 RemoveValue 是否正确的删除 binding 的值
         /// TEMP 类型的 binding 会将实例值转换为类型，移除后应该剩下 someClass_b
@@ -166,30 +230,8 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(scb, binding.value);
         }
 
-        /// <summary>
-        /// 测试链式 Bind 各种类型 To 各种值，最后 binder 中储存的 binding 是否正确
-        /// 绑定的第一个值是 TEMP 类型且没有 id，因此不被 binder 储存，所以总数应该是3
-        /// </summary>
-        [Test]
-        public void BindChain_EveryType_BinderCountCorrect()
-        {
-            //Arrange 
-            IBinder binder = new Binder();
-            binder.Bind<someClass>()
-                .ToSelf()
-                .Bind<int>()
-                .To(1)
-                .BindSingleton<someClass>()
-                .To(new someClass() { id = 10086 })
-                .As("A")
-                .BindFactory< someClass_b>()
-                .To(new someClass() { id = 110 })
-                .As("b");
-            //Act
-            int num = binder.GetAllBindings().Count;
-            //Assert
-            Assert.AreEqual(3, num);
-        }
+        #endregion
+
     }
 
     public class someClass : IInjectionFactory

@@ -54,20 +54,6 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
-        #region Create POOL
-
-        /// <summary>
-        /// 创建并返回指定类型的Binding实例
-        /// </summary>
-        IBinding CreatePool<T>(BindingType bindingType);
-
-        /// <summary>
-        /// 创建并返回指定类型的Binding实例
-        /// </summary>
-        IBinding CreatePool(Type type, BindingType bindingType);
-
-        #endregion
-
         /// <summary>
         /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
         /// </summary>
