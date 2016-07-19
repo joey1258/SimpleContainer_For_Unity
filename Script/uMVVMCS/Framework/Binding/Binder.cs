@@ -27,20 +27,10 @@ namespace uMVVMCS.DIContainer
 {
     public class Binder : IBinder
     {
-        /// <summary>
-        /// 用于储存 binding 到 binder 字典的委托
-        /// </summary>
-        public delegate void BindingStoring(IBinding binding);
-
-        /// <summary>
-        /// 用于从 binding 再次调用 bind 方法的委托
-        /// </summary>
-        public delegate void ReBind(Type type, BindingType bindingType);
-
+        protected IBindingFactory bindingFactory;
         protected Storage<IBinding> bindingStorage;
         protected Dictionary<Type, IList<IBinding>> typeBindings;
         protected Dictionary<object, IList<IBinding>> idBindings;
-        protected IBindingFactory bindingFactory;
 
         #region constructor
 
@@ -49,7 +39,7 @@ namespace uMVVMCS.DIContainer
             bindingStorage = new Storage<IBinding>();
             typeBindings = new Dictionary<Type, IList<IBinding>>();
             idBindings = new Dictionary<object, IList<IBinding>>();
-            bindingFactory = new BindingFactory();
+            bindingFactory = new BindingFactory(this);
         }
 
         #endregion
@@ -80,7 +70,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding BindSingleton<T>()
         {
-            return bindingFactory.CreateSingle(this, typeof(T), BindingType.SINGLETON);
+            return bindingFactory.CreateSingle(typeof(T), BindingType.SINGLETON);
         }
 
         /// <summary>
@@ -88,7 +78,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding BindFactory<T>()
         {
-            return bindingFactory.CreateSingle(this, typeof(T), BindingType.FACTORY);
+            return bindingFactory.CreateSingle(typeof(T), BindingType.FACTORY);
         }
 
         /// <summary>
@@ -96,30 +86,34 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding Bind(Type type, BindingType bindingType)
         {
-            return bindingFactory.Create(this, type, bindingType);
+            return bindingFactory.Create(type, bindingType);
         }
 
         /// <summary>
         /// 未完成，待构思
         /// 返回多个新的Binding实例,并把设置参数分别给 type 属性和 BindingType 属性
         /// </summary>
-        virtual public IList<IBinding> MultipleBind(Type[] types, BindingType[] bindingTypes)
+        virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
-            var bindings = new List<IBinding>();
+            bool notNull = (types != null && 
+                bindingTypes != null &&
+                types.Length != 0 && 
+                bindingTypes.Length != 0);
 
-            bool notNull = (types != null && bindingTypes != null);
-            bool sameLength = (types.Length != 0 && bindingTypes.Length != 0 && types.Length == bindingTypes.Length);
-
-            if (notNull && sameLength)
+            if (!notNull)
             {
-                int length = types.Length;
-                for (int i = 0; i < length; i++)
-                {
-                    bindings.Add(bindingFactory.Create(this, types[i], bindingTypes[i]));
-                }
+                throw new BindingSystemException(
+                    string.Format(BindingSystemException.NULL_PARAMETER,
+                    "[IBinding MultipleBind]",
+                    "[types] || [bindingTypes]"));
             }
 
-            return bindings;
+            if(types.Length != bindingTypes.Length)
+            {
+                throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
+            }
+
+            return null;
         }
 
         #endregion
@@ -249,38 +243,7 @@ namespace uMVVMCS.DIContainer
                 beforeRemoveBinding(this, bindings);
             }
 
-            bindingStorage.Remove(type);
             typeBindings.Remove(type);
-
-            // 如果 AOT 后置委托不为空就执行它
-            if (afterRemoveBinding != null)
-            {
-                afterRemoveBinding(this, bindings);
-            }
-        }
-
-        /// <summary>
-        /// 根据类型从 bindingStorage 中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindBindingStorageByType<T>()
-        {
-            UnbindBindingStorageByType(typeof(T));
-        }
-
-        /// <summary>
-        /// 根据类型从 bindingStorage 中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindBindingStorageByType(Type type)
-        {
-            var bindings = new List<IBinding>(bindingStorage[type].Values);
-
-            // 如果 AOT 前置委托不为空就执行它
-            if (beforeRemoveBinding != null)
-            {
-                beforeRemoveBinding(this, bindings);
-            }
-
-            bindingStorage.Remove(type);
 
             // 如果 AOT 后置委托不为空就执行它
             if (afterRemoveBinding != null)
@@ -310,7 +273,11 @@ namespace uMVVMCS.DIContainer
                 beforeRemoveBinding(this, bindings);
             }
 
-            typeBindings.Remove(type);
+            int length = bindings.Count;
+            for (int i = 0; i < length; i++)
+            {
+                if(bindings[i].id == null) { bindings.Remove(bindings[i]); }
+            }
 
             // 如果 AOT 后置委托不为空就执行它
             if (afterRemoveBinding != null)
@@ -335,6 +302,7 @@ namespace uMVVMCS.DIContainer
             // 如果参数 type 或 id 为空，就直接退出
             if (type == null || id == null) { return; }
 
+            // 为了可以放如 AOT 委托执行而采用 List 形式储存
             var bindings = new List<IBinding>() { bindingStorage[type][id] };
 
             // 如果 AOT 前置委托不为空就执行它
@@ -346,7 +314,13 @@ namespace uMVVMCS.DIContainer
             // 如果无冲突字典中含有参数key相同的key
             if (bindingStorage.Contains(type))
             {
-                if (bindingStorage[type].Contains(id)) { bindingStorage[type].Remove(id); }
+                if (bindings[0] != null)
+                {
+                    bindingStorage[type].Remove(id);
+                    idBindings[id].Remove(bindings[0]);
+                    typeBindings[type].Remove(bindings[0]);
+                }
+
             }
 
             // 如果 AOT 后置委托不为空就执行它
@@ -361,6 +335,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public void Unbind(IBinding binding)
         {
+            // 为了可以放如 AOT 委托执行而采用 List 形式储存
             var bindings = new List<IBinding>() { binding };
 
             // 如果 AOT 前置委托不为空就执行它

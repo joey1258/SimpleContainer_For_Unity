@@ -15,22 +15,33 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace uMVVMCS.DIContainer
 {
     public interface IBindingFactory
     {
+        /// <summary>
+        /// binding 数组
+        /// </summary>
+        IBinding[] bindings { get; }
+
         #region Create default (MANY)
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 MULTIPLE
         /// </summary>
-        IBinding Create<T>(IBinder binder, BindingType bindingType);
+        IBinding Create<T>(BindingType bindingType);
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 MULTIPLE
         /// </summary>
-        IBinding Create(IBinder binder, Type type, BindingType bindingType);
+        IBinding Create(Type type, BindingType bindingType);
+
+        /// <summary>
+        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
+        /// </summary>
+        IBindingFactory MultipleCreate(IList<Type> types, IList<BindingType> bindingType);
 
         #endregion
 
@@ -39,12 +50,17 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
         /// </summary>
-        IBinding CreateSingle<T>(IBinder binder, BindingType bindingType);
+        IBinding CreateSingle<T>(BindingType bindingType);
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
         /// </summary>
-        IBinding CreateSingle(IBinder binder, Type type, BindingType bindingType);
+        IBinding CreateSingle(Type type, BindingType bindingType);
+
+        /// <summary>
+        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 SINGLE，并返回 IBindingFactory
+        /// </summary>
+        IBindingFactory MultipleCreateSingle(IList<Type> types, IList<BindingType> bindingType);
 
         #endregion
 
@@ -53,12 +69,43 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        IBinding CreatePool<T>(IBinder binder, BindingType bindingType);
+        IBinding CreatePool<T>(BindingType bindingType);
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        IBinding CreatePool(IBinder binder, Type type, BindingType bindingType);
+        IBinding CreatePool(Type type, BindingType bindingType);
+
+        /// <summary>
+        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 POOL，并返回 IBindingFactory
+        /// </summary>
+        IBindingFactory MultipleCreatePool(IList<Type> types, IList<BindingType> bindingType);
+
+        #endregion
+
+        #region Binding System Function
+
+        /// <summary>
+        /// 为多个 binding 添加值,如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
+        /// </summary>
+        IBindingFactory To(IList<object> os);
+
+        /// <summary>
+        /// 设置多个 binding 的 id 属性
+        /// </summary>
+        IBindingFactory As(IList<object> os);
+
+        /// <summary>
+        /// 设置多个 binding 的 condition 属性
+        /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
+        /// </summary>
+        IBindingFactory When(IList<Condition> cs);
+
+        /// <summary>
+        /// 设置多个 binding 的 condition 属性为 context.parentType 与指定类型相等
+        /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
+        /// </summary>
+        IBindingFactory Into(IList<Type> ts);
 
         #endregion
     }

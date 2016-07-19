@@ -265,7 +265,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 设置 binding 的 condition 属性 context.parentType 与指定类型相等
+        /// 设置 binding 的 condition 属性为 context.parentType 与指定类型相等
         /// </summary>
         virtual public IBinding Into(Type t)
         {

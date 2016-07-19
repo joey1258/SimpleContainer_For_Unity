@@ -107,16 +107,6 @@ namespace uMVVMCS.DIContainer
         void UnbindByType(Type type);
 
         /// <summary>
-        /// 根据类型从 bindingStorage 中删除所有同类型 Binding
-        /// </summary>
-        void UnbindBindingStorageByType<T>();
-
-        /// <summary>
-        /// 根据类型从 bindingStorage 中删除所有同类型 Binding
-        /// </summary>
-        void UnbindBindingStorageByType(Type type);
-
-        /// <summary>
         /// 根据类型从 typeBindings 中删除所有同类型 Binding
         /// </summary>
         void UnbindNullIdBindingByType<T>();

@@ -19,32 +19,68 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace uMVVMCS.DIContainer
 {
     public class BindingFactory : IBindingFactory
     {
+        public IBinder binder;
+
+        /// <summary>
+        /// binding 数组
+        /// </summary>
+        public IBinding[] bindings
+        {
+            get { return _bindings; }
+        }
+        protected IBinding[] _bindings;
+
+        #region constructor
+
+        public BindingFactory(IBinder binder) { this.binder = binder; }
+
+        #endregion
+
+        #region Create
+
         #region Create default (MANY)
 
         /// <summary>
-        /// 创建并返回指定类型的Binding实例，ConstraintType 为 MULTIPLE
+        /// 创建并返回指定类型的 Binding 实例，ConstraintType 为 MULTIPLE
         /// </summary>
-        virtual public IBinding Create<T>(
-            IBinder binder,
-            BindingType bindingType)
+        virtual public IBinding Create<T>(BindingType bindingType)
         {
-            return Create(binder, typeof(T), bindingType, ConstraintType.MULTIPLE);
+            return Create(typeof(T), bindingType, ConstraintType.MULTIPLE);
         }
 
         /// <summary>
-        /// 创建并返回指定类型的Binding实例，ConstraintType 为 MULTIPLE
+        /// 创建并返回指定类型的 Binding 实例，ConstraintType 为 MULTIPLE
         /// </summary>
-        virtual public IBinding Create(
-            IBinder binder,
-            Type type,
-            BindingType bindingType)
+        virtual public IBinding Create(Type type, BindingType bindingType)
         {
-            return Create(binder, type, bindingType, ConstraintType.MULTIPLE);
+            return Create(type, bindingType, ConstraintType.MULTIPLE);
+        }
+
+        /// <summary>
+        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
+        /// </summary>
+        virtual public IBindingFactory MultipleCreate(
+            IList<Type> types,
+            IList<BindingType> bindingType)
+        {
+            int length = types.Count;
+            _bindings = new IBinding[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                bindings[i] = Create(
+                    types[i],
+                    bindingType[i],
+                    ConstraintType.MULTIPLE);
+            }
+
+            return this;
         }
 
         #endregion
@@ -52,24 +88,40 @@ namespace uMVVMCS.DIContainer
         #region Create SINGLE
 
         /// <summary>
-        /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
+        /// 创建并返回指定类型的 Binding 实例，ConstraintType 为 SINGLE
         /// </summary>
-        virtual public IBinding CreateSingle<T>(
-            IBinder binder,
-            BindingType bindingType)
+        virtual public IBinding CreateSingle<T>(BindingType bindingType)
         {
-            return Create(binder, typeof(T), bindingType, ConstraintType.SINGLE);
+            return Create(typeof(T), bindingType, ConstraintType.SINGLE);
         }
 
         /// <summary>
-        /// 创建并返回指定类型的Binding实例，ConstraintType 为 SINGLE
+        /// 创建并返回指定类型的 Binding 实例，ConstraintType 为 SINGLE
         /// </summary>
-        virtual public IBinding CreateSingle(
-            IBinder binder,
-            Type type,
-            BindingType bindingType)
+        virtual public IBinding CreateSingle(Type type, BindingType bindingType)
         {
-            return Create(binder, type, bindingType, ConstraintType.SINGLE);
+            return Create(type, bindingType, ConstraintType.SINGLE);
+        }
+
+        /// <summary>
+        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 SINGLE，并返回 IBindingFactory
+        /// </summary>
+        virtual public IBindingFactory MultipleCreateSingle(
+            IList<Type> types,
+            IList<BindingType> bindingType)
+        {
+            int length = types.Count;
+            _bindings = new IBinding[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                bindings[i] = Create(
+                    types[i],
+                    bindingType[i],
+                    ConstraintType.SINGLE);
+            }
+
+            return this;
         }
 
         #endregion
@@ -77,26 +129,40 @@ namespace uMVVMCS.DIContainer
         #region Create POOL
 
         /// <summary>
-        /// 创建并返回指定类型的Binding实例
+        /// 创建并返回指定类型的 Binding 实例，ConstraintType 为 POOL
         /// </summary>
-        virtual public IBinding CreatePool<T>(
-            IBinder binder,
-            BindingType bindingType)
+        virtual public IBinding CreatePool<T>(BindingType bindingType)
         {
-            return Create(binder, typeof(T), bindingType, ConstraintType.POOL);
+            return Create(typeof(T), bindingType, ConstraintType.POOL);
         }
 
         /// <summary>
-        /// 创建并返回指定类型的Binding实例
+        /// 创建并返回指定类型的 Binding 实例，ConstraintType 为 POOL
         /// </summary>
-        virtual public IBinding CreatePool(
-            IBinder binder,
-            Type type,
-            BindingType bindingType)
+        virtual public IBinding CreatePool(Type type, BindingType bindingType)
         {
-            IBinding binding = new Binding(binder, type, bindingType, ConstraintType.POOL);
+            return Create(type, bindingType, ConstraintType.POOL);
+        }
 
-            return binding;
+        /// <summary>
+        /// 创建指定类型的多个 Binding 实例，ConstraintType 为 POOL，并返回 IBindingFactory
+        /// </summary>
+        virtual public IBindingFactory MultipleCreatePool(
+            IList<Type> types,
+            IList<BindingType> bindingType)
+        {
+            int length = types.Count;
+            _bindings = new IBinding[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                bindings[i] = Create(
+                    types[i],
+                    bindingType[i],
+                    ConstraintType.POOL);
+            }
+
+            return this;
         }
 
         #endregion
@@ -104,19 +170,15 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        virtual public IBinding Create<T>(
-            IBinder binder,
-            BindingType bindingType,
-            ConstraintType constraint)
+        virtual public IBinding Create<T>(BindingType bindingType, ConstraintType constraint)
         {
-            return Create(binder, typeof(T), bindingType, constraint);
+            return Create(typeof(T), bindingType, constraint);
         }
 
         /// <summary>
         /// 创建并返回指定类型的Binding实例
         /// </summary>
-        virtual public IBinding Create (
-            IBinder binder,
+        virtual public IBinding Create(
             Type type,
             BindingType bindingType,
             ConstraintType constraint)
@@ -125,5 +187,105 @@ namespace uMVVMCS.DIContainer
 
             return binding;
         }
+
+        #endregion
+
+        #region Binding System Function
+
+        /// <summary>
+        /// 为多个 binding 添加值，如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
+        /// </summary>
+        virtual public IBindingFactory To(IList<object> os)
+        {
+            // 不允许参数长度大于 bindings 长度
+            if (os.Count > bindings.Length)
+            {
+                throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
+            }
+
+            int length = bindings.Length;
+            int osLength = os.Count;
+            int osi = 0;
+            for (int i = 0; i < length; i++)
+            {
+                bindings[i].To(os[osi]);
+                if (osi < osLength - 1) { osi++; }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// 设置多个 binding 的 id 属性
+        /// </summary>
+        virtual public IBindingFactory As(IList<object> os)
+        {
+            // 由于 id 必须是唯一的，所以如果参数和 binding的数量不同则将抛出异常
+            if (os.Count != bindings.Length)
+            {
+                throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
+            }
+
+            int length = bindings.Length;
+            int osLength = os.Count;
+            int osi = 0;
+            for (int i = 0; i < length; i++)
+            {
+                bindings[i].As(os[osi]);
+                if (osi < osLength - 1) { osi++; }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// 设置多个 binding 的 condition 属性
+        /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
+        /// </summary>
+        virtual public IBindingFactory When(IList<Condition> cs)
+        {
+            // 不允许参数长度大于 bindings 长度
+            if (cs.Count > bindings.Length)
+            {
+                throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
+            }
+
+            int length = bindings.Length;
+            int csLength = cs.Count;
+            int csi = 0;
+            for (int i = 0; i < length; i++)
+            {
+                bindings[i].condition = cs[csi];
+                if (csi < csLength - 1) { csi++; }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// 设置多个 binding 的 condition 属性为 context.parentType 与指定类型相等
+        /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
+        /// </summary>
+        virtual public IBindingFactory Into(IList<Type> ts)
+        {
+            // 不允许参数长度大于 bindings 长度
+            if (ts.Count > bindings.Length)
+            {
+                throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
+            }
+
+            int length = bindings.Length;
+            int tsLength = ts.Count;
+            int tsi = 0;
+            for (int i = 0; i < length; i++)
+            {
+                bindings[i].condition = context => context.parentType == ts[tsi];
+                if (tsi < tsLength - 1) { tsi++; }
+            }
+
+            return this;
+        }
+
+        #endregion
     }
 }

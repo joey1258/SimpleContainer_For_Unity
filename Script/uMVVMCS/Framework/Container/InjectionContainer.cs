@@ -286,22 +286,6 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型从 bindingStorage 中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindBindingStorageByType<T>()
-        {
-            binder.UnbindBindingStorageByType<T>();
-        }
-
-        /// <summary>
-        /// 根据类型从 bindingStorage 中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindBindingStorageByType(Type type)
-        {
-            binder.UnbindBindingStorageByType(type);
-        }
-
-        /// <summary>
         /// 根据类型从 typeBindings 中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindNullIdBindingByType<T>()
