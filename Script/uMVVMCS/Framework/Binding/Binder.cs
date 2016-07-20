@@ -58,7 +58,7 @@ namespace uMVVMCS.DIContainer
         #region Bind
 
         /// <summary>
-        /// 返回一个新的Binding实例,并设置指定类型给 type 属性, BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {
@@ -66,7 +66,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例,并设置指定类型给 type 属性, BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind(Type type)
         {
@@ -74,7 +74,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindSingleton<T>()
         {
@@ -82,7 +82,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindSingleton(Type type)
         {
@@ -90,7 +90,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 FACTORY，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindFactory<T>()
         {
@@ -98,7 +98,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 FACTORY，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindFactory(Type type)
         {
@@ -106,7 +106,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding BindMultiton<T>()
         {
@@ -114,7 +114,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding BindMultiton(Type type)
         {
@@ -368,70 +368,6 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
-        #region Remove
-
-        /// <summary>
-        /// 删除指定 binding 中指定的 value 值，如果移除后 value 属性为空或 value 约束为唯一，就移除该 binding (会否牵连其它同值binding？待测)
-        /// </summary>
-        virtual public void RemoveValue(IBinding binding, object value)
-        {
-            // 如果参数 binding 为空，或者参数 value 为空，就直接退出
-            if (binding == null || value == null) { return; }
-
-            // 如果约束类型为 SINGLE 直接删除 binding （如果 id 为空，将删除所有同值的无 id binding）
-            if (binding.constraint == ConstraintType.SINGLE)
-            {
-                RemoveBinding(binding);
-                return;
-            }
-
-            // 移除相同的值
-            int length = binding.valueArray.Length;
-            for (int i = 0; i < length; i++)
-            {
-                if (binding.valueArray[i] == value)
-                {
-                    binding.RemoveValue(value);
-                    break;
-                }
-            }
-
-            // 如果移除后 value 长度为 0，就移除 binding （如果 id 为空，将删除所有同值的无 id binding）
-            if (binding.valueArray.Length == 0 || binding.valueArray == null)
-            {
-                RemoveBinding(binding);
-            }
-        }
-
-        /// <summary>
-        /// 删除指定 binding 中 value 的多个值，如果移除后 value 属性为空或 value 约束为唯一，就移除该 binding
-        /// </summary>
-        virtual public void RemoveValues(IBinding binding, IList<object> valueList)
-        {
-            // 如果参数 binding 为空，或者参数 value 为空，就直接退出
-            if (binding == null || 
-                valueList == null || 
-                valueList.Count == 0 ||
-                binding.valueArray.Length < valueList.Count ||
-                binding.constraint == ConstraintType.SINGLE) { return; }
-
-            int length = binding.valueArray.Length;
-            for (int i = 0; i < length; i++)
-            {
-                if (binding.valueArray[i] == valueList[i])
-                {
-                    binding.RemoveValue(valueList[i]);
-                    break;
-                }
-            }
-
-            // 如果移除后值为空则移除 binding
-            if (binding.valueArray.Length == 0 || binding.valueArray == null)
-            {
-                RemoveBinding(binding);
-            }
-        }
-
         /// <summary>
         /// 删除 binding 自身
         /// </summary>
@@ -453,8 +389,6 @@ namespace uMVVMCS.DIContainer
                 typeBindings[binding.type].Remove(binding);
             }
         }
-
-        #endregion
 
         #endregion 
 

@@ -38,15 +38,5 @@ namespace uMVVMCS_NUitTests
         #region Unbind
 
         #endregion
-
-        #region RemoveValue
-
-        #endregion
-
-        #region RemoveBinding
-
-        #endregion
-
-
     }
 }

@@ -33,25 +33,25 @@ namespace uMVVMCS.DIContainer
         #region Bind
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 TEMP，值约束为 MULTIPLE
         /// </summary>
         IBinding Bind<T>();
         IBinding Bind(Type type);
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         IBinding BindSingleton<T>();
         IBinding BindSingleton(Type type);
 
         /// <summary>
-        ///  返回一个新的Binding实例，并设置指定类型给 type 属性和 BindingType 属性为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 FACTORY，值约束为 SINGLE
         /// </summary>
         IBinding BindFactory<T>();
         IBinding BindFactory(Type type);
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
         /// </summary>
         IBinding BindMultiton<T>();
         IBinding BindMultiton(Type type);
@@ -138,20 +138,6 @@ namespace uMVVMCS.DIContainer
         /// 根据 binding 从 bindingStorage 中删除 Binding
         /// </summary>
         void Unbind(IBinding binding);
-
-        #endregion
-
-        #region Remove
-
-        /// <summary>
-        /// 删除指定 binding 中指定的 value 值，如果移除后 value 属性为空或 value 约束为唯一，就移除该 binding
-        /// </summary>
-        void RemoveValue(IBinding binding, object value);
-
-        /// <summary>
-        /// 删除指定 binding 中 value 的多个值，如果移除后 value 属性为空或 value 约束为唯一，就移除该 binding
-        /// </summary>
-        void RemoveValues(IBinding binding, IList<object> values);
 
         #endregion
 

@@ -291,7 +291,7 @@ namespace uMVVMCS.DIContainer
         #region ReBind
 
         /// <summary>
-        /// 返回一个新的Binding实例,并设置指定类型给 type 属性, BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {
@@ -299,7 +299,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例,并设置指定类型给 type 属性, BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind(Type type)
         {
@@ -307,7 +307,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindSingleton<T>()
         {
@@ -315,7 +315,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindSingleton(Type type)
         {
@@ -323,7 +323,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 FACTORY，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindFactory<T>()
         {
@@ -331,7 +331,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 FACTORY，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindFactory(Type type)
         {
@@ -339,7 +339,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding BindMultiton<T>()
         {
@@ -347,15 +347,14 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
-        /// </summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
         virtual public IBinding BindMultiton(Type type)
         {
             return _binder.BindMultiton(type);
         }
 
         /// <summary>
-        /// 创建多个指定类型的 binding，并返回 IBindingFactory
+        /// 创建多个指定 type 属性的 binding，并返回 IBindingFactory
         /// </summary>
         virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
         {
@@ -378,10 +377,12 @@ namespace uMVVMCS.DIContainer
             if (_constraint == ConstraintType.MULTIPLE)
             {
                 RemoveArrayValue(o);
+                if(_value.Length == 0) { binder.Unbind(this); }
                 return this;
             }
 
             _value = null;
+            binder.Unbind(this);
             return this;
         }
 
@@ -404,6 +405,13 @@ namespace uMVVMCS.DIContainer
                 length--;
                 osi++;
                 if (osi >= osLength) { break; }
+            }
+
+            if(list.Count == 0)
+            {
+                _value = null;
+                binder.Unbind(this);
+                return this;
             }
 
             _value = list.ToArray();

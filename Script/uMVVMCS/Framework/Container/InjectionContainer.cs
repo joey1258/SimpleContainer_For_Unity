@@ -367,26 +367,6 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
-        #region Remove
-
-        /// <summary>
-        /// 删除指定 binding 中指定的 value 值，如果移除后 value 属性为空或 value 约束为唯一，就移除该 binding
-        /// </summary>
-        virtual public void RemoveValue(IBinding binding, object value)
-        {
-            binder.RemoveValue(binding, value);
-        }
-
-        /// <summary>
-        /// 删除指定 binding 中 value 的多个值，如果移除后 value 属性为空或 value 约束为唯一，就移除该 binding
-        /// </summary>
-        virtual public void RemoveValues(IBinding binding, IList<object> values)
-        {
-            binder.RemoveValues(binding, values);
-        }
-
-        #endregion
-
         /// <summary>
         /// 储存 binding
         /// </summary>

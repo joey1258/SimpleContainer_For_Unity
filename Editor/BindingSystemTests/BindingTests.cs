@@ -106,5 +106,9 @@ namespace uMVVMCS_NUitTests
         #region ReBind
 
         #endregion
+
+        #region Remove
+
+        #endregion
     }
 }

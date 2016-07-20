@@ -76,15 +76,4 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         FACTORY
     }
-
-    /// <summary>
-    /// Binding 常量
-    /// </summary>
-    public enum BindingConst
-    {
-        /// <summary> 
-        /// 预删除
-        /// </summary>
-        PREPARETOREMOVE,
-    }
 }
