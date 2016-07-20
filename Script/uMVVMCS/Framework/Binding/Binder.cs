@@ -66,6 +66,14 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
+        /// 返回一个新的Binding实例,并设置指定类型给 type 属性, BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding Bind(Type type)
+        {
+            return Bind(type, BindingType.TEMP);
+        }
+
+        /// <summary>
         /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindSingleton<T>()
@@ -74,11 +82,43 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindSingleton(Type type)
+        {
+            return bindingFactory.CreateSingle(type, BindingType.SINGLETON);
+        }
+
+        /// <summary>
         /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindFactory<T>()
         {
             return bindingFactory.CreateSingle(typeof(T), BindingType.FACTORY);
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindFactory(Type type)
+        {
+            return bindingFactory.CreateSingle(type, BindingType.FACTORY);
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindMultiton<T>()
+        {
+            return bindingFactory.Create(typeof(T), BindingType.MULTITON);
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindMultiton(Type type)
+        {
+            return bindingFactory.Create(type, BindingType.MULTITON);
         }
 
         /// <summary>

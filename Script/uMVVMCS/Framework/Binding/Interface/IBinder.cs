@@ -36,16 +36,25 @@ namespace uMVVMCS.DIContainer
         /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
         /// </summary>
         IBinding Bind<T>();
+        IBinding Bind(Type type);
 
         /// <summary>
         /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         IBinding BindSingleton<T>();
+        IBinding BindSingleton(Type type);
 
         /// <summary>
         ///  返回一个新的Binding实例，并设置指定类型给 type 属性和 BindingType 属性为 FACTORY，值约束为 SINGLE
         /// </summary>
         IBinding BindFactory<T>();
+        IBinding BindFactory(Type type);
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        IBinding BindMultiton<T>();
+        IBinding BindMultiton(Type type);
 
         /// <summary>
         /// 创建多个指定类型的 binding，并返回 IBindingFactory

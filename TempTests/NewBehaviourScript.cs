@@ -11,23 +11,37 @@ public class NewBehaviourScript : MonoBehaviour {
     {
         //Arrange 
         IBinder binder = new Binder();
-        binder.Bind<someClass>()
-            .ToSelf()
-            .Bind<int>()
-            .To(1)
-            .BindSingleton<someClass>()
-            .To(new someClass() { id = 10086 })
-            .As("A")
-            .BindFactory<someClass_b>()
-            .To(new someClass() { id = 110 })
-            .As("b");
+        binder.MultipleBind(
+            new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+            new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                .To(new List<object>() { typeof(someClass_b), new int[] { 111, 222 }, new someClass() })
+                .As(new List<object>() { null, 1, 2 })
+                .Bind<someClass>().ToSelf()
+                .MultipleBind(
+            new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+            new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                .Bind<someClass>().To(new someClass()).As(3)
+                .MultipleBind(
+            new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+            new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                .To(new List<object>() { typeof(someClass_b), new int[] { 444, 555, 666 }, new someClass() })
+                .As(new List<object>() { null, 4, 5 })
+                .Bind<someClass>().ToSelf();
+        //Act
+        int num = binder.GetBinding<someClass>(1).valueArray.Length +
+            binder.GetBinding<someClass>(4).valueArray.Length;
 
-        IList<IBinding> bindings = binder.GetAllBindings();
-        print(bindings.Count);
-        foreach(IBinding binding in bindings)
-        {
-            print(binding.value);
-        }
+        print(num);
     }
 
     // Update is called once per frame

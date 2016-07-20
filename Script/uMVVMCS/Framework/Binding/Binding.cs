@@ -17,7 +17,7 @@
 /*
  * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类
  * TEMP 类型的 Binding 只能储存类型值，同时不会被储存到 binder
- * 值约束只保留单列与复数两个类型，去除同样必须保存为单例的 POOL 类型
+ * 去除值约束只保留单列与复数两个类型，去除同样必须保存为单例的 POOL 类型
  */
 
 using System;
@@ -173,7 +173,7 @@ namespace uMVVMCS.DIContainer
                 throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
             }
             
-            if (_constraint != ConstraintType.MULTIPLE)
+            if (_constraint == ConstraintType.SINGLE)
             {
                 _value = o;
             }
@@ -187,18 +187,26 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 将多个 object 添加到 binding 的 value 属性中
         /// </summary>
-        virtual public IBinding To(IList<object> os)
+        virtual public IBinding To(object[] os)
         {
-            // 如果约束类型为单例就抛出异常
-            if (_constraint != ConstraintType.MULTIPLE)
+            // 如果 binding 类型不为多例就抛出异常
+            if (_constraint == ConstraintType.SINGLE)
             {
-                throw new BindingSystemException(
-                    string.Format(BindingSystemException.CONSTRAINTYPE_NOT_ASSIGNABLE,
-                    "[To(IList<object> os)]",
-                    "[ConstraintType.SINGLE]"));
+                if (_bindingType == BindingType.TEMP)
+                {
+                    _bindingType = BindingType.MULTITON;
+                    _constraint = ConstraintType.MULTIPLE;
+                }
+                else
+                {
+                    throw new BindingSystemException(
+                        string.Format(BindingSystemException.BINDINGTYPE_NOT_ASSIGNABLE,
+                        "[To(object[] os)]",
+                        _bindingType));
+                }
             }
 
-            int length = os.Count;
+            int length = os.Length;
             for (int i = 0; i < length; i++)
             {
                 var osi = os[i];
@@ -288,6 +296,14 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
+        /// 返回一个新的Binding实例,并设置指定类型给 type 属性, BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding Bind(Type type)
+        {
+            return _binder.Bind(type);
+        }
+
+        /// <summary>
         /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindSingleton<T>()
@@ -296,11 +312,43 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindSingleton(Type type)
+        {
+            return _binder.BindSingleton(type);
+        }
+
+        /// <summary>
         /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindFactory<T>()
         {
             return _binder.BindFactory<T>();
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindFactory(Type type)
+        {
+            return _binder.BindFactory(type);
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindMultiton<T>()
+        {
+            return _binder.BindMultiton<T>();
+        }
+
+        /// <summary>
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindMultiton(Type type)
+        {
+            return _binder.BindMultiton(type);
         }
 
         /// <summary>

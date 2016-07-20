@@ -27,7 +27,7 @@ namespace uMVVMCS_NUitTests
     [TestFixture]
     public class BindingSystemTests
     {
-        #region Bind & To
+        #region Bind & To & GetBinding
 
         /// <summary>
         /// 测试绑定到 TEMP 类型的无 id binding 会否被忽略，不保留在 binder 中
@@ -104,20 +104,21 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试一次绑定多个 binding 后 binder 保存数量是否正确
+        /// 测试一次绑定多个无 id 的 binding 后 binder 保存数量是否正确
+        /// 由于第一个绑定的是 TEMP 类型且值也是类型、并且没有 id，所以 binder 只储存了2个
         /// </summary>
         [Test]
-        public void MultipleBind_MultipleBindings_CountCorrect()
+        public void MultipleBindNUllId_BindingsCount_Correct()
         {
             //Arrange 
             IBinder binder = new Binder();
             binder.MultipleBind(
-                new List<Type>() { typeof(bool), typeof(int), typeof(someClass) },
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new List<BindingType>() {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { false, 1, new someClass() });
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() });
             //Act
             int num = binder.GetAllBindings().Count;
             //Assert
@@ -167,13 +168,163 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(3, num);
         }
 
+        /// <summary>
+        /// 测试绑定多个无 id 的 binding 后可否控制对具体 binding 的赋值数量
+        /// id 为2的 binding 的值有2个，id 为 5 的有3个，总数应该有5个
+        /// </summary>
+        [Test]
+        public void MultipleBind_ToSingleAndMulpitleValue_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(object), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), ((object[])new object[] { 111, 222, 333 }), new someClass() })
+                    .As(new List<object>() { null, 1, 2 })
+                    .Bind<someClass>().ToSelf()
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .Bind<someClass>().To(new someClass()).As(3)
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), new int[] { 444, 555, 666 }, new someClass() })
+                    .As(new List<object>() { null, 4, 5 })
+                    .Bind<someClass>().ToSelf();
+            //Act
+            int num = binder.GetBinding<someClass>(1).valueArray.Length +
+                binder.GetBinding<someClass>(4).valueArray.Length;
+            //Assert
+            Assert.AreEqual(5, num);
+        }
+
         #endregion
 
         #region Bind Chain
 
+        /// <summary>
+        /// 测试一次绑定多个无 id 的 binding 并赋值后再次绑定多个无 id binding，binder 保存数量是否正确
+        /// 由于有两个 TEMP 类型且值也是类型、并且没有 id 的 binding，所以 binder 只储存了4个
+        /// </summary>
+        [Test]
+        public void MultipleBindNUllIdTo_ChainMultipleBind_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() });
+            //Act
+            int num = binder.GetAllBindings().Count;
+            //Assert
+            Assert.AreEqual(4, num);
+        }
+
+        /// <summary>
+        /// 测试绑定多个有、无 id 的 binding 往复链式操作，binder 保存数量是否正确
+        /// 由于有3个 TEMP 类型且值也是类型、并且没有 id 的 binding，所以 binder 只储存了4个
+        /// </summary>
+        [Test]
+        public void MultipleBind_ChainMultipleBind_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .As(new List<object>() { null, 1, 2 })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .As(new List<object>() { null, 3, 4 });
+            //Act
+            int num = binder.GetAllBindings().Count;
+            //Assert
+            Assert.AreEqual(6, num);
+        }
+
+        /// <summary>
+        /// 测试绑定多个有或无 id 的 binding 并赋值后再次绑定单个有或无 id 的 binding，并多次
+        /// 链式循环操作后 binder 保存数量是否正确
+        /// </summary>
+        [Test]
+        public void MultipleBindTo_ChainNomalBind_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .As(new List<object>() { null, 1, 2 })
+                    .Bind<someClass>().ToSelf()
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .Bind<someClass>().To(new someClass()).As(3)
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .As(new List<object>() { null, 4, 5 })
+                    .Bind<someClass>().ToSelf();
+            //Act
+            int num = binder.GetAllBindings().Count;
+            //Assert
+            Assert.AreEqual(7, num);
+        }
+
         #endregion
 
-        #region Get
+        #region GetValue
 
         /// <summary>
         /// 测试 BindSingleton、To 方法绑定的值取回后是否正确
@@ -203,6 +354,61 @@ namespace uMVVMCS_NUitTests
             int num = ((someClass)binder.GetBinding<someClass>("A").value).id;
             //Assert
             Assert.AreEqual(10086, num);
+        }
+
+        /// <summary>
+        /// 测试一次绑定多个无 id 的 binding 取值后相加是否正确
+        /// 虽然都是 TEMP 类型，但 To（object） 方法会自动转换 bindingType 和值约束类型
+        /// </summary>
+        [Test]
+        public void MultipleBindNullId_ValueAdd_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.MultipleBind(
+                new List<Type>() { typeof(float), typeof(float), typeof(float) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.TEMP,
+                    BindingType.TEMP })
+                    .To(new List<object>() { 1f, 2f, 3.3f });
+
+            IList<IBinding> bindings = binder.GetAllBindings();
+            int length = bindings.Count;
+            float num = 0;
+            //Act
+            for (int i = 0; i < length; i++)
+            {
+                num += (float)bindings[i].value;
+            }
+
+            //Assert
+            Assert.AreEqual(6.3f, num);
+        }
+
+        /// <summary>
+        /// 测试一次绑定多个 binding 取值后相加是否正确
+        /// 虽然都是 TEMP 类型，但 To（object） 方法会自动转换 bindingType 和值约束类型
+        /// </summary>
+        [Test]
+        public void MultipleBind_ValueAdd_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder.MultipleBind(
+                new List<Type>() { typeof(int), typeof(int), typeof(float) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.TEMP,
+                    BindingType.TEMP })
+                    .To(new List<object>() { 1, 2, 3.3f })
+                    .As(new List<object>() { 1, 2, 3 });
+            //Act
+            float num = (int)binder.GetBinding<int>(1).value +
+                (int)binder.GetBinding<int>(2).value +
+                (float)binder.GetBinding<float>(3).value;
+            //Assert
+            Assert.AreEqual(6.3f, num);
         }
 
         #endregion

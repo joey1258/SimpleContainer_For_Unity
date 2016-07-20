@@ -149,7 +149,13 @@ namespace uMVVMCS.DIContainer
             int osi = 0;
             for (int i = 0; i < length; i++)
             {
-                bindings[i].To(os[osi]);
+                UnityEngine.Debug.Log(os[osi] is Array);
+                if(os[osi] is Array)
+                {
+                    object[] oa = (object[])os[osi];
+                    bindings[i].To(oa);
+                }
+                else { bindings[i].To(os[osi]); }
                 if (osi < osLength - 1) { osi++; }
             }
 
