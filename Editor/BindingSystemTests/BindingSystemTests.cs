@@ -26,40 +26,8 @@ namespace uMVVMCS_NUitTests
 {
     [TestFixture]
     public class BindingSystemTests
-    {
+    {/*
         #region Bind & To & GetBinding
-
-        /// <summary>
-        /// 测试绑定到 TEMP 类型的无 id binding 会否被忽略，不保留在 binder 中
-        /// 既然是临时 binding，保存在字典中又没有高效的删除方法，不如即用即弃，让GC自然回收
-        /// 如需反复使用，不建议使用 TEMP 类型，或为其加上 id
-        /// </summary>
-        [Test]
-        public void BindTempNullIdTo_ToSomeValue_BinderDoNotSave()
-        {
-            //Arrange 
-            IBinder binder = new Binder();
-            //Act
-            binder.Bind<object>().ToSelf();
-            binder.Bind<object>().ToSelf();
-            //Assert
-            Assert.AreEqual(0, binder.GetAllBindings().Count);
-        }
-
-        /// <summary>
-        /// 测试 ToSelf 方法是否使 TEMP 类型的 binding 的值约束转换为 SINGLE 类型
-        /// 由于绑定自身的type作为自己的值的缘故，自身的值只有一个，所以值的类型也没有必要保留为 MULTIPLE
-        /// </summary>
-        [Test]
-        public void BindTempNullId_ToSelf_ConstraintChangeTOSingle()
-        {
-            //Arrange 
-            IBinder binder = new Binder();
-            //Act
-            IBinding binding = binder.Bind<object>().ToSelf();
-            //Assert
-            Assert.AreEqual(ConstraintType.SINGLE, binding.constraint);
-        }
 
         /// <summary>
         /// 测试绑定实例到 TEMP 类型的 binding，其值约束是否任保持为 MULTIPLE 类型
@@ -73,20 +41,6 @@ namespace uMVVMCS_NUitTests
             IBinding binding = binder.Bind<object>().To<Binding>();
             //Assert
             Assert.AreEqual(ConstraintType.MULTIPLE, binding.constraint);
-        }
-
-        /// <summary>
-        /// 测试绑定实例的值到 TEMP 类型的 binding,binding 是否会自动转换为 SINGLETON 类型
-        /// </summary>
-        [Test]
-        public void BindTempNullIdTo_Instance_BindingChangeTOSingleton()
-        {
-            //Arrange 
-            IBinder binder = new Binder();
-            //Act
-            binder.Bind<int>().To(1).As(1);
-            //Assert
-            Assert.AreEqual(BindingType.SINGLETON, binder.GetBinding<int>(1).bindingType);
         }
 
         /// <summary>
@@ -437,18 +391,8 @@ namespace uMVVMCS_NUitTests
         }
 
         #endregion
-
+        */
     }
-
-    public class someClass : IInjectionFactory
-    {
-        public int id;
-        public object Create(InjectionContext context) { return this; }
-    }
-
-    public class someClass_b : someClass { }
-
-    public class someClass_c : someClass { }
 }
 
 

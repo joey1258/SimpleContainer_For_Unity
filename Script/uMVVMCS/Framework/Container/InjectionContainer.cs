@@ -385,22 +385,6 @@ namespace uMVVMCS.DIContainer
             binder.RemoveValues(binding, values);
         }
 
-        /// <summary>
-        /// 删除 binding 自身
-        /// </summary>
-        virtual public void RemoveBinding(IBinding binding)
-        {
-            binder.RemoveBinding(binding);
-        }
-
-        /// <summary>
-        /// 根据 type 和 id 删除 binding （type 和 id 不可为空）
-        /// </summary>
-        virtual public void RemoveBinding(Type type, object id)
-        {
-            binder.RemoveBinding(type, id);
-        }
-
         #endregion
 
         /// <summary>

@@ -153,14 +153,14 @@ namespace uMVVMCS.DIContainer
         #region RemoveValue
 
         /// <summary>
-        /// 从 binding 的 value 属性中移除指定的值，如果删除后值为空，则移除 binding
+        /// 从 binding 的 value 属性中移除指定的值
         /// </summary>
         IBinding RemoveValue(object value);
 
         /// <summary>
-        /// 从 binding 的 value 属性中移除指定的值，如果删除后值为空，则移除 binding
+        /// 从 binding 的 value 属性中移除指定的值
         /// </summary>
-        IBinding RemoveValues(System.Collections.Generic.IList<object> values);
+        IBinding RemoveValues(IList<object> values);
 
         #endregion
 

@@ -378,12 +378,10 @@ namespace uMVVMCS.DIContainer
             if (_constraint == ConstraintType.MULTIPLE)
             {
                 RemoveArrayValue(o);
-                if(_value.Length == 0) { binder.Unbind(this); }
                 return this;
             }
 
             _value = null;
-            binder.Unbind(this);
             return this;
         }
 
@@ -406,13 +404,6 @@ namespace uMVVMCS.DIContainer
                 length--;
                 osi++;
                 if (osi >= osLength) { break; }
-            }
-
-            if(list.Count == 0)
-            {
-                _value = null;
-                binder.Unbind(this);
-                return this;
             }
 
             _value = list.ToArray();

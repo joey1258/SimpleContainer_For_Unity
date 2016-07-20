@@ -277,18 +277,12 @@ namespace uMVVMCS.DIContainer
             var bindings = GetBindingsByType(type);
 
             // 如果 AOT 前置委托不为空就执行它
-            if (beforeRemoveBinding != null)
-            {
-                beforeRemoveBinding(this, bindings);
-            }
+            if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
 
             typeBindings.Remove(type);
 
             // 如果 AOT 后置委托不为空就执行它
-            if (afterRemoveBinding != null)
-            {
-                afterRemoveBinding(this, bindings);
-            }
+            if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
         }
 
         /// <summary>
@@ -307,10 +301,7 @@ namespace uMVVMCS.DIContainer
             var bindings = typeBindings[type];
 
             // 如果 AOT 前置委托不为空就执行它
-            if (beforeRemoveBinding != null)
-            {
-                beforeRemoveBinding(this, bindings);
-            }
+            if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
 
             int length = bindings.Count;
             for (int i = 0; i < length; i++)
@@ -319,10 +310,7 @@ namespace uMVVMCS.DIContainer
             }
 
             // 如果 AOT 后置委托不为空就执行它
-            if (afterRemoveBinding != null)
-            {
-                afterRemoveBinding(this, bindings);
-            }
+            if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
         }
 
         /// <summary>
@@ -345,28 +333,19 @@ namespace uMVVMCS.DIContainer
             var bindings = new List<IBinding>() { bindingStorage[type][id] };
 
             // 如果 AOT 前置委托不为空就执行它
-            if (beforeRemoveBinding != null)
-            {
-                beforeRemoveBinding(this, bindings);
-            }
+            if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
 
-            // 如果无冲突字典中含有参数key相同的key
-            if (bindingStorage.Contains(type))
+            // 如果获取到了 binding 就进行删除
+            if (bindings[0] != null)
             {
-                if (bindings[0] != null)
-                {
-                    bindingStorage[type].Remove(id);
-                    idBindings[id].Remove(bindings[0]);
-                    typeBindings[type].Remove(bindings[0]);
-                }
-
+                bindingStorage[type].Remove(id);
+                idBindings[id].Remove(bindings[0]);
+                typeBindings[type].Remove(bindings[0]);
             }
+            bindings = null;
 
             // 如果 AOT 后置委托不为空就执行它
-            if (afterRemoveBinding != null)
-            {
-                afterRemoveBinding(this, bindings);
-            }
+            if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
         }
 
         /// <summary>
@@ -378,19 +357,13 @@ namespace uMVVMCS.DIContainer
             var bindings = new List<IBinding>() { binding };
 
             // 如果 AOT 前置委托不为空就执行它
-            if (beforeRemoveBinding != null)
-            {
-                beforeRemoveBinding(this, bindings);
-            }
+            if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
 
             if (binding == null) { return; }
             RemoveBinding(binding);
 
             // 如果 AOT 后置委托不为空就执行它
-            if (afterRemoveBinding != null)
-            {
-                afterRemoveBinding(this, bindings);
-            }
+            if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
         }
 
         #endregion
@@ -424,7 +397,7 @@ namespace uMVVMCS.DIContainer
             }
 
             // 如果移除后 value 长度为 0，就移除 binding （如果 id 为空，将删除所有同值的无 id binding）
-            if (binding.valueArray.Length == 0)
+            if (binding.valueArray.Length == 0 || binding.valueArray == null)
             {
                 RemoveBinding(binding);
             }
@@ -453,7 +426,10 @@ namespace uMVVMCS.DIContainer
             }
 
             // 如果移除后值为空则移除 binding
-            if (binding.valueArray.Length == 0) { RemoveBinding(binding); }
+            if (binding.valueArray.Length == 0 || binding.valueArray == null)
+            {
+                RemoveBinding(binding);
+            }
         }
 
         /// <summary>
@@ -473,20 +449,9 @@ namespace uMVVMCS.DIContainer
             else
             {
                 bindingStorage[binding.type].Remove(binding.id);
-                typeBindings[binding.type].Remove(binding);
                 idBindings[binding.id].Remove(binding);
+                typeBindings[binding.type].Remove(binding);
             }
-        }
-
-        /// <summary>
-        /// 根据 type 和 id 删除 binding （type 和 id 不可为空）
-        /// </summary>
-        virtual public void RemoveBinding(Type type, object id)
-        {
-            // 如果参数 type 或 id 为空，就直接退出
-            if (type == null || id == null) { return; }
-
-            if (bindingStorage[type].Contains(id)) { bindingStorage[type].Remove(id); }
         }
 
         #endregion

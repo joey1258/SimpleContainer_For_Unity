@@ -153,16 +153,6 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         void RemoveValues(IBinding binding, IList<object> values);
 
-        /// <summary>
-        /// 删除 binding 自身
-        /// </summary>
-        void RemoveBinding(IBinding binding);
-
-        /// <summary>
-        /// 根据 type 和 id 删除 binding （type 和 id 不可为空）
-        /// </summary>
-        void RemoveBinding(Type type, object id);
-
         #endregion
 
         /// <summary>
