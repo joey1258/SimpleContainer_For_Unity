@@ -33,34 +33,34 @@ namespace uMVVMCS.DIContainer
 
         #region constructor
 
-        public InjectionContainer() : base(new ReflectionCache(), new InjectionBinder())
+        public InjectionContainer() : base(new ReflectionCache(), new Binder())
         {
             RegisterItself();
         }
 
-        public InjectionContainer(object id) : base(new ReflectionCache(), new InjectionBinder())
-        {
-            this.id = id;
-            RegisterItself();
-        }
-
-        public InjectionContainer(IReflectionCache cache) : base(cache, new InjectionBinder())
-        {
-            RegisterItself();
-        }
-
-        public InjectionContainer(object id, IReflectionCache cache) : base(cache, new InjectionBinder())
+        public InjectionContainer(object id) : base(new ReflectionCache(), new Binder())
         {
             this.id = id;
             RegisterItself();
         }
 
-        public InjectionContainer(IReflectionCache cache, InjectionBinder binder) : base(cache, binder)
+        public InjectionContainer(IReflectionCache cache) : base(cache, new Binder())
         {
             RegisterItself();
         }
 
-        public InjectionContainer(object id, IReflectionCache cache, InjectionBinder binder) : base(cache, binder)
+        public InjectionContainer(object id, IReflectionCache cache) : base(cache, new Binder())
+        {
+            this.id = id;
+            RegisterItself();
+        }
+
+        public InjectionContainer(IReflectionCache cache, IBinder binder) : base(cache, binder)
+        {
+            RegisterItself();
+        }
+
+        public InjectionContainer(object id, IReflectionCache cache, IBinder binder) : base(cache, binder)
         {
             this.id = id;
             RegisterItself();
@@ -235,14 +235,6 @@ namespace uMVVMCS.DIContainer
         virtual public IBinding BindMultiton(Type type)
         {
             return binder.BindMultiton(type);
-        }
-
-        /// <summary>
-        /// 返回一个新的Binding实例，并把设置参数分别给 type 和 BindingType，值约束为 SINGLE
-        /// </summary>
-        virtual public IBinding Bind(Type type, BindingType bindingType)
-        {
-            return binder.Bind(type, bindingType);
         }
 
         /// <summary>

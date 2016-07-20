@@ -35,12 +35,13 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         /// value 属性
+        ///  valueArray 属性为避免外部需要以数组形式获取时的拆装箱消耗
         /// </summary>
         object value { get; }
         object[] valueArray { get; }
 
         /// <summary>
-        /// name 属性
+        /// id 属性
         /// </summary>
         object id { get; }
 
@@ -152,21 +153,21 @@ namespace uMVVMCS.DIContainer
         #region RemoveValue
 
         /// <summary>
-        /// 设置 binding 的 condition 属性为返回 context.parentInstance 与参数 instance 相等
-        /// </summary>
-        IBinding ParentInstanceCondition(object instance);
-
-        /// <summary>
-        /// 从 binding 的 value 属性中移除指定的值
+        /// 从 binding 的 value 属性中移除指定的值，如果删除后值为空，则移除 binding
         /// </summary>
         IBinding RemoveValue(object value);
 
         /// <summary>
-        /// 从 binding 的 value 属性中移除指定的值
+        /// 从 binding 的 value 属性中移除指定的值，如果删除后值为空，则移除 binding
         /// </summary>
         IBinding RemoveValues(System.Collections.Generic.IList<object> values);
 
         #endregion
+
+        /// <summary>
+        /// 设置 binding 的 condition 属性为返回 context.parentInstance 与参数 instance 相等
+        /// </summary>
+        IBinding ParentInstanceCondition(object instance);
 
         #region SetProperty
 

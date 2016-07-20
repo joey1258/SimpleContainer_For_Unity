@@ -16,6 +16,7 @@
 
 /*
  * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类
+ * id 用于快速获取 binding，如果需要同1个类型的多个实例，可以将其以数组的形式保存在同一个 binding
  * TEMP 类型的 Binding 只能储存类型值，同时不会被储存到 binder
  * 去除值约束只保留单列与复数两个类型，去除同样必须保存为单例的 POOL 类型
  */
@@ -82,20 +83,21 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         ///  value 属性
+        ///  valueArray 属性为避免外部需要以数组形式获取时的拆装箱消耗
         /// </summary>
         public object value
         {
             get
             {
-                if(_value is Array) { return ((object[])_value)[0]; }
+                if(_constraint == ConstraintType.SINGLE) { return _value[0]; }
                 return _value;
             }
         }
-        protected object _value;
         public object[] valueArray
         {
-            get { return (object[])_value; }
+            get { return _value; }
         }
+        protected object[] _value;
 
         /// <summary>
         /// id 属性
@@ -143,7 +145,8 @@ namespace uMVVMCS.DIContainer
         {
             // 每个 binding 只有一个 type，所以绑定到自身也必然只有一个值
             _constraint = ConstraintType.SINGLE;
-            _value = _type;
+            _value = new object[1] { _type };
+
             binder.Storing(this);
 
             return this;
@@ -175,7 +178,7 @@ namespace uMVVMCS.DIContainer
             
             if (_constraint == ConstraintType.SINGLE)
             {
-                _value = o;
+                _value = new object[1] { o };
             }
             else { AddValue(o); }
 
@@ -364,7 +367,7 @@ namespace uMVVMCS.DIContainer
         #region RemoveValue
 
         /// <summary>
-        /// 从 binding 的 value 属性中移除指定的值
+        /// 从 binding 的 value 属性中移除指定的值，如果删除后值为空，则移除 binding
         /// </summary>
         virtual public IBinding RemoveValue(object o)
         {
@@ -374,31 +377,27 @@ namespace uMVVMCS.DIContainer
             // 值约束过滤
             if (_constraint == ConstraintType.MULTIPLE)
             {
-                if (_bindingType == BindingType.TEMP)
-                {
-                    Type t = o.GetType();
-                    RemoveArrayValue(t);
-                }
                 RemoveArrayValue(o);
+                if(_value.Length == 0) { binder.Unbind(this); }
                 return this;
             }
 
             _value = null;
-
+            binder.Unbind(this);
             return this;
         }
 
         /// <summary>
-        /// 从 binding 的 value 属性中移除多个值
+        /// 从 binding 的 value 属性中移除多个值，如果删除后值为空，则移除 binding
         /// </summary>
         virtual public IBinding RemoveValues(IList<object> os)
         {
             // 过滤空值、值约束
             if (os == null || _constraint != ConstraintType.MULTIPLE) { return this; }
 
-            List<object> list = new List<object>(valueArray);
+            List<object> list = new List<object>(_value);
 
-            int length = valueArray.Length;
+            int length = _value.Length;
             int osLength = os.Count;
             int osi = 0;
             for (int i = 0; i < length; i++)
@@ -407,6 +406,13 @@ namespace uMVVMCS.DIContainer
                 length--;
                 osi++;
                 if (osi >= osLength) { break; }
+            }
+
+            if(list.Count == 0)
+            {
+                _value = null;
+                binder.Unbind(this);
+                return this;
             }
 
             _value = list.ToArray();
@@ -459,18 +465,18 @@ namespace uMVVMCS.DIContainer
             // 过滤空值、值约束
             if (o == null || _constraint != ConstraintType.MULTIPLE) { return; }
 
-            if (_value is Array)
+            if (_constraint == ConstraintType.MULTIPLE)
             {
                 // 过滤同值
-                int length = valueArray.Length;
+                int length = _value.Length;
                 for (int i = 0; i < length; i++)
                 {
-                    if (o.Equals(valueArray[i])) { return; }
+                    if (o.Equals(_value[i])) { return; }
                 }
 
                 // 添加元素
                 object[] newArray = new object[length + 1];
-                valueArray.CopyTo(newArray, 0);
+                _value.CopyTo(newArray, 0);
                 newArray[length] = o;
                 _value = newArray;
             }
@@ -494,10 +500,10 @@ namespace uMVVMCS.DIContainer
             }
 
             // 遍历数组，将找到的相同的元素移除
-            int length = valueArray.Length;
+            int length = _value.Length;
             for (int i = 0; i < length; i++)
             {
-                if (o.Equals(valueArray[i]))
+                if (o.Equals(_value[i]))
                 {
                     spliceValueAt(i);
                     return;
@@ -511,7 +517,7 @@ namespace uMVVMCS.DIContainer
         protected void spliceValueAt(int splicePos)
         {
             int mod = 0;
-            int length = valueArray.Length;
+            int length = _value.Length;
             object[] newArray = new object[length - 1];
 
             for (int i = 0; i < length; i++)
@@ -521,7 +527,7 @@ namespace uMVVMCS.DIContainer
                     mod = -1;
                     continue;
                 }
-                newArray[i + mod] = valueArray[i];
+                newArray[i + mod] = _value[i];
             }
             _value = (newArray.Length == 0) ? null : newArray;
         }
@@ -535,7 +541,7 @@ namespace uMVVMCS.DIContainer
         {
             if (_constraint != ConstraintType.MULTIPLE)
             {
-                _value = o;
+                _value = new object[1] { o };
             }
             else { AddValue(o); }
 
