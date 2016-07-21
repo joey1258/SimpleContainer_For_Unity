@@ -464,7 +464,7 @@ namespace uMVVMCS.DIContainer
             // 过滤空值、值约束
             if (o == null || _constraint != ConstraintType.MULTIPLE) { return; }
 
-            if (_constraint == ConstraintType.MULTIPLE)
+            if (_constraint == ConstraintType.MULTIPLE && _value != null)
             {
                 // 过滤同值
                 int length = _value.Length;

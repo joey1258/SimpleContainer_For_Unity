@@ -29,13 +29,359 @@ namespace uMVVMCS_NUitTests
     {
         #region Bind
 
+        /// <summary>
+        /// 测试 Bind 方法是否生成了 TEMP 类型的 binding,值约束为 Multiple
+        /// </summary>
+        [Test]
+        public void Bind_CreateTempBinding_True()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            IBinding binding = binder.Bind<object>();
+            //Assert
+            Assert.AreEqual(
+                true, 
+                binding != null && 
+                binding.bindingType == BindingType.TEMP &&
+                binding.constraint == ConstraintType.MULTIPLE);
+        }
+
+        /// <summary>
+        /// 测试 BindSingleton 方法是否生成了 SINGLETON 类型的 binding,值约束为 Single
+        /// </summary>
+        [Test]
+        public void BindSingleton_CreateSingletonBinding_True()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            IBinding binding = binder.BindSingleton<object>();
+            //Assert
+            Assert.AreEqual(
+                true,
+                binding != null &&
+                binding.bindingType == BindingType.SINGLETON &&
+                binding.constraint == ConstraintType.SINGLE);
+        }
+
+        /// <summary>
+        /// 测试 BindFactory 方法是否生成了 FACTORY 类型的 binding,值约束为 Single
+        /// </summary>
+        [Test]
+        public void BindFactory_CreateFactoryBinding_True()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            IBinding binding = binder.BindFactory<object>();
+            //Assert
+            Assert.AreEqual(
+                true,
+                binding != null &&
+                binding.bindingType == BindingType.FACTORY &&
+                binding.constraint == ConstraintType.SINGLE);
+        }
+
+        /// <summary>
+        /// 测试 BindMultiton 方法是否生成了 MULTITON 类型的 binding,值约束为 Multiple
+        /// </summary>
+        [Test]
+        public void BindMultiton_CreateMultitonBinding_True()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            IBinding binding = binder.BindMultiton<object>();
+            //Assert
+            Assert.AreEqual(
+                true,
+                binding != null &&
+                binding.bindingType == BindingType.MULTITON &&
+                binding.constraint == ConstraintType.MULTIPLE);
+        }
+
+        /// <summary>
+        /// 测试 MultipleBind 方法是否生成了指定个指定类型的 binding，其值约束是否各种正确
+        /// </summary>
+        [Test]
+        public void MultipleBind_CreateMultipleBinding_True()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder.MultipleBind(
+                new List<Type>() { typeof(int) , typeof(float), typeof(someClass) },
+                new List<BindingType>() { BindingType.MULTITON, BindingType.SINGLETON, BindingType.FACTORY })
+                .As(new List<object>() { 1, 2, 3 });
+            IList<IBinding> bindings = binder.GetAllBindings();
+            //Assert
+            Assert.AreEqual(
+                true,
+                bindings.Count == 3 &&
+                bindings[0].bindingType == BindingType.MULTITON &&
+                bindings[0].constraint == ConstraintType.MULTIPLE &&
+                bindings[1].bindingType == BindingType.SINGLETON &&
+                bindings[1].constraint == ConstraintType.SINGLE &&
+                bindings[2].bindingType == BindingType.FACTORY &&
+                bindings[2].constraint == ConstraintType.SINGLE);
+        }
+
         #endregion
 
         #region GetBinding
 
+        /// <summary>
+        /// 测试 GetBindingsByType 所获取的各种类型的 binding 数量是否正确
+        /// </summary>
+        [Test]
+        public void GetBindingsByType_TypeBindingsNumber_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder
+                .MultipleBind(
+                new List<Type>() { typeof(int), typeof(int), typeof(int) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 1, 2, 3 })
+                .MultipleBind(
+                new List<Type>() { typeof(float), typeof(float) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 4, 5 })
+                .MultipleBind(
+                new List<Type>() { typeof(string), typeof(string), typeof(string), typeof(string) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 6, 7, 8, 9 });
+            //Assert
+            Assert.AreEqual(
+                true,
+                binder.GetBindingsByType<int>().Count == 3 &&
+                binder.GetBindingsByType<float>().Count == 2 &&
+                binder.GetBindingsByType<string>().Count == 4);
+        }
+
+        /// <summary>
+        /// 测试 GetBindingsById 所获取的各种 id 的 binding 数量是否正确
+        /// </summary>
+        [Test]
+        public void GetBindingsById_IdBindingsNumber_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder
+                .MultipleBind(
+                new List<Type>() { typeof(int), typeof(int), typeof(int) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 1, 2, 3 })
+                .MultipleBind(
+                new List<Type>() { typeof(float), typeof(float) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 1, 5 })
+                .MultipleBind(
+                new List<Type>() { typeof(string), typeof(string), typeof(string) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 1, 5, 3 });
+            //Assert
+            Assert.AreEqual(
+                true,
+                binder.GetBindingsById(1).Count == 3 &&
+                binder.GetBindingsById(2).Count == 1 &&
+                binder.GetBindingsById(3).Count == 2 &&
+                binder.GetBindingsById(5).Count == 2);
+        }
+
+        /// <summary>
+        /// 测试 GetAllBindings 所获取的 binding 数量是否正确
+        /// </summary>
+        [Test]
+        public void GetAllBindings_BindingsNumber_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder
+                .MultipleBind(
+                new List<Type>() { typeof(int), typeof(int), typeof(int) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 1, 2, 3 })
+                .MultipleBind(
+                new List<Type>() { typeof(float), typeof(float) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 4, 5 })
+                .MultipleBind(
+                new List<Type>() { typeof(string), typeof(string), typeof(string), typeof(string) },
+                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new List<object>() { 6, 7, 8, 9 });
+            //Assert
+            Assert.AreEqual( 9, binder.GetAllBindings().Count);
+        }
+
+        /// <summary>
+        /// 测试 GetSameNullIdBinding 获取的 binding 是否正确
+        /// </summary>
+        [Test]
+        public void GetSameNullIdBinding_ReturnBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            IBinding binding1 = binder.Bind<object>().To(1);
+            IBinding binding2 = binder.BindMultiton<object>().To(new object[] { 7, 8, 9 });
+            //Act
+            binder
+                .Bind<object>()
+                .To(1)
+                .Bind<object>()
+                .To(2)
+                .BindMultiton<object>()
+                .To(new object[] { 7, 8, 9 })
+                .Bind<int>()
+                .To(1)
+                .BindMultiton<int>()
+                .To(new object[] { 7, 8, 9 });
+            //Assert
+            Assert.AreEqual(
+                true,
+                /*确认没有取到多余的值，且取到的不是自身*/
+                binder.GetSameNullIdBinding(binding1).Count == 1 &&
+                binder.GetSameNullIdBinding(binding1)[0].GetHashCode() !=
+                binding1.GetHashCode() &&
+                binder.GetSameNullIdBinding(binding2).Count == 1 &&
+                binder.GetSameNullIdBinding(binding2)[0].GetHashCode() !=
+                binding2.GetHashCode());
+        }
+
+        /// <summary>
+        /// 测试 GetBinding 是否获取到了正确的 binding
+        /// </summary>
+        [Test]
+        public void GetBinding_ReturnBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder
+                .Bind<object>()
+                .To(1)
+                .As(1)
+                .Bind<int>()
+                .To(1)
+                .As(1)
+                .Bind<string>()
+                .To("1")
+                .As(1)
+                .Bind<float>()
+                .To(1.111111f)
+                .As(1);
+            //Assert
+            Assert.AreEqual(1.111111f, binder.GetBinding<float>(1).value);
+        }
+
         #endregion
 
         #region Unbind
+
+        /// <summary>
+        /// 测试 UnbindByType 方法是否正确的移除了相应的 binding
+        /// </summary>
+        [Test]
+        public void UnbindByType_UnbindBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder
+                .Bind<object>()
+                .To(1)
+                .Bind<object>()
+                .To(2)
+                .Bind<int>()
+                .To(1)
+                .Bind<int>()
+                .To(2)
+                .Bind<float>()
+                .To(1f)
+                .Bind<float>()
+                .To(2f);
+            //Act
+            binder.UnbindByType<int>();
+            //Assert
+            Assert.AreEqual(
+                true,
+                binder.GetAllBindings().Count == 4 &&
+                binder.GetBindingsByType<int>().Count == 0);
+        }
+
+        /// <summary>
+        /// 测试 UnbindById 方法是否正确的移除了相应的 binding
+        /// </summary>
+        [Test]
+        public void UnbindById_UnbindBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder
+                .Bind<object>()
+                .To(1)
+                .As(1)
+                .Bind<object>()
+                .To(2)
+                .As(2)
+                .Bind<int>()
+                .To(1)
+                .As(1)
+                .Bind<int>()
+                .To(2)
+                .As(2)
+                .Bind<float>()
+                .To(1f)
+                .As(1)
+                .Bind<float>()
+                .To(2f)
+                .As(2);
+            //Act
+            binder.UnbindById(1);
+            //Assert
+            Assert.AreEqual(
+                true,
+                binder.GetAllBindings().Count == 3);
+        }
+
+        /// <summary>
+        /// 测试 UnbindNullIdBindingByType 方法是否正确的移除了相应的 binding
+        /// </summary>
+        [Test]
+        public void UnbindNullIdBindingByType_UnbindBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder
+                .Bind<object>()
+                .To(1)
+                .Bind<object>()
+                .To(2)
+                .As(2)
+                .Bind<int>()
+                .To(1)
+                .Bind<int>()
+                .To(2)
+                .Bind<float>()
+                .To(1f)
+                .As(1)
+                .Bind<float>()
+                .To(2f);
+            //Act
+            binder.UnbindNullIdBindingByType<object>();
+            binder.UnbindNullIdBindingByType<int>();
+            binder.UnbindNullIdBindingByType<float>();
+            //Assert
+            Assert.AreEqual(
+                true,
+                binder.GetAllBindings().Count == 2 &&
+                binder.GetBindingsByType<object>().Count == 1 &&
+                binder.GetBindingsByType<int>().Count == 0 &&
+                binder.GetBindingsByType<float>().Count == 1);
+        }
 
         #endregion
     }

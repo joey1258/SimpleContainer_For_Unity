@@ -9,39 +9,33 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
+
         //Arrange 
         IBinder binder = new Binder();
-        binder.MultipleBind(
-            new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-            new List<BindingType>() {
-                    BindingType.TEMP,
-                    BindingType.SINGLETON,
-                    BindingType.FACTORY })
-                .To(new List<object>() { typeof(someClass_b), new int[] { 111, 222 }, new someClass() })
-                .As(new List<object>() { null, 1, 2 })
-                .Bind<someClass>().ToSelf()
-                .MultipleBind(
-            new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-            new List<BindingType>() {
-                    BindingType.TEMP,
-                    BindingType.SINGLETON,
-                    BindingType.FACTORY })
-                .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
-                .Bind<someClass>().To(new someClass()).As(3)
-                .MultipleBind(
-            new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-            new List<BindingType>() {
-                    BindingType.TEMP,
-                    BindingType.SINGLETON,
-                    BindingType.FACTORY })
-                .To(new List<object>() { typeof(someClass_b), new int[] { 444, 555, 666 }, new someClass() })
-                .As(new List<object>() { null, 4, 5 })
-                .Bind<someClass>().ToSelf();
+        binder
+            .Bind<object>()
+            .To(1)
+            .Bind<object>()
+            .To(2)
+            .As(2)
+            .Bind<int>()
+            .To(1)
+            .Bind<int>()
+            .To(2)
+            .Bind<float>()
+            .To(1f)
+            .As(1)
+            .Bind<float>()
+            .To(2f);
         //Act
-        int num = binder.GetBinding<someClass>(1).valueArray.Length +
-            binder.GetBinding<someClass>(4).valueArray.Length;
+        //binder.UnbindNullIdBindingByType<object>();
+        binder.UnbindNullIdBindingByType<int>();
+        //binder.UnbindNullIdBindingByType<float>();
 
-        print(num);
+        //print(binder.GetAllBindings().Count);
+        //print(binder.GetBindingsByType<object>().Count);
+        print(binder.GetBindingsByType<int>().Count);
+        //print(binder.GetBindingsByType<float>().Count);
     }
 
     // Update is called once per frame

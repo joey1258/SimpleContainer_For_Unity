@@ -66,17 +66,17 @@ namespace uMVVMCS.DIContainer
         #region GetBinding
 
         /// <summary>
-        /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
+        /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
         IList<IBinding> GetBindingsByType<T>();
 
         /// <summary>
-        /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
+        /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
-		IList<IBinding> GetBindingsByType(Type type);
+        IList<IBinding> GetBindingsByType(Type type);
 
         /// <summary>
-        /// 获取 bindingStorage 中所有指定 id 的 binding
+        /// 获取储存容器中所有指定 id 的 binding
         /// </summary>
         IList<IBinding> GetBindingsById(object id);
 
@@ -86,56 +86,61 @@ namespace uMVVMCS.DIContainer
 		IList<IBinding> GetAllBindings();
 
         /// <summary>
-        /// 返回 typeBindings 中除自身以外所有 type 和值都相同的 binding
+        /// 返回储存容器中除自身以外所有 type 和值都相同的 binding
         /// </summary>
         IList<IBinding> GetSameNullIdBinding(IBinding binding);
 
         /// <summary>
-        /// 根据类型和id获取 bindingStorage 中的 Binding
+        /// 根据类型和id获取储存容器中的 Binding
         /// </summary>
-		IBinding GetBinding<T>(object id);
+        IBinding GetBinding<T>(object id);
 
         /// <summary>
-        /// 根据类型和id获取 bindingStorage 中的 Binding
+        /// 根据类型和id获取储存容器中的 Binding
         /// </summary>
-		IBinding GetBinding(Type type, object id);
+        IBinding GetBinding(Type type, object id);
 
         #endregion
 
         #region Unbind
 
         /// <summary>
-        /// 根据类型从 bindingStorage 和 typeBindings 中删除所有同类型 Binding
+        /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
         void UnbindByType<T>();
 
         /// <summary>
-        /// 根据类型从 bindingStorage 和 typeBindings 中删除所有同类型 Binding
+        /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
         void UnbindByType(Type type);
 
         /// <summary>
-        /// 根据类型从 typeBindings 中删除所有同类型 Binding
+        /// 根据 id 从所有容器中删除所有同类型 Binding
+        /// </summary>
+        void UnbindById(object id);
+
+        /// <summary>
+        /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
         void UnbindNullIdBindingByType<T>();
 
         /// <summary>
-        /// 根据类型从 typeBindings 中删除所有同类型 Binding
+        /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
         void UnbindNullIdBindingByType(Type type);
 
         /// <summary>
-        /// 根据类型和 id 从 bindingStorage 中删除 Binding
+        /// 根据类型和 id 从所有容器中删除 Binding
         /// </summary>
 		void Unbind<T>(object id);
 
         /// <summary>
-        /// 根据类型和 id 从 bindingStorage 中删除 Binding
+        /// 根据类型和 id 从所有容器中删除 Binding
         /// </summary>
 		void Unbind(Type type, object id);
 
         /// <summary>
-        /// 根据 binding 从 bindingStorage 中删除 Binding
+        /// 根据 binding 从所有容器中删除 Binding
         /// </summary>
         void Unbind(IBinding binding);
 

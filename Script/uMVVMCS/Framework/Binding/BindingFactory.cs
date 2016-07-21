@@ -97,7 +97,11 @@ namespace uMVVMCS.DIContainer
             for (int i = 0; i < length; i++)
             {
                 ConstraintType cti = ConstraintType.MULTIPLE;
-                if (bindingType[i] != BindingType.TEMP) { cti = ConstraintType.SINGLE; }
+                if (bindingType[i] != BindingType.TEMP && 
+                    bindingType[i] != BindingType.MULTITON)
+                {
+                    cti = ConstraintType.SINGLE;
+                }
 
                 bindings[i] = Create(
                     types[i],
@@ -149,7 +153,6 @@ namespace uMVVMCS.DIContainer
             int osi = 0;
             for (int i = 0; i < length; i++)
             {
-                UnityEngine.Debug.Log(os[osi] is Array);
                 if(os[osi] is Array)
                 {
                     object[] oa = (object[])os[osi];
@@ -174,12 +177,9 @@ namespace uMVVMCS.DIContainer
             }
 
             int length = bindings.Length;
-            int osLength = os.Count;
-            int osi = 0;
             for (int i = 0; i < length; i++)
             {
-                bindings[i].As(os[osi]);
-                if (osi < osLength - 1) { osi++; }
+                bindings[i].As(os[i]);
             }
 
             return this;
