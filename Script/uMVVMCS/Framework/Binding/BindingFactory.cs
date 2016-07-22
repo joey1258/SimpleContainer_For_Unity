@@ -88,10 +88,10 @@ namespace uMVVMCS.DIContainer
         /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
         /// </summary>
         virtual public IBindingFactory MultipleCreate(
-            IList<Type> types,
-            IList<BindingType> bindingType)
+            Type[] types,
+            BindingType[] bindingType)
         {
-            int length = types.Count;
+            int length = types.Length;
             _bindings = new IBinding[length];
 
             for (int i = 0; i < length; i++)
@@ -140,16 +140,16 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 为多个 binding 添加值，如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
         /// </summary>
-        virtual public IBindingFactory To(IList<object> os)
+        virtual public IBindingFactory To(object[] os)
         {
             // 不允许参数长度大于 bindings 长度
-            if (os.Count > bindings.Length)
+            if (os.Length > bindings.Length)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }
 
             int length = bindings.Length;
-            int osLength = os.Count;
+            int osLength = os.Length;
             int osi = 0;
             for (int i = 0; i < length; i++)
             {
@@ -168,10 +168,10 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 设置多个 binding 的 id 属性
         /// </summary>
-        virtual public IBindingFactory As(IList<object> os)
+        virtual public IBindingFactory As(object[] os)
         {
             // 由于 id 必须是唯一的，所以如果参数和 binding的数量不同则将抛出异常
-            if (os.Count != bindings.Length)
+            if (os.Length != bindings.Length)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }
@@ -189,16 +189,16 @@ namespace uMVVMCS.DIContainer
         /// 设置多个 binding 的 condition 属性
         /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
         /// </summary>
-        virtual public IBindingFactory When(IList<Condition> cs)
+        virtual public IBindingFactory When(Condition[] cs)
         {
             // 不允许参数长度大于 bindings 长度
-            if (cs.Count > bindings.Length)
+            if (cs.Length > bindings.Length)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }
 
             int length = bindings.Length;
-            int csLength = cs.Count;
+            int csLength = cs.Length;
             int csi = 0;
             for (int i = 0; i < length; i++)
             {
@@ -213,16 +213,16 @@ namespace uMVVMCS.DIContainer
         /// 设置多个 binding 的 condition 属性为 context.parentType 与指定类型相等
         /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
         /// </summary>
-        virtual public IBindingFactory Into(IList<Type> ts)
+        virtual public IBindingFactory Into(Type[] ts)
         {
             // 不允许参数长度大于 bindings 长度
-            if (ts.Count > bindings.Length)
+            if (ts.Length > bindings.Length)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }
 
             int length = bindings.Length;
-            int tsLength = ts.Count;
+            int tsLength = ts.Length;
             int tsi = 0;
             for (int i = 0; i < length; i++)
             {
@@ -260,12 +260,12 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建多个指定类型的 binding，并返回 IBindingFactory
         /// </summary>
-        virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
+        virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
             bool notNull = (types != null &&
                 bindingTypes != null &&
-                types.Count != 0 &&
-                bindingTypes.Count != 0);
+                types.Length != 0 &&
+                bindingTypes.Length != 0);
 
             if (!notNull)
             {
@@ -275,7 +275,7 @@ namespace uMVVMCS.DIContainer
                     "[types] || [bindingTypes]"));
             }
 
-            if (types.Count != bindingTypes.Count)
+            if (types.Length != bindingTypes.Length)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }

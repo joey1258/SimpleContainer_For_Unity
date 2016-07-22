@@ -59,7 +59,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建多个指定类型的 binding，并返回 IBindingFactory
         /// </summary>
-        IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes);
+        IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes);
 
         #endregion
 

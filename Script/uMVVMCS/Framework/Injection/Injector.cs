@@ -398,7 +398,7 @@ namespace uMVVMCS.DIContainer
 
             if (instance == null)
             {
-                int length = binding.valueArray.Length;
+                int length = binding.valueArray.Count;
 
                 switch (binding.bindingType)
                 {
@@ -590,7 +590,7 @@ namespace uMVVMCS.DIContainer
             if (binding.bindingType != BindingType.TEMP)
             {
                 // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
-                int length = binding.valueArray.Length;
+                int length = binding.valueArray.Count;
                 for (int i = 0; i < length; i++)
                 {
                     if (binding.valueArray[i] is Type)

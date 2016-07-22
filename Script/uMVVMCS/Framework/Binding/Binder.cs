@@ -132,12 +132,12 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建多个指定类型的 binding，并返回 IBindingFactory
         /// </summary>
-        virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
+        virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
             bool notNull = (types != null && 
                 bindingTypes != null &&
-                types.Count != 0 && 
-                bindingTypes.Count != 0);
+                types.Length != 0 && 
+                bindingTypes.Length != 0);
 
             if (!notNull)
             {
@@ -147,7 +147,7 @@ namespace uMVVMCS.DIContainer
                     "[types] || [bindingTypes]"));
             }
 
-            if(types.Count != bindingTypes.Count)
+            if(types.Length != bindingTypes.Length)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }
@@ -220,7 +220,7 @@ namespace uMVVMCS.DIContainer
 
                 if (binding.constraint == ConstraintType.MULTIPLE)
                 {
-                    if (CompareUtils.isSameValueArray(
+                    if (CompareUtils.isSameValueIList(
                         typeBindings[binding.type][i].valueArray,
                         binding.valueArray) &&
                         !CompareUtils.isSameObject(typeBindings[binding.type][i], binding))

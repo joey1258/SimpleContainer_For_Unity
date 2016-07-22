@@ -111,9 +111,9 @@ namespace uMVVMCS_NUitTests
             IBinder binder = new Binder();
             //Act
             binder.MultipleBind(
-                new List<Type>() { typeof(int) , typeof(float), typeof(someClass) },
-                new List<BindingType>() { BindingType.MULTITON, BindingType.SINGLETON, BindingType.FACTORY })
-                .As(new List<object>() { 1, 2, 3 });
+                new Type[] { typeof(int) , typeof(float), typeof(someClass) },
+                new BindingType[] { BindingType.MULTITON, BindingType.SINGLETON, BindingType.FACTORY })
+                .As(new object[] { 1, 2, 3 });
             IList<IBinding> bindings = binder.GetAllBindings();
             //Assert
             Assert.AreEqual(
@@ -142,17 +142,17 @@ namespace uMVVMCS_NUitTests
             //Act
             binder
                 .MultipleBind(
-                new List<Type>() { typeof(int), typeof(int), typeof(int) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 1, 2, 3 })
+                new Type[] { typeof(int), typeof(int), typeof(int) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 1, 2, 3 })
                 .MultipleBind(
-                new List<Type>() { typeof(float), typeof(float) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 4, 5 })
+                new Type[] { typeof(float), typeof(float) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 4, 5 })
                 .MultipleBind(
-                new List<Type>() { typeof(string), typeof(string), typeof(string), typeof(string) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 6, 7, 8, 9 });
+                new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 6, 7, 8, 9 });
             //Assert
             Assert.AreEqual(
                 true,
@@ -172,17 +172,17 @@ namespace uMVVMCS_NUitTests
             //Act
             binder
                 .MultipleBind(
-                new List<Type>() { typeof(int), typeof(int), typeof(int) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 1, 2, 3 })
+                new Type[] { typeof(int), typeof(int), typeof(int) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 1, 2, 3 })
                 .MultipleBind(
-                new List<Type>() { typeof(float), typeof(float) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 1, 5 })
+                new Type[] { typeof(float), typeof(float) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 1, 5 })
                 .MultipleBind(
-                new List<Type>() { typeof(string), typeof(string), typeof(string) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 1, 5, 3 });
+                new Type[] { typeof(string), typeof(string), typeof(string) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 1, 5, 3 });
             //Assert
             Assert.AreEqual(
                 true,
@@ -203,17 +203,17 @@ namespace uMVVMCS_NUitTests
             //Act
             binder
                 .MultipleBind(
-                new List<Type>() { typeof(int), typeof(int), typeof(int) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 1, 2, 3 })
+                new Type[] { typeof(int), typeof(int), typeof(int) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 1, 2, 3 })
                 .MultipleBind(
-                new List<Type>() { typeof(float), typeof(float) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 4, 5 })
+                new Type[] { typeof(float), typeof(float) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 4, 5 })
                 .MultipleBind(
-                new List<Type>() { typeof(string), typeof(string), typeof(string), typeof(string) },
-                new List<BindingType>() { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
-                .As(new List<object>() { 6, 7, 8, 9 });
+                new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) },
+                new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
+                .As(new object[] { 6, 7, 8, 9 });
             //Assert
             Assert.AreEqual( 9, binder.GetAllBindings().Count);
         }
@@ -459,19 +459,19 @@ namespace uMVVMCS_NUitTests
                 .BindMultiton<string>()
                 .To(new object[] { "a", "b", "c" })
                 .MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() });
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() });
             //Assert
             Assert.AreEqual(5, binder.GetAllBindings().Count);
         }
@@ -490,28 +490,28 @@ namespace uMVVMCS_NUitTests
                 .To(new object[] { "a", "b", "c" })
                 .As(0)
                 .MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
-                    .As(new List<object>() { null, 1, 2 })
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() })
+                    .As(new object[] { null, 1, 2 })
                     .MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
-                    .As(new List<object>() { null, 3, 4 });
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() })
+                    .As(new object[] { null, 3, 4 });
             //Assert
             Assert.AreEqual(
                 true,
@@ -533,19 +533,19 @@ namespace uMVVMCS_NUitTests
             IBinder binder = new Binder();
             //Act
             binder.MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() });
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() });
             //Assert
             Assert.AreEqual(4, binder.GetAllBindings().Count);
         }
@@ -560,28 +560,28 @@ namespace uMVVMCS_NUitTests
             IBinder binder = new Binder();
             //Act
             binder.MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
-                    .As(new List<object>() { null, 1, 2 })
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() })
+                    .As(new object[] { null, 1, 2 })
                     .MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
-                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
-                new List<BindingType>() {
+                new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new BindingType[] {
                     BindingType.TEMP,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
-                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
-                    .As(new List<object>() { null, 3, 4 });
+                    .To(new object[] { typeof(someClass_b), 1, new someClass() })
+                    .As(new object[] { null, 3, 4 });
             //Assert
             Assert.AreEqual(
                 true, 
