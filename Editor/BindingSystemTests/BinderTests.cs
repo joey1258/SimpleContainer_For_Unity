@@ -383,6 +383,215 @@ namespace uMVVMCS_NUitTests
                 binder.GetBindingsByType<float>().Count == 1);
         }
 
+        /// <summary>
+        /// 测试 Unbind 方法是否正确的移除了相应的 binding
+        /// </summary>
+        [Test]
+        public void Unbind_UnbindBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder
+                .Bind<object>()
+                .To(1)
+                .Bind<object>()
+                .To(2)
+                .As(2)
+                .Bind<int>()
+                .To(1)
+                .Bind<int>()
+                .To(2)
+                .Bind<float>()
+                .To(1f)
+                .As(1)
+                .Bind<float>()
+                .To(2f);
+            //Act
+            binder.Unbind<object>(1);
+            //Assert
+            Assert.AreEqual(true , binder.GetBinding<object>(1) == null);
+        }
+
+        /// <summary>
+        /// 测试 Unbind(binding) 方法是否正确的移除了相应的 binding
+        /// </summary>
+        [Test]
+        public void UnbindBinding_UnbindBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            binder
+                .Bind<object>()
+                .To(1)
+                .Bind<object>()
+                .To(2)
+                .As(2)
+                .Bind<int>()
+                .To(1)
+                .Bind<int>()
+                .To(2)
+                .Bind<float>()
+                .To(1f)
+                .As(1)
+                .Bind<float>()
+                .To(2f);
+            IBinding binding = binder.GetBinding<object>(1);
+            //Act
+            binder.Unbind(binding);
+            //Assert
+            Assert.AreEqual(true, binder.GetBinding<object>(1) == null);
+        }
+
+        #endregion
+
+        #region Chain
+
+        /// <summary>
+        /// 测试链式绑定（单数开始无 id）是否正确的绑定了相应的 binding
+        /// </summary>
+        [Test]
+        public void ChainBind_SingleBeginNullId_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder
+                .BindMultiton<string>()
+                .To(new object[] { "a", "b", "c" })
+                .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() });
+            //Assert
+            Assert.AreEqual(5, binder.GetAllBindings().Count);
+        }
+
+        /// <summary>
+        /// 测试链式绑定（单数开始无 id）是否正确的绑定了相应的 binding
+        /// </summary>
+        [Test]
+        public void ChainBind_SingleBeginHasId_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder
+                .Bind<string>()
+                .To(new object[] { "a", "b", "c" })
+                .As(0)
+                .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .As(new List<object>() { null, 1, 2 })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .As(new List<object>() { null, 3, 4 });
+            //Assert
+            Assert.AreEqual(
+                true,
+                binder.GetAllBindings().Count == 7 &&
+                binder.GetBinding<int>(1) != null &&
+                binder.GetBinding<string>(0) != null &&
+                binder.GetBinding<someClass>(2) != null &&
+                binder.GetBinding<int>(3) != null &&
+                binder.GetBinding<someClass>(4) != null);
+        }
+
+        /// <summary>
+        /// 测试链式绑定（复数开始无 id）是否正确的绑定了相应的 binding
+        /// </summary>
+        [Test]
+        public void ChainBind_MultipleBeginNullId_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder.MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() });
+            //Assert
+            Assert.AreEqual(4, binder.GetAllBindings().Count);
+        }
+
+        /// <summary>
+        /// 测试链式绑定（复数开始有 id）是否正确的绑定了相应的 binding
+        /// </summary>
+        [Test]
+        public void ChainBind_MultipleBeginHasId_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            binder.MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .As(new List<object>() { null, 1, 2 })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .MultipleBind(
+                new List<Type>() { typeof(someClass_b), typeof(int), typeof(someClass) },
+                new List<BindingType>() {
+                    BindingType.TEMP,
+                    BindingType.SINGLETON,
+                    BindingType.FACTORY })
+                    .To(new List<object>() { typeof(someClass_b), 1, new someClass() })
+                    .As(new List<object>() { null, 3, 4 });
+            //Assert
+            Assert.AreEqual(
+                true, 
+                binder.GetAllBindings().Count == 6 &&
+                binder.GetBinding<int>(1) != null &&
+                binder.GetBinding<someClass>(2) != null &&
+                binder.GetBinding<int>(3) != null &&
+                binder.GetBinding<someClass>(4) != null);
+        }
+
         #endregion
     }
 }
