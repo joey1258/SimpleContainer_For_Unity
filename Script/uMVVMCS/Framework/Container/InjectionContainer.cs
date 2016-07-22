@@ -33,34 +33,34 @@ namespace uMVVMCS.DIContainer
 
         #region constructor
 
-        public InjectionContainer() : base(new ReflectionCache(), new InjectionBinder())
+        public InjectionContainer() : base(new ReflectionCache(), new Binder())
         {
             RegisterItself();
         }
 
-        public InjectionContainer(object id) : base(new ReflectionCache(), new InjectionBinder())
-        {
-            this.id = id;
-            RegisterItself();
-        }
-
-        public InjectionContainer(IReflectionCache cache) : base(cache, new InjectionBinder())
-        {
-            RegisterItself();
-        }
-
-        public InjectionContainer(object id, IReflectionCache cache) : base(cache, new InjectionBinder())
+        public InjectionContainer(object id) : base(new ReflectionCache(), new Binder())
         {
             this.id = id;
             RegisterItself();
         }
 
-        public InjectionContainer(IReflectionCache cache, InjectionBinder binder) : base(cache, binder)
+        public InjectionContainer(IReflectionCache cache) : base(cache, new Binder())
         {
             RegisterItself();
         }
 
-        public InjectionContainer(object id, IReflectionCache cache, InjectionBinder binder) : base(cache, binder)
+        public InjectionContainer(object id, IReflectionCache cache) : base(cache, new Binder())
+        {
+            this.id = id;
+            RegisterItself();
+        }
+
+        public InjectionContainer(IReflectionCache cache, IBinder binder) : base(cache, binder)
+        {
+            RegisterItself();
+        }
+
+        public InjectionContainer(object id, IReflectionCache cache, IBinder binder) : base(cache, binder)
         {
             this.id = id;
             RegisterItself();
@@ -174,7 +174,7 @@ namespace uMVVMCS.DIContainer
         #region Bind
 
         /// <summary>
-        /// 返回一个新的Binding实例,并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 TEMP，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {
@@ -182,27 +182,67 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 SINGLETON，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 TEMP，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding Bind(Type type)
+        {
+            return binder.Bind(type);
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindSingleton<T>()
         {
-            return binder.Bind<T>();
+            return binder.BindSingleton<T>();
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 FACTORY，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindSingleton(Type type)
+        {
+            return binder.BindSingleton(type);
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 FACTORY，值约束为 SINGLE
         /// </summary>
         virtual public IBinding BindFactory<T>()
         {
-            return binder.Bind<T>();
+            return binder.BindFactory<T>();
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例，并把设置参数分别给 type 和 BindingType，值约束为 SINGLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 FACTORY，值约束为 SINGLE
         /// </summary>
-        virtual public IBinding Bind(Type type, BindingType bindingType)
+        virtual public IBinding BindFactory(Type type)
         {
-            return binder.Bind(type, bindingType);
+            return binder.BindFactory(type);
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding BindMultiton<T>()
+        {
+            return binder.BindMultiton<T>();
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding BindMultiton(Type type)
+        {
+            return binder.BindMultiton(type);
+        }
+
+        /// <summary>
+        /// 创建多个指定类型的 binding，并返回 IBindingFactory
+        /// </summary>
+        virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
+        {
+            return binder.MultipleBind(types, bindingTypes);
         }
 
         #endregion
@@ -210,7 +250,7 @@ namespace uMVVMCS.DIContainer
         #region GetBinding
 
         /// <summary>
-        /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
+        /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
         virtual public IList<IBinding> GetBindingsByType<T>()
         {
@@ -218,7 +258,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型获取 typeBindings 字典和 bindingStorage 中的所有同类型 Binding
+        /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
         virtual public IList<IBinding> GetBindingsByType(Type type)
         {
@@ -226,7 +266,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 获取 bindingStorage 中 所有指定 id 的 binding
+        /// 获取储存容器中所有指定 id 的 binding
         /// </summary>
         virtual public IList<IBinding> GetBindingsById(object id)
         {
@@ -242,7 +282,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回 typeBindings 中除自身以外所有 type 和值都相同的 binding
+        /// 返回储存容器中除自身以外所有 type 和值都相同的 binding
         /// </summary>
         virtual public IList<IBinding> GetSameNullIdBinding(IBinding binding)
         {
@@ -250,7 +290,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型和id获取 bindingStorage 中的 Binding
+        /// 根据类型和id获取储存容器中的 Binding
         /// </summary>
         virtual public IBinding GetBinding<T>(object id)
         {
@@ -258,7 +298,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型和id获取 bindingStorage 中的 Binding
+        /// 根据类型和id获取储存容器中的 Binding
         /// </summary>
         virtual public IBinding GetBinding(Type type, object id)
         {
@@ -270,7 +310,7 @@ namespace uMVVMCS.DIContainer
         #region Unbind
 
         /// <summary>
-        /// 根据类型从 bindingStorage 和 typeBindings 中删除所有同类型 Binding
+        /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindByType<T>()
         {
@@ -278,7 +318,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型从 bindingStorage 和 typeBindings 中删除所有同类型 Binding
+        /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindByType(Type type)
         {
@@ -286,23 +326,15 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型从 bindingStorage 中删除所有同类型 Binding
+        /// 根据 id 从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindBindingStorageByType<T>()
+        virtual public void UnbindById(object id)
         {
-            binder.UnbindBindingStorageByType<T>();
+            binder.UnbindById(id);
         }
 
         /// <summary>
-        /// 根据类型从 bindingStorage 中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindBindingStorageByType(Type type)
-        {
-            binder.UnbindBindingStorageByType(type);
-        }
-
-        /// <summary>
-        /// 根据类型从 typeBindings 中删除所有同类型 Binding
+        /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindNullIdBindingByType<T>()
         {
@@ -310,7 +342,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型从 typeBindings 中删除所有同类型 Binding
+        /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindNullIdBindingByType(Type type)
         {
@@ -318,7 +350,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型和 id 从 bindingStorage 中删除 Binding
+        /// 根据类型和 id 从所有容器中删除 Binding
         /// </summary>
 		virtual public void Unbind<T>(object id)
         {
@@ -326,7 +358,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据类型和 id 从 bindingStorage 中删除 Binding
+        /// 根据类型和 id 从所有容器中删除 Binding
         /// </summary>
 		virtual public void Unbind(Type type, object id)
         {
@@ -334,7 +366,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 根据 binding 从 bindingStorage 中删除 Binding
+        /// 根据 binding 从所有容器中删除 Binding
         /// </summary>
         virtual public void Unbind(IBinding binding)
         {
@@ -343,41 +375,13 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
-        #region Remove
-
         /// <summary>
-        /// 删除指定 binding 中指定的 value 值，如果移除后 value 属性为空或 value 约束为唯一，就移除该 binding
+        /// 储存 binding
         /// </summary>
-        virtual public void RemoveValue(IBinding binding, object value)
+        public void Storing(IBinding binding)
         {
-            binder.RemoveValue(binding, value);
+            binder.Storing(binding);
         }
-
-        /// <summary>
-        /// 删除指定 binding 中 value 的多个值，如果移除后 value 属性为空或 value 约束为唯一，就移除该 binding
-        /// </summary>
-        virtual public void RemoveValues(IBinding binding, IList<object> values)
-        {
-            binder.RemoveValues(binding, values);
-        }
-
-        /// <summary>
-        /// 删除 binding 自身
-        /// </summary>
-        virtual public void RemoveBinding(IBinding binding)
-        {
-            binder.RemoveBinding(binding);
-        }
-
-        /// <summary>
-        /// 根据 type 和 id 删除 binding （type 和 id 不可为空）
-        /// </summary>
-        virtual public void RemoveBinding(Type type, object id)
-        {
-            binder.RemoveBinding(type, id);
-        }
-
-        #endregion
 
         #endregion
 

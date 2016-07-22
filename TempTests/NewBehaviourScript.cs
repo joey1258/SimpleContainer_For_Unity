@@ -9,15 +9,33 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        object o1 = 1;
-        object o2 = 1;
-        print(o1.Equals(o2));
-        object o3 = new ren();
-        object o4 = new ren();
-        object o5 = o3;
-        object o6 = o3;
-        print(o3.Equals(o4));
-        print(o5.Equals(o6));
+
+        //Arrange 
+        IBinder binder = new Binder();
+        binder
+            .Bind<object>()
+            .To(1)
+            .Bind<object>()
+            .To(2)
+            .As(2)
+            .Bind<int>()
+            .To(1)
+            .Bind<int>()
+            .To(2)
+            .Bind<float>()
+            .To(1f)
+            .As(1)
+            .Bind<float>()
+            .To(2f);
+        //Act
+        //binder.UnbindNullIdBindingByType<object>();
+        binder.UnbindNullIdBindingByType<int>();
+        //binder.UnbindNullIdBindingByType<float>();
+
+        //print(binder.GetAllBindings().Count);
+        //print(binder.GetBindingsByType<object>().Count);
+        print(binder.GetBindingsByType<int>().Count);
+        //print(binder.GetBindingsByType<float>().Count);
     }
 
     // Update is called once per frame
@@ -28,8 +46,25 @@ public class NewBehaviourScript : MonoBehaviour {
 
 }
 
-public class ren { public int age; public string name; }
+public interface p {  }
+public class ren : p { public int age; public string name; }
+public class ren1 : ren {  }
+public class ren2 : ren {  }
 
+public static class renKZ
+{
+    public static void printAge(this ren r) { UnityEngine.Debug.Log(r.age); }
+}
+
+public class someClass : IInjectionFactory
+{
+    public int id;
+    public object Create(InjectionContext context) { return this; }
+}
+
+public class someClass_b : someClass { }
+
+public class someClass_c : someClass { }
 
 
 

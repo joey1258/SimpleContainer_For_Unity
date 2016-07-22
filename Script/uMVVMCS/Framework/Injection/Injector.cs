@@ -40,11 +40,11 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// Binder used to resolved bindings.
         /// </summary>
-        public InjectionBinder binder { get; protected set; }
+        public IBinder binder { get; protected set; }
 
         #region constructor
 
-        public Injector(IReflectionCache cache, InjectionBinder binder)
+        public Injector(IReflectionCache cache, IBinder binder)
         {
             this.cache = cache;
             this.binder = binder;
@@ -232,7 +232,17 @@ namespace uMVVMCS.DIContainer
                         parentInstance,
                         id);
 
-                    instances.Add(instance);
+                    if (instance is Array)
+                    {
+                        object[] os = (object[])instance;
+                        int length = os.Length;
+
+                        for (int n = 0; n < length; n++)
+                        {
+                            instances.Add(os[n]);
+                        }
+                    }
+                    else { instances.Add(instance); }
                 }
             }
 
@@ -245,7 +255,10 @@ namespace uMVVMCS.DIContainer
             else if (instances.Count > 0)
             {
                 var array = Array.CreateInstance(inwardType, instances.Count);
-                for (int i = 0; i < instances.Count; i++) { array.SetValue(instances[i], i); }
+                for (int i = 0; i < instances.Count; i++)
+                {
+                    array.SetValue(instances[i], i);
+                }
                 resolution = array;
             }
 
@@ -340,7 +353,7 @@ namespace uMVVMCS.DIContainer
         #region Resolve assist
 
         /// <summary>
-        /// 对参数 binding 进行过滤，根据 BindingType 选择相应的实例化和注入操作，并返回其结果
+        /// 对参数 binding 进行过滤，根据 BindingType 进行实例化和注入操作，并返回其结果(有可能是数组）
         /// </summary>
         virtual protected object ResolveBinding(
             IBinding binding,
@@ -385,6 +398,8 @@ namespace uMVVMCS.DIContainer
 
             if (instance == null)
             {
+                int length = binding.valueArray.Length;
+
                 switch (binding.bindingType)
                 {
                     // 如果实例类型为 TEMP，获取对应的完成注入后的实例
@@ -392,15 +407,14 @@ namespace uMVVMCS.DIContainer
                     case BindingType.TEMP:
                         if(binding.constraint == ConstraintType.MULTIPLE)
                         {
-                            int length = binding.valueArray.Length;
                             object[] list = new object[length];
                             for (int i = 0; i < length; i++)
                             {
-                                list[i] = this.Instantiate(binding.valueArray[i] as Type);
+                                list[i] = Instantiate(binding.valueArray[i] as Type);
                             }
                             instance = list;
                         }
-                        else { instance = this.Instantiate(binding.value as Type); }
+                        else { instance = Instantiate(binding.value as Type); }
                         break;
 
                     // 如果是工厂类型，将 binding 的值作为工厂类并获取其create方法的结果
@@ -414,10 +428,26 @@ namespace uMVVMCS.DIContainer
                     case BindingType.SINGLETON:
                         if (binding.value is Type)
                         {
-                            binding.To(this.Instantiate(binding.value as Type));
+                            binding.To(Instantiate(binding.value as Type));
                         }
 
                         instance = binding.value;
+                        break;
+
+                    // 如果是多例类型，遍历它的所有值,如果值是 Type，就实例化该类型并执行注入
+                    // 同时保存实例化的结果到当前元素；如果不是 Type 就直接获取其值
+                    case BindingType.MULTITON:
+                        object[] instances = new object[length];
+                        for (int i = 0; i < length; i++)
+                        {
+                            if (binding.valueArray[i] is Type)
+                            {
+                                binding.valueArray[i] = Instantiate(binding.value as Type);
+                            }
+                            instances[i] = binding.valueArray[i];
+                        }
+
+                        instance = instances;
                         break;
                 }
             }
@@ -557,33 +587,22 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual protected void OnBeforeAddBinding(IBinder source, ref IBinding binding)
         {
-            if (binding.bindingType == BindingType.SINGLETON ||
-                binding.bindingType == BindingType.FACTORY)
+            if (binding.bindingType != BindingType.TEMP)
             {
                 // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
-                switch (binding.constraint)
+                int length = binding.valueArray.Length;
+                for (int i = 0; i < length; i++)
                 {
-                    case ConstraintType.SINGLE:
-                    case ConstraintType.MULTIPLE:
-                        int length = binding.valueArray.Length;
-                        for (int i = 0; i < length; i++)
-                        {
-                            if (binding.valueArray[i] is Type)
-                            {
-                                var value = this.Resolve(binding.valueArray[i] as Type);
-                                binding.To(value);
-                            }
-                            else
-                            {
-                                // hasBeenInjected 判断放在容器类中更为合适，所以这里不做注入状态检查
-                                Inject(binding.valueArray[i]);
-                            }
-                        }
-                        break;
-
-                    case ConstraintType.POOL:
-                        // 待补充
-                        break;
+                    if (binding.valueArray[i] is Type)
+                    {
+                        var value = this.Resolve(binding.valueArray[i] as Type);
+                        binding.To(value);
+                    }
+                    else
+                    {
+                        // hasBeenInjected 判断放在容器类中更为合适，所以这里不做注入状态检查
+                        Inject(binding.valueArray[i]);
+                    }
                 }
             }
         }
