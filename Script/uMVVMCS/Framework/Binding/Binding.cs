@@ -35,8 +35,6 @@ namespace uMVVMCS.DIContainer
             _binder = b;
 
             _type = t;
-
-            _value = new List<object>();
         }
 
         public Binding(IBinder b, Type t, BindingType bt)
@@ -46,8 +44,6 @@ namespace uMVVMCS.DIContainer
             _type = t;
 
             _bindingType = bt;
-
-            _value = new List<object>();
         }
 
         public Binding(IBinder b, Type t, BindingType bt, ConstraintType c)
@@ -88,20 +84,24 @@ namespace uMVVMCS.DIContainer
         protected Type _type;
 
         /// <summary>
-        ///  value 属性
-        ///  valueArray 属性为避免外部需要以数组形式获取时的拆装箱消耗
+        ///  value 属性 返回 valueList 的第一个元素
+        ///  valueList 返回整个 valueList
         /// </summary>
         public object value
         {
             get
             {
-                if(_constraint == ConstraintType.SINGLE) { return _value[0]; }
-                return _value;
+                if(_value == null) { _value = new List<object>(); }
+                return _value[0];
             }
         }
-        public IList<object> valueArray
+        public IList<object> valueList
         {
-            get { return _value; }
+            get
+            {
+                if (_value == null) { _value = new List<object>(); }
+                return _value;
+            }
         }
         protected IList<object> _value;
 
@@ -181,12 +181,22 @@ namespace uMVVMCS.DIContainer
             {
                 throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
             }
-            
+
+            bool add = true;
+            int count = _value.Count;
+            for (int n = 0; n < count; n++)
+            {
+                if (_value[n] == o) { add = false; }
+            }
+
             if (_constraint == ConstraintType.SINGLE || _value == null)
             {
-                _value = new List<object>() { o };
+                if (add) { _value = new List<object>() { o }; }
             }
-            else { _value.Add(o); }
+            else
+            {
+                if (add) { _value.Add(o); }
+            }
 
             binder.Storing(this);
 
@@ -198,32 +208,37 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding To(object[] os)
         {
-            // 如果 binding 类型不为多例就抛出异常
+            if (_bindingType == BindingType.TEMP)
+            {
+                _bindingType = BindingType.MULTITON;
+                _constraint = ConstraintType.MULTIPLE;
+            }
+
+            // 如果值约束不为复数就抛出异常
             if (_constraint == ConstraintType.SINGLE)
             {
-                if (_bindingType == BindingType.TEMP)
-                {
-                    _bindingType = BindingType.MULTITON;
-                    _constraint = ConstraintType.MULTIPLE;
-                }
-                else
-                {
-                    throw new BindingSystemException(
-                        string.Format(BindingSystemException.BINDINGTYPE_NOT_ASSIGNABLE,
-                        "[To(object[] os)]",
-                        _bindingType));
-                }
+                throw new BindingSystemException(
+                    string.Format(BindingSystemException.BINDINGTYPE_NOT_ASSIGNABLE,
+                    "[To(object[] os)]",
+                    _bindingType));
             }
 
             int length = os.Length;
             for (int i = 0; i < length; i++)
             {
-                var osi = os[i];
-                if (!PassToAdd(osi))
+                bool add = true;
+                int count = _value.Count;
+                for (int n = 0; n < count; n++)
+                {
+                    if(_value[n] == os[i]) { add = false; }
+                }
+                
+                if (!PassToAdd(os[i]))
                 {
                     throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
                 }
-               _value.Add(osi);
+
+                if (add) { _value.Add(os[i]); }
             }
 
             binder.Storing(this);

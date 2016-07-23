@@ -34,11 +34,11 @@ namespace uMVVMCS.DIContainer
         Type type { get; }
 
         /// <summary>
-        /// value 属性
-        ///  valueArray 属性为避免外部需要以数组形式获取时的拆装箱消耗
+        ///  value 属性 返回 valueList 的第一个元素
+        ///  valueList 返回整个 valueList
         /// </summary>
         object value { get; }
-        IList<object> valueArray { get; }
+        IList<object> valueList { get; }
 
         /// <summary>
         /// id 属性

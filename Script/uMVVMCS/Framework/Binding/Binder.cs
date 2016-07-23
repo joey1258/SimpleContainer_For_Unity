@@ -221,8 +221,8 @@ namespace uMVVMCS.DIContainer
                 if (binding.constraint == ConstraintType.MULTIPLE)
                 {
                     if (CompareUtils.isSameValueIList(
-                        typeBindings[binding.type][i].valueArray,
-                        binding.valueArray) &&
+                        typeBindings[binding.type][i].valueList,
+                        binding.valueList) &&
                         !CompareUtils.isSameObject(typeBindings[binding.type][i], binding))
                     {
                         bindingList.Add(typeBindings[binding.type][i]);

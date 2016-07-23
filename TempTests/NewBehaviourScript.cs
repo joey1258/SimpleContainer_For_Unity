@@ -9,33 +9,13 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-
         //Arrange 
         IBinder binder = new Binder();
-        binder
-            .Bind<object>()
-            .To(1)
-            .Bind<object>()
-            .To(2)
-            .As(2)
-            .Bind<int>()
-            .To(1)
-            .Bind<int>()
-            .To(2)
-            .Bind<float>()
-            .To(1f)
-            .As(1)
-            .Bind<float>()
-            .To(2f);
+        IBinding binding = binder.BindMultiton<int>().To(new object[] { 1, 2, 3, 4, 5, 6 });
         //Act
-        //binder.UnbindNullIdBindingByType<object>();
-        binder.UnbindNullIdBindingByType<int>();
-        //binder.UnbindNullIdBindingByType<float>();
+        binding.RemoveValue(new object[] { 1, 2 });
 
-        //print(binder.GetAllBindings().Count);
-        //print(binder.GetBindingsByType<object>().Count);
-        print(binder.GetBindingsByType<int>().Count);
-        //print(binder.GetBindingsByType<float>().Count);
+        print(binding.valueList.Count);
     }
 
     // Update is called once per frame
