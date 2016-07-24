@@ -508,5 +508,27 @@ namespace uMVVMCS.DIContainer
         }
 
         #endregion
+
+        /// <summary>
+        /// 配合 BindingsPrinter 窗口显示 binding 信息
+        /// </summary>
+        public override string ToString()
+        {
+            return string.Format(
+            "Type: {0}\n" +
+            "Value: {1} ({2})\n" +
+            "Id: {3}\n"+
+            "BindingType: {4}\n" +
+            "constraint: {5}\n" +
+            "Conditions: {6}\n",
+            this.type.FullName,
+            (this.value == null ? "null" : this.value.ToString()),
+            (this.value is Type ? "type" : "instance"),
+            (this.id == null ? "null" : this.id.ToString()),
+            this.bindingType.ToString(),
+            this.constraint.ToString(),
+            (this.condition == null ? "no" : "yes")
+            );
+        }
     }
 }
