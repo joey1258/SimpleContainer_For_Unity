@@ -303,7 +303,6 @@ namespace uMVVMCS.DIContainer.Extensions
 
             var gameObjects = GameObject.FindGameObjectsWithTag(tag);
 
-            var bindingTypes = new IBinding[gameObjects.Length];
             for (int i = 0; i < gameObjects.Length; i++)
             {
                 // 如果参数 type 是 GameObject 类型,就将 gameObject 作为 binding 的值
