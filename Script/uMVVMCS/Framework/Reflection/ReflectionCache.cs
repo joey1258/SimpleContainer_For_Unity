@@ -24,9 +24,9 @@ namespace uMVVMCS.DIContainer
     /// </summary>
     public class ReflectionCache : IReflectionCache
     {
-        protected Dictionary<Type, ReflectionInfo> infos;
+        private Dictionary<Type, ReflectionInfo> infos;
 
-        protected IReflectionFactory reflectionFactory;
+        private IReflectionFactory reflectionFactory;
 
         #region constructor
 
@@ -52,7 +52,6 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 为缓存字典添加指定类型的反射类实例
         /// </summary>
-        /// <param name="type">Type to be added.</param>
         public void Add(Type type)
         {
             if (type == null)
@@ -69,7 +68,6 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 从缓存字典中移除指定类型的实例
         /// </summary>
-        /// <param name="type">Type to be removed.</param>
         public void Remove(Type type)
         {
             if (this.Contains(type))

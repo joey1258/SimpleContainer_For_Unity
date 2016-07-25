@@ -241,39 +241,124 @@ namespace uMVVMCS.DIContainer.Extensions
 
         #endregion
 
-        /*#region ToGameObjectsWithTag
+        #region ToGameObjectsWithTag
 
+        /// <summary>
+        /// 获取所有指定 tag 的 gameobject 并将它们作为多例 binding 的值，如果参数 type 是 Component
+        /// 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// </summary>
+        /// <remarks>
+        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
+        /// </remarks>
         public static IBinding ToGameObjectsWithTag(this IBinding binding, string tag)
         {
             return binding.ToGameObjectsWithTag(binding.type, tag);
         }
 
+
+        /// <summary>
+        /// 获取所有指定 tag 的 gameobject 并将它们作为多例 binding 的值，如果参数 type 是 Component
+        /// 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// </summary>
+        /// <remarks>
+        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
+        /// </remarks>
         public static IBinding ToGameObjectsWithTag<T>(this IBinding binding, string tag) where T : Component
         {
             return binding.ToGameObjectsWithTag(typeof(T), tag);
         }
 
         /// <summary>
-        /// Binds the key type to singletons <see cref="UnityEngine.Component"/>
-        /// of itself on game objects of a given <paramref name="tag"/>.
-        /// 
-        /// If <paramref name="type"/> is <see cref="UnityEngine.GameObject"/>, binds the
-        /// key to the GameObject itself.
-        /// 
-        /// If <paramref name="type"/> is see cref="UnityEngine.Component"/>, binds the key
-        /// to the the instance of the component.
-        /// 
-        /// If the <see cref="UnityEngine.Component"/> is not found on the GameObject, it will be added.
+        /// 获取所有指定 tag 的 gameobject 并将它们作为多例 binding 的值，如果参数 type 是 Component
+        /// 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
         /// </summary>
         /// <remarks>
-        /// To prevent references to destroyed objects, only bind to game objects that won't 
-        /// be destroyed in the scene.
+        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
         /// </remarks>
-        /// <param name="bindingFactory">The original binding factory.</param>
-        /// <param name="type">The component type.</param>
-        /// <param name="tag">The GameObject tag.</param>
-        /// <returns>The binding condition object related to this binding.</returns>
         public static IBinding ToGameObjectsWithTag(this IBinding binding, Type type, string tag)
+        {
+            if(binding.bindingType == BindingType.FACTORY)
+            {
+                throw new BindingSystemException(
+                    string.Format(
+                        BindingSystemException.BINDINGTYPE_NOT_ASSIGNABLE,
+                        "ToGameObjectsWithTag",
+                        "FACTORY"));
+            }
+
+            if (!TypeUtils.IsAssignable(binding.type, type))
+            {
+                throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
+            }
+
+            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
+            var isComponent = TypeUtils.IsAssignable(typeof(Component), type);
+            if (!isGameObject && !isComponent)
+            {
+                throw new BindingSystemException(BindingSystemException.TYPE_NOT_COMPONENT);
+            }
+
+            binding.SetBindingType(BindingType.MULTITON);
+            binding.SetConstraint(ConstraintType.MULTIPLE);
+
+            var gameObjects = GameObject.FindGameObjectsWithTag(tag);
+
+            var bindingTypes = new IBinding[gameObjects.Length];
+            for (int i = 0; i < gameObjects.Length; i++)
+            {
+                // 如果参数 type 是 GameObject 类型,就将 gameObject 作为 binding 的值
+                if (isGameObject)
+                {
+                    binding.SetValue(gameObjects[i]);
+                }
+                // 否则获取 gameObject 上指定类型的组件，将组件作为 binding 的值
+                else
+                {
+                    var component = gameObjects[i].GetComponent(type);
+
+                    if (component == null)
+                    {
+                        component = gameObjects[i].AddComponent(type);
+                    }
+
+                    binding.SetValue(component);
+                }
+            }
+
+            return binding;
+        }
+
+        #endregion/**/
+
+        /*#region ToPrefab
+
+        public static IBindingConditionFactory ToPrefab(this IBindingFactory bindingFactory, string name)
+        {
+            return bindingFactory.ToPrefab(bindingFactory.bindingType, name);
+        }
+
+        public static IBindingConditionFactory ToPrefab<T>(this IBindingFactory bindingFactory, string name) where T : Component
+        {
+            return bindingFactory.ToPrefab(typeof(T), name);
+        }
+
+        /// <summary>
+        /// Binds the key type to a transient <see cref="UnityEngine.Component"/>
+        /// of <paramref name="type"/> on the prefab.
+        /// 
+        /// If the <see cref="UnityEngine.Component"/> is not found on the prefab
+        /// at the moment of the instantiation, it will be added.
+        /// </summary>
+        /// <remarks>
+        /// Every resolution of a transient prefab will generate a new instance. So, even
+        /// if the component resolved from the prefab is destroyed, it won't generate any
+        /// missing references in the container.
+        /// </remarks>
+        /// <param name="binding">The original binding factory.</param>
+        /// <param name="type">The component type.</param>
+        /// <param name="name">Prefab name. It will be loaded using <c>Resources.Load<c/>.</param>
+        /// <returns>The binding condition object related to this binding.</returns>
+        public static IBinding ToPrefab(this IBinding binding, Type type, string name)
         {
             if (!TypeUtils.IsAssignable(binding.type, type))
             {
@@ -287,16 +372,15 @@ namespace uMVVMCS.DIContainer.Extensions
                 throw new BindingSystemException(BindingSystemException.TYPE_NOT_COMPONENT);
             }
 
-            var gameObjects = GameObject.FindGameObjectsWithTag(tag);
-            var bindingFactories = new IBinding[gameObjects.Length];
-
-            for (int gameObjectIndex = 0; gameObjectIndex < gameObjects.Length; gameObjectIndex++)
+            var prefab = Resources.Load(name);
+            if (prefab == null)
             {
-                bindingFactories[gameObjectIndex] =
-                    CreateSingletonBinding(binding, gameObjects[gameObjectIndex], type, isGameObject);
+                throw new BindingException(PREFAB_IS_NULL);
             }
 
-            return new MultipleBindingConditionFactory(bindingFactories, binding.binder);
+            var prefabBinding = new PrefabBinding(prefab, type);
+
+            return binding.AddBinding(prefabBinding, BindingInstance.Transient);
         }
 
         #endregion*/
