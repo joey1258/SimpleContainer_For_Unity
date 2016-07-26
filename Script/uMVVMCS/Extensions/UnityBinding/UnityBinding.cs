@@ -24,73 +24,60 @@ namespace uMVVMCS.DIContainer.Extensions
         #region ToGameObject
 
         /// <summary>
-        /// 将名称与 binding.type 相同的 GameObject 作为单例 binding 的值，如果参数 type 是
-        /// Component 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，
-        /// 就为其添加该组件
+        /// 在场景中新建一个与 binding.type 同名的空物体并将 binding.type 同类型的组件加载到空物体上，如
+        /// 果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 binding 的值，为了保证运
+        /// 作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObject(this IBinding binding)
         {
             return binding.ToGameObject(binding.type, null);
         }
 
         /// <summary>
-        /// 将名称与参数 type 相同的 GameObject 作为单例 binding 的值，如果参数 type 是 Component 
-        /// 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 在场景中新建一个指定类型同名的空物体并将指定类型的组件加载到空物体上，如果类型是 GameObject 就
+        /// 直接用空物体作为 binding 的值，否则用组件作为 binding 的值，为了保证运作正常该物体生成后不应该
+        /// 被从场景中删除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObject<T>(this IBinding binding) where T : Component
         {
             return binding.ToGameObject(typeof(T), null);
         }
 
         /// <summary>
-        /// 用 type 的字符串名称新建的 GameObject 作为单例 binding 的值，如果参数 type 是 Component 
-        /// 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 在场景中新建一个指定类型同名的空物体并将指定类型的组件加载到空物体上，如果类型是 GameObject 就
+        /// 直接用空物体作为 binding 的值，否则用组件作为 binding 的值，为了保证运作正常该物体生成后不应该
+        /// 被从场景中删除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObject(this IBinding binding, Type type)
         {
             return binding.ToGameObject(type, null);
         }
 
         /// <summary>
-        /// 将一个指定名称的 GameObject 作为单例 binding 的值，如果参数 type 是 Component 类型，
-        /// 就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 在场景中建立或获取一个指定名称的空物体并将指定类型的组件加载到空物体上，如果指定名称为空就以组件
+        /// 的名称来命名空物体，如果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 
+        /// binding 的值，为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObject(this IBinding binding, string name)
         {
             return binding.ToGameObject(binding.type, name);
         }
 
         /// <summary>
-        /// 将一个指定名称的 GameObject 作为单例 binding 的值，如果参数 type 是 Component 类型，
-        /// 就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 在场景中建立或获取一个指定名称的空物体并将指定类型的组件加载到空物体上，如果指定名称为空就以组件
+        /// 的名称来命名空物体，如果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 
+        /// binding 的值，为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObject<T>(this IBinding binding, string name) where T : Component
         {
             return binding.ToGameObject(typeof(T), name);
         }
 
         /// <summary>
-        /// 将一个指定名称的 GameObject 作为单例 binding 的值，如果 binding.type 是 Component 类型，
-        /// 就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 在场景中建立或获取一个指定名称的空物体并将指定类型的组件加载到空物体上，如果指定名称为空就以组件
+        /// 的名称来命名空物体，如果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 
+        /// binding 的值，为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObject(this IBinding binding, Type type, string name)
         {
             if (binding.bindingType == BindingType.TEMP)
@@ -112,7 +99,7 @@ namespace uMVVMCS.DIContainer.Extensions
             else { gameObject = GameObject.Find(name); }
 
             // 将 gameObject 设为 binding 的值
-            SetBindingValue(binding, gameObject, type, isGameObject);
+            SetValueAddComponent(binding, gameObject, type, isGameObject);
             binding.binder.Storing(binding);
 
             return binding;
@@ -123,15 +110,13 @@ namespace uMVVMCS.DIContainer.Extensions
         #region ToGameObjects
 
         /// <summary>
-        /// 将多个 GameObject 作为单例 binding 的值，如果 binding.type 是 Component 类型，
-        /// 就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 为多个 GameObject 添加指定类型的组件，如果 binding.type 是 Component 类型，就将 
+        /// Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件，
+        /// 为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObjects(
-            this IBinding binding, 
-            Type type, 
+            this IBinding binding,
+            Type type,
             GameObject[] gameObjects)
         {
             if (binding.bindingType == BindingType.TEMP)
@@ -146,7 +131,7 @@ namespace uMVVMCS.DIContainer.Extensions
             for (int i = 0; i < gameObjects.Length; i++)
             {
                 // 将 gameObject 设为 binding 的值
-                SetBindingValue(binding, gameObjects[i], type, isGameObject);
+                SetValueAddComponent(binding, gameObjects[i], type, isGameObject);
             }
 
             binding.binder.Storing(binding);
@@ -159,39 +144,33 @@ namespace uMVVMCS.DIContainer.Extensions
         #region ToGameObjectWithTag
 
         /// <summary>
-        /// 将一个带有指定 tag 的 GameObject 作为单例 binding 的值，如果带有指定 tag 的 GameObject
-        /// 多于1个，将取其中第一个；如果参数 type 是 Component 类型，就将 Component 作为 binding 的
-        /// 值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 获取带有指定 tag 的 GameObject，如果参数 type 是 GameObject 类型，就将 GameObject 作为 
+        /// binding 的值；如果参数 type 是 Component 类型，就将 Component 作为 binding 的值，同时如
+        /// 果 GameObject 上没有该组件，就为其添加该组件。为了保证运作正常该物体生成后不应该被从场景中删
+        /// 除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObjectWithTag(this IBinding binding, string tag)
         {
             return binding.ToGameObjectWithTag(binding.type, tag);
         }
 
         /// <summary>
-        /// 将一个带有指定 tag 的 GameObject 作为单例 binding 的值，如果带有指定 tag 的 GameObject
-        /// 多于1个，将取其中第一个；如果参数 type 是 Component 类型，就将 Component 作为 binding 的
-        /// 值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 获取带有指定 tag 的 GameObject，如果参数 type 是 GameObject 类型，就将 GameObject 作为 
+        /// binding 的值；如果参数 type 是 Component 类型，就将 Component 作为 binding 的值，同时如
+        /// 果 GameObject 上没有该组件，就为其添加该组件。为了保证运作正常该物体生成后不应该被从场景中删
+        /// 除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObjectWithTag<T>(this IBinding binding, string tag) where T : Component
         {
             return binding.ToGameObjectWithTag(typeof(T), tag);
         }
 
         /// <summary>
-        /// 将一个带有指定 tag 的 GameObject 作为单例 binding 的值，如果带有指定 tag 的 GameObject
-        /// 多于1个，将取其中第一个；如果参数 type 是 Component 类型，就将 Component 作为 binding 的
-        /// 值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 获取带有指定 tag 的 GameObject，如果参数 type 是 GameObject 类型，就将 GameObject 作为 
+        /// binding 的值；如果参数 type 是 Component 类型，就将 Component 作为 binding 的值，同时如
+        /// 果 GameObject 上没有该组件，就为其添加该组件。为了保证运作正常该物体生成后不应该被从场景中删
+        /// 除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObjectWithTag(this IBinding binding, Type type, string tag)
         {
             if (binding.bindingType == BindingType.TEMP)
@@ -207,7 +186,7 @@ namespace uMVVMCS.DIContainer.Extensions
             var gameObject = GameObject.FindWithTag(tag);
 
             // 将 gameObject 设为 binding 的值
-            SetBindingValue(binding, gameObject, type, isGameObject);
+            SetValueAddComponent(binding, gameObject, type, isGameObject);
             binding.binder.Storing(binding);
 
             return binding;
@@ -218,12 +197,11 @@ namespace uMVVMCS.DIContainer.Extensions
         #region ToGameObjectsWithTag
 
         /// <summary>
-        /// 获取所有指定 tag 的 gameobject 并将它们作为多例 binding 的值，如果参数 type 是 Component
-        /// 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 获取所有带有指定 tag 的 GameObject，如果参数 type 是 GameObject 类型，就将 GameObject 作
+        /// 为 binding 的值；如果参数 type 是 Component 类型，就将 Component 作为 binding 的值，同时
+        /// 如果 GameObject 上没有该组件，就为其添加该组件。为了保证运作正常该物体生成后不应该被从场景中删
+        /// 除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObjectsWithTag(this IBinding binding, string tag)
         {
             return binding.ToGameObjectsWithTag(binding.type, tag);
@@ -231,24 +209,22 @@ namespace uMVVMCS.DIContainer.Extensions
 
 
         /// <summary>
-        /// 获取所有指定 tag 的 gameobject 并将它们作为多例 binding 的值，如果参数 type 是 Component
-        /// 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 获取所有带有指定 tag 的 GameObject，如果参数 type 是 GameObject 类型，就将 GameObject 作
+        /// 为 binding 的值；如果参数 type 是 Component 类型，就将 Component 作为 binding 的值，同时
+        /// 如果 GameObject 上没有该组件，就为其添加该组件。为了保证运作正常该物体生成后不应该被从场景中删
+        /// 除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObjectsWithTag<T>(this IBinding binding, string tag) where T : Component
         {
             return binding.ToGameObjectsWithTag(typeof(T), tag);
         }
 
         /// <summary>
-        /// 获取所有指定 tag 的 gameobject 并将它们作为多例 binding 的值，如果参数 type 是 Component
-        /// 类型，就将 Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件
+        /// 获取所有带有指定 tag 的 GameObject，如果参数 type 是 GameObject 类型，就将 GameObject 作
+        /// 为 binding 的值；如果参数 type 是 Component 类型，就将 Component 作为 binding 的值，同时
+        /// 如果 GameObject 上没有该组件，就为其添加该组件。为了保证运作正常该物体生成后不应该被从场景中删
+        /// 除，或将组件添加到会被删除的物体上
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToGameObjectsWithTag(this IBinding binding, Type type, string tag)
         {
             if(binding.bindingType == BindingType.FACTORY)
@@ -275,7 +251,7 @@ namespace uMVVMCS.DIContainer.Extensions
             for (int i = 0; i < gameObjects.Length; i++)
             {
                 // 将 gameObject 设为 binding 的值
-                SetBindingValue(binding, gameObjects[i], type, isGameObject);
+                SetValueAddComponent(binding, gameObjects[i], type, isGameObject);
             }
 
             binding.binder.Storing(binding);
@@ -288,36 +264,33 @@ namespace uMVVMCS.DIContainer.Extensions
         #region ToPrefab
 
         /// <summary>
-        /// 将带有参数 type 类型组件的 prefab 作为 binding 的值，如果实例化时 prefab 上没有组件，
-        /// 实例化时将会进行添加
+        /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；TEMP 类型 binding
+        /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
+        /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToPrefab(this IBinding binding, string path)
         {
             return binding.ToPrefab(binding.type, path);
         }
 
         /// <summary>
-        /// 将带有参数 type 类型组件的 prefab 作为 binding 的值，如果实例化时 prefab 上没有组件，
-        /// 实例化时将会进行添加
+        /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；TEMP 类型 binding
+        /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
+        /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToPrefab<T>(this IBinding binding, string path) where T : Component
         {
             return binding.ToPrefab(typeof(T), path);
         }
 
         /// <summary>
-        /// 将带有参数 type 类型组件的 prefab 作为 binding 的值，如果实例化时 prefab 上没有组件，
-        /// 实例化时将会进行添加
+        /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；TEMP 类型 binding
+        /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
+        /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
         public static IBinding ToPrefab(this IBinding binding, Type type, string path)
         {
             var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
@@ -371,7 +344,7 @@ namespace uMVVMCS.DIContainer.Extensions
 
         #endregion
 
-        private static void SetBindingValue(IBinding binding,
+        private static void SetValueAddComponent(IBinding binding,
             GameObject gameObject,
             Type type,
             bool typeIsGameObject)

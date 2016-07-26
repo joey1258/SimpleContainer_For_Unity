@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace uMVVMCS.DIContainer.Extensions
 {
-    public class UnityBindingContainer : IContainerAOT
+    public class UnityContainer : IContainerAOT
     {
         #region IContainerAOT implementation 
 
@@ -50,7 +50,8 @@ namespace uMVVMCS.DIContainer.Extensions
         }
 
         /// <summary>
-        /// （未完成）为 TEMP 类型 binding 返回实例化并加载好组件的 gameObject
+        /// 为 TEMP 类型 binding 返回实例化并加载好组件的 gameObject(在 Injector 类的 
+        /// ResolveBinding 方法中触发)
         /// </summary>
         protected object OnBindingEvaluation(IInjector source, ref IBinding binding)
         {
