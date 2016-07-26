@@ -53,7 +53,7 @@ namespace uMVVMCS_NUitTests
             //Arrange 
             IBinder binder = new Binder();
             //Act
-            IBinding binding = binder.Bind<object>().ToSelf();
+            binder.Bind<object>().ToSelf();
             //Assert
             Assert.AreEqual(0, binder.GetAllBindings().Count);
         }
@@ -82,7 +82,7 @@ namespace uMVVMCS_NUitTests
             //Arrange 
             IBinder binder = new Binder();
             //Act
-            IBinding binding = binder.Bind<object>().ToSelf().As(1);
+            binder.Bind<object>().ToSelf().As(1);
             //Assert
             Assert.AreEqual(
                 true,
@@ -704,7 +704,6 @@ namespace uMVVMCS_NUitTests
         {
             //Arrange 
             IBinder binder = new Binder();
-            object o = new object();
             //Act
             IBinding binding = binder.Bind<object>().ToSelf().To(typeof(object));
             //Assert

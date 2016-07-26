@@ -14,18 +14,72 @@
  *		limitations under the License.
  */
 
+using System;
 using UnityEngine;
-using System.Collections;
 
-public class UnityBindingContainer : MonoBehaviour {
+namespace uMVVMCS.DIContainer.Extensions
+{
+    public class UnityBindingContainer : IContainerAOT
+    {
+        #region IContainerAOT implementation 
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+        public void OnRegister(IInjectionContainer container)
+        {
+            container.beforeAddBinding += OnBeforeAddBinding;
+            container.bindingEvaluation += this.OnBindingEvaluation;
+        }
+
+        public void OnUnregister(IInjectionContainer container)
+        {
+            container.beforeAddBinding -= this.OnBeforeAddBinding;
+            container.bindingEvaluation -= this.OnBindingEvaluation;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 如果当前 binding 的值是类型且是 MonoBehaviour 派生类就抛出异常
+        /// </summary>
+        protected void OnBeforeAddBinding(IBinder source, ref IBinding binding)
+        {
+            if (binding.value is Type &&
+                TypeUtils.IsAssignable(typeof(MonoBehaviour), binding.value as Type))
+            {
+                throw new InjectionSystemException(InjectionSystemException.CANNOT_RESOLVE_MONOBEHAVIOUR);
+            }
+        }
+
+        /// <summary>
+        /// （未完成）为 TEMP 类型 binding 返回实例化并加载好组件的 gameObject
+        /// </summary>
+        protected object OnBindingEvaluation(IInjector source, ref IBinding binding)
+        {
+            //Checks whether a prefab should be instantiated.
+            if (binding.value is PrefabBinding &&
+                binding.bindingType == BindingType.TEMP)
+            {
+                var prefabBinding = (PrefabBinding)binding.value;
+                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabBinding.prefab);
+
+                if (prefabBinding.type.Equals(typeof(GameObject)))
+                {
+                    return gameObject;
+                }
+                else
+                {
+                    var component = gameObject.GetComponent(prefabBinding.type);
+
+                    if (component == null)
+                    {
+                        component = gameObject.AddComponent(prefabBinding.type);
+                    }
+
+                    return component;
+                }
+            }
+            else {
+                return null;
+            }
+        }
+    }
 }
