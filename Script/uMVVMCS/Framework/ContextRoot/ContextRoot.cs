@@ -23,6 +23,8 @@ namespace uMVVMCS.DIContainer
 {
     public abstract class ContextRoot : MonoBehaviour//, IContextRoot
     {
+        #region Inner Class
+
         /// <summary>
         /// 注入容器数据内部类
         /// </summary>
@@ -63,6 +65,8 @@ namespace uMVVMCS.DIContainer
             BaseType
         }
 
+        #endregion
+
         #region property
 
         /// <summary>
@@ -90,9 +94,20 @@ namespace uMVVMCS.DIContainer
         {
             get
             {
-                _containers = new IInjectionContainer[containersData.Count];
+                int length = containersData.Count;
 
-                Storing();
+                if (_containers == null ||
+                    _containers.Length == 0 ||
+                    _containers.Length != length)
+                {
+                    _containers = new IInjectionContainer[length];
+                    for (var i = 0; i < containersData.Count; i++)
+                    {
+                        _containers[i] = containersData[i].container;
+                    }
+
+                    Storing();
+                }
 
                 return _containers;
             }
@@ -152,7 +167,7 @@ namespace uMVVMCS.DIContainer
         virtual public IInjectionContainer AddContainer<T>() where T : IInjectionContainer, new()
         {
             var container = Activator.CreateInstance<T>();
-            return this.AddContainer(container, true);
+            return AddContainer(container, true);
         }
 
         /// <summary>
@@ -206,9 +221,9 @@ namespace uMVVMCS.DIContainer
 
                 if (_containers[i].id != null)
                 {
-                    if (!containersStorage[GetType()].Contains(_containers[i].id))
+                    if (!containersStorage[this.GetType()].Contains(_containers[i].id))
                     {
-                        containersStorage[GetType()][_containers[i].id] = _containers[i];
+                        containersStorage[this.GetType()][_containers[i].id] = _containers[i];
                     }
                     else
                     {

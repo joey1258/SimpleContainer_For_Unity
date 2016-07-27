@@ -34,11 +34,11 @@ namespace uMVVMCS.DIContainer
         Type type { get; }
 
         /// <summary>
-        /// value 属性
-        ///  valueArray 属性为避免外部需要以数组形式获取时的拆装箱消耗
+        ///  value 属性 返回 valueList 的第一个元素
+        ///  valueList 返回整个 valueList
         /// </summary>
         object value { get; }
-        object[] valueArray { get; }
+        IList<object> valueList { get; }
 
         /// <summary>
         /// id 属性
@@ -151,7 +151,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建多个指定类型的 binding，并返回 IBindingFactory
         /// </summary>
-        IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes);
+        IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes);
 
         #endregion
 
@@ -165,7 +165,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 从 binding 的 value 属性中移除指定的值，如果删除后值为空，则移除 binding
         /// </summary>
-        IBinding RemoveValues(IList<object> values);
+        IBinding RemoveValues(object[] values);
 
         #endregion
 

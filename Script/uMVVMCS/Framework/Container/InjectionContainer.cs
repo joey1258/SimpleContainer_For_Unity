@@ -145,26 +145,26 @@ namespace uMVVMCS.DIContainer
 
         virtual public event BindingAddedHandler beforeAddBinding
         {
-            add { this.binder.beforeAddBinding += value; }
-            remove { this.binder.beforeAddBinding -= value; }
+            add { binder.beforeAddBinding += value; }
+            remove { binder.beforeAddBinding -= value; }
         }
 
         virtual public event BindingAddedHandler afterAddBinding
         {
-            add { this.binder.afterAddBinding += value; }
-            remove { this.binder.afterAddBinding -= value; }
+            add { binder.afterAddBinding += value; }
+            remove { binder.afterAddBinding -= value; }
         }
 
         virtual public event BindingRemovedHandler beforeRemoveBinding
         {
-            add { this.binder.beforeRemoveBinding += value; }
-            remove { this.binder.beforeRemoveBinding -= value; }
+            add { binder.beforeRemoveBinding += value; }
+            remove { binder.beforeRemoveBinding -= value; }
         }
 
         virtual public event BindingRemovedHandler afterRemoveBinding
         {
-            add { this.binder.afterRemoveBinding += value; }
-            remove { this.binder.afterRemoveBinding -= value; }
+            add { binder.afterRemoveBinding += value; }
+            remove { binder.afterRemoveBinding -= value; }
         }
 
         #endregion
@@ -240,7 +240,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建多个指定类型的 binding，并返回 IBindingFactory
         /// </summary>
-        virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
+        virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
             return binder.MultipleBind(types, bindingTypes);
         }

@@ -398,7 +398,7 @@ namespace uMVVMCS.DIContainer
 
             if (instance == null)
             {
-                int length = binding.valueArray.Length;
+                int length = binding.valueList.Count;
 
                 switch (binding.bindingType)
                 {
@@ -410,7 +410,7 @@ namespace uMVVMCS.DIContainer
                             object[] list = new object[length];
                             for (int i = 0; i < length; i++)
                             {
-                                list[i] = Instantiate(binding.valueArray[i] as Type);
+                                list[i] = Instantiate(binding.valueList[i] as Type);
                             }
                             instance = list;
                         }
@@ -440,11 +440,11 @@ namespace uMVVMCS.DIContainer
                         object[] instances = new object[length];
                         for (int i = 0; i < length; i++)
                         {
-                            if (binding.valueArray[i] is Type)
+                            if (binding.valueList[i] is Type)
                             {
-                                binding.valueArray[i] = Instantiate(binding.value as Type);
+                                binding.valueList[i] = Instantiate(binding.value as Type);
                             }
-                            instances[i] = binding.valueArray[i];
+                            instances[i] = binding.valueList[i];
                         }
 
                         instance = instances;
@@ -590,18 +590,18 @@ namespace uMVVMCS.DIContainer
             if (binding.bindingType != BindingType.TEMP)
             {
                 // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
-                int length = binding.valueArray.Length;
+                int length = binding.valueList.Count;
                 for (int i = 0; i < length; i++)
                 {
-                    if (binding.valueArray[i] is Type)
+                    if (binding.valueList[i] is Type)
                     {
-                        var value = this.Resolve(binding.valueArray[i] as Type);
+                        var value = this.Resolve(binding.valueList[i] as Type);
                         binding.To(value);
                     }
                     else
                     {
                         // hasBeenInjected 判断放在容器类中更为合适，所以这里不做注入状态检查
-                        Inject(binding.valueArray[i]);
+                        Inject(binding.valueList[i]);
                     }
                 }
             }

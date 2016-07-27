@@ -57,31 +57,31 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建指定类型的多个 Binding 实例，ConstraintType 为 MULTIPLE，并返回 IBindingFactory
         /// </summary>
-        IBindingFactory MultipleCreate(IList<Type> types, IList<BindingType> bindingType);
+        IBindingFactory MultipleCreate(Type[] types, BindingType[] bindingType);
 
         #region Binding System Function
 
         /// <summary>
         /// 为多个 binding 添加值,如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
         /// </summary>
-        IBindingFactory To(IList<object> os);
+        IBindingFactory To(object[] os);
 
         /// <summary>
         /// 设置多个 binding 的 id 属性
         /// </summary>
-        IBindingFactory As(IList<object> os);
+        IBindingFactory As(object[] os);
 
         /// <summary>
         /// 设置多个 binding 的 condition 属性
         /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
         /// </summary>
-        IBindingFactory When(IList<Condition> cs);
+        IBindingFactory When(Condition[] cs);
 
         /// <summary>
         /// 设置多个 binding 的 condition 属性为 context.parentType 与指定类型相等
         /// 如果参数长度短于 binding 数量，参数的最后一个元素将被重复使用
         /// </summary>
-        IBindingFactory Into(IList<Type> ts);
+        IBindingFactory Into(Type[] ts);
 
         /// <summary>
         /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
@@ -101,7 +101,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建多个指定类型的 binding，并返回 IBindingFactory
         /// </summary>
-        IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes);
+        IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes);
 
         #endregion
     }

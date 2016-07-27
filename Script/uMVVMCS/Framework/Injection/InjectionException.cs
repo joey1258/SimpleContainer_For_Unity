@@ -23,6 +23,7 @@ namespace uMVVMCS.DIContainer
         public const string NO_CONSTRUCTORS = "There are no constructors on the type {0}, Is it an interface?";
         public const string PARAMETER_TYPE_ERROR = "Array or IList type parameters, like 'typeof(object[])' or 'typeof(IList<object>)' should be obtains the actual type on the outside of the method {0}";
         public const string SAME_OBJECT = "The object with the same key and id already exists.";
+        public const string CANNOT_RESOLVE_MONOBEHAVIOUR = "A MonoBehaviour cannot be resolved directly.";
 
         public InjectionSystemException(string message) : base(message) { }
     }

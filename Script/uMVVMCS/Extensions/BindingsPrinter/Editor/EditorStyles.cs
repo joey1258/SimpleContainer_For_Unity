@@ -82,12 +82,12 @@ namespace uMVVMCS.DIContainer.Extensions
         /// <summary>
         /// Styles for binding's data
         /// </summary>
-        public static GUIStyle bindinds
+        public static GUIStyle bindings
         {
             get
             {
                 var style = new GUIStyle();
-                style.fontSize = 16;
+                style.fontSize = 13;
                 style.alignment = TextAnchor.UpperLeft;
                 return style;
             }

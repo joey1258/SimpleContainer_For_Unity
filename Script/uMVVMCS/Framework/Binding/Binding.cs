@@ -55,6 +55,8 @@ namespace uMVVMCS.DIContainer
             _bindingType = bt;
 
             _constraint = c;
+
+            _value = new List<object>();
         }
 
         #endregion
@@ -82,22 +84,26 @@ namespace uMVVMCS.DIContainer
         protected Type _type;
 
         /// <summary>
-        ///  value 属性
-        ///  valueArray 属性为避免外部需要以数组形式获取时的拆装箱消耗
+        ///  value 属性 返回 valueList 的第一个元素
+        ///  valueList 返回整个 valueList
         /// </summary>
         public object value
         {
             get
             {
-                if(_constraint == ConstraintType.SINGLE) { return _value[0]; }
+                if(_value == null) { _value = new List<object>(); }
+                return _value[0];
+            }
+        }
+        public IList<object> valueList
+        {
+            get
+            {
+                if (_value == null) { _value = new List<object>(); }
                 return _value;
             }
         }
-        public object[] valueArray
-        {
-            get { return _value; }
-        }
-        protected object[] _value;
+        protected IList<object> _value;
 
         /// <summary>
         /// id 属性
@@ -145,7 +151,7 @@ namespace uMVVMCS.DIContainer
         {
             // 每个 binding 只有一个 type，所以绑定到自身也必然只有一个值
             _constraint = ConstraintType.SINGLE;
-            _value = new object[1] { _type };
+            _value = new List<object>() { _type };
 
             binder.Storing(this);
 
@@ -175,12 +181,22 @@ namespace uMVVMCS.DIContainer
             {
                 throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
             }
-            
-            if (_constraint == ConstraintType.SINGLE)
+
+            bool add = true;
+            int count = _value.Count;
+            for (int n = 0; n < count; n++)
             {
-                _value = new object[1] { o };
+                if (_value[n] == o) { add = false; }
             }
-            else { AddValue(o); }
+
+            if (_constraint == ConstraintType.SINGLE || _value == null)
+            {
+                if (add) { _value = new List<object>() { o }; }
+            }
+            else
+            {
+                if (add) { _value.Add(o); }
+            }
 
             binder.Storing(this);
 
@@ -192,32 +208,37 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding To(object[] os)
         {
-            // 如果 binding 类型不为多例就抛出异常
+            if (_bindingType == BindingType.TEMP)
+            {
+                _bindingType = BindingType.MULTITON;
+                _constraint = ConstraintType.MULTIPLE;
+            }
+
+            // 如果值约束不为复数就抛出异常
             if (_constraint == ConstraintType.SINGLE)
             {
-                if (_bindingType == BindingType.TEMP)
-                {
-                    _bindingType = BindingType.MULTITON;
-                    _constraint = ConstraintType.MULTIPLE;
-                }
-                else
-                {
-                    throw new BindingSystemException(
-                        string.Format(BindingSystemException.BINDINGTYPE_NOT_ASSIGNABLE,
-                        "[To(object[] os)]",
-                        _bindingType));
-                }
+                throw new BindingSystemException(
+                    string.Format(BindingSystemException.BINDINGTYPE_NOT_ASSIGNABLE,
+                    "[To(object[] os)]",
+                    _bindingType));
             }
 
             int length = os.Length;
             for (int i = 0; i < length; i++)
             {
-                var osi = os[i];
-                if (!PassToAdd(osi))
+                bool add = true;
+                int count = _value.Count;
+                for (int n = 0; n < count; n++)
+                {
+                    if(_value[n] == os[i]) { add = false; }
+                }
+                
+                if (!PassToAdd(os[i]))
                 {
                     throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
                 }
-                AddValue(osi);
+
+                if (add) { _value.Add(os[i]); }
             }
 
             binder.Storing(this);
@@ -356,7 +377,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 创建多个指定 type 属性的 binding，并返回 IBindingFactory
         /// </summary>
-        virtual public IBindingFactory MultipleBind(IList<Type> types, IList<BindingType> bindingTypes)
+        virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
             return _binder.MultipleBind(types, bindingTypes);
         }
@@ -376,8 +397,8 @@ namespace uMVVMCS.DIContainer
             // 值约束过滤
             if (_constraint == ConstraintType.MULTIPLE)
             {
-                RemoveArrayValue(o);
-                if(_value.Length == 0) { binder.Unbind(this); }
+                _value.Remove(o);
+                if(_value.Count == 0) { binder.Unbind(this); }
                 return this;
             }
 
@@ -389,32 +410,26 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 从 binding 的 value 属性中移除多个值，如果删除后值为空，则移除 binding
         /// </summary>
-        virtual public IBinding RemoveValues(IList<object> os)
+        virtual public IBinding RemoveValues(object[] os)
         {
-            // 过滤空值、值约束
-            if (os == null || _constraint != ConstraintType.MULTIPLE) { return this; }
+            // 过滤空值、值约束、要删除的值比已储存的值更多的情况
+            if (os == null || os.Length > _value.Count ||
+                _constraint != ConstraintType.MULTIPLE)
+            { return this; }
 
-            List<object> list = new List<object>(_value);
-
-            int length = _value.Length;
-            int osLength = os.Count;
-            int osi = 0;
+            int length = os.Length;
             for (int i = 0; i < length; i++)
             {
-                list.Remove(os[i]);
-                length--;
-                osi++;
-                if (osi >= osLength) { break; }
+                _value.Remove(os[i]);
             }
 
-            if(list.Count == 0)
+            if(_value.Count == 0)
             {
                 _value = null;
                 binder.Unbind(this);
                 return this;
             }
-
-            _value = list.ToArray();
+            
             return this;
         }
 
@@ -456,81 +471,6 @@ namespace uMVVMCS.DIContainer
             return TypeUtils.IsAssignable(_type, v.GetType());
         }
 
-        /// <summary>
-        /// 当值约束为 MULTIPLE 时向 value 属性的末尾添加不重复的新元素
-        /// </summary>
-        virtual public void AddValue(object o)
-        {
-            // 过滤空值、值约束
-            if (o == null || _constraint != ConstraintType.MULTIPLE) { return; }
-
-            if (_constraint == ConstraintType.MULTIPLE && _value != null)
-            {
-                // 过滤同值
-                int length = _value.Length;
-                for (int i = 0; i < length; i++)
-                {
-                    if (o.Equals(_value[i])) { return; }
-                }
-
-                // 添加元素
-                object[] newArray = new object[length + 1];
-                _value.CopyTo(newArray, 0);
-                newArray[length] = o;
-                _value = newArray;
-            }
-            // 如果值还不是数组，直接赋1个新数组
-            else { _value = new object[] { o }; }
-        }
-
-        /// <summary>
-        /// 当值约束为 MULTIPLE 时移除 value 属性中指定的值(如果找不到相同的值则不做处理)
-        /// </summary>
-        virtual public void RemoveArrayValue(object o)
-        {
-            // 过滤空值、值约束
-            if (o == null || _constraint != ConstraintType.MULTIPLE) { return; }
-
-            // 如果 value 为空或与参数相等，将其置空并返回
-            if (o.Equals(_value) || _value == null)
-            {
-                _value = null;
-                return;
-            }
-
-            // 遍历数组，将找到的相同的元素移除
-            int length = _value.Length;
-            for (int i = 0; i < length; i++)
-            {
-                if (o.Equals(_value[i]))
-                {
-                    spliceValueAt(i);
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 移除数组中指定位置的值
-        /// </summary>
-        protected void spliceValueAt(int splicePos)
-        {
-            int mod = 0;
-            int length = _value.Length;
-            object[] newArray = new object[length - 1];
-
-            for (int i = 0; i < length; i++)
-            {
-                if (i == splicePos)
-                {
-                    mod = -1;
-                    continue;
-                }
-                newArray[i + mod] = _value[i];
-            }
-            _value = (newArray.Length == 0) ? null : newArray;
-        }
-
         #region set binding property
 
         /// <summary>
@@ -540,9 +480,9 @@ namespace uMVVMCS.DIContainer
         {
             if (_constraint != ConstraintType.MULTIPLE)
             {
-                _value = new object[1] { o };
+                _value = new List<object>() { o };
             }
-            else { AddValue(o); }
+            else { _value.Add(o); }
 
             binder.Storing(this);
 
@@ -568,5 +508,27 @@ namespace uMVVMCS.DIContainer
         }
 
         #endregion
+
+        /// <summary>
+        /// 配合 BindingsPrinter 窗口显示 binding 信息
+        /// </summary>
+        public override string ToString()
+        {
+            return string.Format(
+            "Type: {0}\n" +
+            "Value: {1} ({2})\n" +
+            "Id: {3}\n"+
+            "BindingType: {4}\n" +
+            "constraint: {5}\n" +
+            "Conditions: {6}\n",
+            this.type.FullName,
+            (this.value == null ? "null" : this.value.ToString()),
+            (this.value is Type ? "type" : "instance"),
+            (this.id == null ? "null" : this.id.ToString()),
+            this.bindingType.ToString(),
+            this.constraint.ToString(),
+            (this.condition == null ? "no" : "yes")
+            );
+        }
     }
 }

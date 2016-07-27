@@ -113,7 +113,7 @@ namespace uMVVMCS.DIContainer.Extensions
                 {
                     var binding = bindings[bindingIndex];
 
-                    GUILayout.Label(binding.ToString(), EditorStyles.bindinds);
+                    GUILayout.Label(binding.ToString(), EditorStyles.bindings);
                 }
 
                 GUILayout.EndVertical();
