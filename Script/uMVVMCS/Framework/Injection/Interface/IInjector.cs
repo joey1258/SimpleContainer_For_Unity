@@ -20,6 +20,11 @@ namespace uMVVMCS.DIContainer
 {
     public interface IInjector
     {
+        /// <summary>
+        /// binding 实例化模式
+        /// </summary>
+        ResolutionMode resolutionMode { get; set; }
+
         #region Injector AOT Event
 
         event TypeResolutionHandler beforeResolve;

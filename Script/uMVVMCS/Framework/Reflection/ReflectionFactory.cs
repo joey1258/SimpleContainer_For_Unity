@@ -47,7 +47,7 @@ namespace uMVVMCS.DIContainer
             }
 
             reflectionInfo.constructorParameters = GetConstructorParameters(constructor);
-            reflectionInfo.postConstructors = GetPostConstructors(type);
+            reflectionInfo.methods = GetMethods(type);
             reflectionInfo.properties = GetProperties(type);
             reflectionInfo.fields = GetFields(type);
 
@@ -55,7 +55,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 获取首选构造函数信息，优先带有[Construct]特性的构造函数，如果没有，就选择参数最少的构造函数
+        /// 获取首选构造函数信息，优先带有[Inject]特性的构造函数，如果没有，就选择参数最少的构造函数
         /// </summary>
         virtual protected ConstructorInfo GetPreferredConstructor(Type type)
         {
@@ -76,8 +76,11 @@ namespace uMVVMCS.DIContainer
             for (int i = 0, length = 0, shortestLength = int.MaxValue; i < constructors.Length; i++)
             {
                 var constructor = constructors[i];
-                // 获取附着于当前构造函数的[Construct]特性，如果获取到就直接返回当前构造函数
-                object[] attributes = constructor.GetCustomAttributes(typeof(Construct), true);
+                // 获取附着于当前构造函数的[Inject]特性，如果获取到就直接返回当前构造函数
+                var attributes = constructor.GetCustomAttributes(typeof(Inject), true);
+
+
+
                 if (attributes.Length > 0) { return constructor; }
                 
                 // 如果没有获取到就比较参数的长度
@@ -124,9 +127,9 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 获取指定类型注入后需要执行的方法的信息类
         /// </summary>
-        virtual protected PostConstructorInfo[] GetPostConstructors(Type type)
+        virtual protected uMVVMCS.DIContainer.MethodInfo[] GetMethods(Type type)
         {
-            var postConstructors = new List<PostConstructorInfo>();
+            var parameterlessMethods = new List<uMVVMCS.DIContainer.MethodInfo>();
             // 获取参数 type 中的方法
             var methods = type.GetMethods (
                 BindingFlags.FlattenHierarchy |
@@ -138,14 +141,14 @@ namespace uMVVMCS.DIContainer
             {
                 var method = methods[i];
 
-                // 获取方法是否附着有[PostConstruct]特性
-                var attributes = method.GetCustomAttributes(typeof(PostConstruct), true);
+                // 获取方法是否附着有[Inject]特性
+                var attributes = method.GetCustomAttributes(typeof(Inject), true);
                 if (attributes.Length > 0)
                 {
                     // 如果获取成功，继续获取方法的参数，并获取它们的 id，用它们构造 ParameterInfo 类
                     var parameters = method.GetParameters();
-                    var postConstructorParameters = new ParameterInfo[parameters.Length];
-                    for (int n = 0; n < postConstructorParameters.Length; n++)
+                    var methodParameters = new ParameterInfo[parameters.Length];
+                    for (int n = 0; n < methodParameters.Length; n++)
                     {
                         object id = null;
                         var parameter = parameters[n];
@@ -156,26 +159,28 @@ namespace uMVVMCS.DIContainer
                             id = (parameterAttributes[0] as Inject).id;
                         }
 
-                        postConstructorParameters[n] = new ParameterInfo(parameter.ParameterType, id);
+                        methodParameters[n] = new ParameterInfo(parameter.ParameterType, id);
                     }
 
-                    var postConstructor = new PostConstructorInfo(postConstructorParameters);
+                    var parameterlessMethod = new uMVVMCS.DIContainer.MethodInfo(methodParameters);
+
                     // 根据参数个数创建方法委托
-                    if (postConstructorParameters.Length == 0)
+                    if (methodParameters.Length == 0)
                     {
-                        postConstructor.postConstructor = MethodUtils.CreateParameterlessMethod(type, method);
+                        parameterlessMethod.method = MethodUtils.CreateParameterlessMethod(type, method);
                     }
-                    else {
-                        postConstructor.paramsPostConstructor = MethodUtils.CreateParameterizedMethod(type, method);
+                    else
+                    {
+                        parameterlessMethod.paramsMethod = MethodUtils.CreateParameterizedMethod(type, method);
                     }
 
                     // 将方法委托加入数组
-                    postConstructors.Add(postConstructor);
+                    parameterlessMethods.Add(parameterlessMethod);
                 }
             }
 
             // 以数组形式返回
-            return postConstructors.ToArray();
+            return parameterlessMethods.ToArray();
         }
 
         /// <summary>

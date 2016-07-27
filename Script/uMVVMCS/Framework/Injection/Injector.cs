@@ -42,12 +42,21 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public IBinder binder { get; protected set; }
 
+        /// <summary>
+        /// binding 实例化模式
+        /// </summary>
+        public ResolutionMode resolutionMode { get; set; }
+
         #region constructor
 
-        public Injector(IReflectionCache cache, IBinder binder)
+        public Injector(
+            IReflectionCache cache, 
+            IBinder binder, 
+            ResolutionMode resolutionMode)
         {
             this.cache = cache;
             this.binder = binder;
+            this.resolutionMode = resolutionMode;
 
             binder.beforeAddBinding += this.OnBeforeAddBinding;
         }
@@ -215,10 +224,18 @@ namespace uMVVMCS.DIContainer
 
             IList<object> instances = new List<object>();
 
-            // 如果没有获取到 binding，就调用 Instantiate 方法返回参数 type 的执行结果并添加到 instances 中
+            // 如果没有获取到 binding，且 ResolutionMode 是 ALWAYS_RESOLVE，就调用 Instantiate 方法
+            // 返回参数 type 的执行结果并添加到 instances 中,否则返回空
             if (bindings.Count == 0)
             {
-                instances.Add(this.Instantiate(type as Type));
+                if (this.resolutionMode == ResolutionMode.ALWAYS_RESOLVE)
+                {
+                    instances.Add(this.Instantiate(type as Type));
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
@@ -332,9 +349,9 @@ namespace uMVVMCS.DIContainer
             }
 
             // 如果有需要在注入后执行的方法，为其执行该方法
-            if (reflectedInfo.postConstructors.Length > 0)
+            if (reflectedInfo.methods.Length > 0)
             {
-                this.InjectPostConstructors(instance, reflectedInfo.postConstructors);
+                this.InjectMethods(instance, reflectedInfo.methods);
             }
 
             // 如果 AOT Inject 后置委托不为空就执行
@@ -561,21 +578,26 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 注入后续方法
+        /// 注入到方法
         /// </summary>
-        virtual protected void InjectPostConstructors(object instance, PostConstructorInfo[] postConstructors)
+        virtual protected void InjectMethods(
+            object instance,
+            MethodInfo[] methods)
         {
-            for (int constIndex = 0; constIndex < postConstructors.Length; constIndex++)
+            for (int i = 0; i < methods.Length; i++)
             {
-                var method = postConstructors[constIndex];
+                var method = methods[i];
 
                 if (method.parameters.Length == 0)
                 {
-                    method.postConstructor(instance);
+                    method.method(instance);
                 }
-                else {
-                    object[] parameters = this.GetParametersFromInfo(instance, method.parameters);
-                    method.paramsPostConstructor(instance, parameters);
+                else
+                {
+                    object[] parameters = this.GetParametersFromInfo(
+                        instance, 
+                        method.parameters);
+                    method.paramsMethod(instance, parameters);
                 }
             }
         }

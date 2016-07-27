@@ -52,4 +52,19 @@ namespace uMVVMCS.DIContainer
         Field,
         Property
     }
+
+    /// <summary>
+    /// binding 实例化模式
+    /// </summary>
+    public enum ResolutionMode
+    {
+        /// <summary>
+        /// 不论有没有绑定到容器，尝试对所有的类型执行 resolve（默认模式）
+        /// </summary>
+        ALWAYS_RESOLVE,
+        /// <summary>
+        /// 只对绑定到容器的类型进行 resolves，尝试对没有绑定的类型执行 resolves 将返回空
+        /// </summary>
+        BOUND_ONLY
+    }
 }

@@ -43,9 +43,9 @@ namespace uMVVMCS.DIContainer
         public ParameterInfo[] constructorParameters { get; set; }
 
         /// <summary>
-        /// 带有 [PostConstruct] 特性的注入方法
+        /// 接受注入的方法
         /// </summary>
-        public PostConstructorInfo[] postConstructors { get; set; }
+        public MethodInfo[] methods { get; set; }
 
         /// <summary>
         /// 接受注入的公共属性

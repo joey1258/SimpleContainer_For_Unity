@@ -179,7 +179,7 @@ namespace uMVVMCS
         /// <summary>
         /// 返回一个没有参数的方法委托
         /// </summary>
-        public static PostConstructor CreateParameterlessMethod(Type type, MethodInfo methodInfo)
+        public static ParameterlessMethod CreateParameterlessMethod(Type type, System.Reflection.MethodInfo methodInfo)
         {
             // 如果是移动平台，直接使用 Invoke 方法调用
 #if UNITY_IOS || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1 || UNITY_WEBGL
@@ -189,14 +189,17 @@ namespace uMVVMCS
 #else
 
             var parametersTypes = new Type[] { OBJECT_TYPE };
-            DynamicMethod method = new DynamicMethod(methodInfo.Name, typeof(void), parametersTypes, true);
+            DynamicMethod method = new DynamicMethod(
+                methodInfo.Name, 
+                typeof(void), 
+                parametersTypes, true);
             ILGenerator generator = method.GetILGenerator();
 
             generator.Emit(OpCodes.Ldarg_0);
             generator.Emit(OpCodes.Callvirt, methodInfo);
             generator.Emit(OpCodes.Ret);
 
-            return (PostConstructor)method.CreateDelegate(typeof(PostConstructor));
+            return (ParameterlessMethod)method.CreateDelegate(typeof(ParameterlessMethod));
 
 #endif
         }
@@ -204,7 +207,7 @@ namespace uMVVMCS
         /// <summary>
         /// 返回一个有参数的方法委托
         /// </summary>
-        public static ParamsPostConstructor CreateParameterizedMethod(Type type, MethodInfo methodInfo)
+        public static ParamsMethod CreateParameterizedMethod(Type type, System.Reflection.MethodInfo methodInfo)
         {
             return (object instance, object[] parameters) => methodInfo.Invoke(instance, parameters);
         }

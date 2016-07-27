@@ -22,6 +22,11 @@ namespace uMVVMCS.DIContainer
     public class InjectionContainer : Injector, IInjectionContainer
     {
         /// <summary>
+        /// 默认实例化模式
+        /// </summary>
+        protected const ResolutionMode DEFAULT_RESOLUTION_MODE = ResolutionMode.ALWAYS_RESOLVE;
+
+        /// <summary>
         /// 容器 id
         /// </summary>
         public object id { get; private set; }
@@ -33,34 +38,63 @@ namespace uMVVMCS.DIContainer
 
         #region constructor
 
-        public InjectionContainer() : base(new ReflectionCache(), new Binder())
+        public InjectionContainer() 
+            : base(new ReflectionCache(), new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             RegisterItself();
         }
 
-        public InjectionContainer(object id) : base(new ReflectionCache(), new Binder())
-        {
-            this.id = id;
-            RegisterItself();
-        }
-
-        public InjectionContainer(IReflectionCache cache) : base(cache, new Binder())
-        {
-            RegisterItself();
-        }
-
-        public InjectionContainer(object id, IReflectionCache cache) : base(cache, new Binder())
+        public InjectionContainer(object id) 
+            : base(new ReflectionCache(), new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
             RegisterItself();
         }
 
-        public InjectionContainer(IReflectionCache cache, IBinder binder) : base(cache, binder)
+        public InjectionContainer(IReflectionCache cache) 
+            : base(cache, new Binder(),  DEFAULT_RESOLUTION_MODE)
         {
             RegisterItself();
         }
 
-        public InjectionContainer(object id, IReflectionCache cache, IBinder binder) : base(cache, binder)
+        public InjectionContainer(ResolutionMode resolutionMode)
+            : base(new ReflectionCache(), new Binder(), resolutionMode)
+        {
+            RegisterItself();
+        }
+
+        public InjectionContainer(object id, IReflectionCache cache) 
+            : base(cache, new Binder(), DEFAULT_RESOLUTION_MODE)
+        {
+            this.id = id;
+            RegisterItself();
+        }
+
+        public InjectionContainer(IReflectionCache cache, ResolutionMode resolutionMode)
+            : base(cache, new Binder(), resolutionMode)
+        {
+            RegisterItself();
+        }
+
+        public InjectionContainer(IReflectionCache cache, IBinder binder) 
+            : base(cache, binder, DEFAULT_RESOLUTION_MODE)
+        {
+            RegisterItself();
+        }
+
+        public InjectionContainer(object id, IReflectionCache cache, IBinder binder) 
+            : base(cache, binder, DEFAULT_RESOLUTION_MODE)
+        {
+            this.id = id;
+            RegisterItself();
+        }
+
+        public InjectionContainer(
+            object id, 
+            IReflectionCache cache, 
+            IBinder binder,
+            ResolutionMode resolutionMode) 
+            : base(cache, binder, resolutionMode)
         {
             this.id = id;
             RegisterItself();
