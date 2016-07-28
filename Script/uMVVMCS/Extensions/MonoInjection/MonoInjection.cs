@@ -16,7 +16,7 @@
 
 using UnityEngine;
 
-namespace uMVVMCS.DIContainer.Extensions
+namespace uMVVMCS.DIContainer
 {
     /// <summary>
     /// 为 MonoBehaviour 提供注入方法，默认 ContextRoot Extension 可以使用

@@ -17,7 +17,7 @@
 using System;
 using UnityEngine;
 
-namespace uMVVMCS.DIContainer.Extensions
+namespace uMVVMCS.DIContainer
 {
     public class UnityContainer : IContainerAOT
     {

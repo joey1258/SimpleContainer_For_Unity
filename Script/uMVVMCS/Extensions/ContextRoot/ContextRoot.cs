@@ -17,7 +17,6 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using uMVVMCS.DIContainer.Extensions;
 
 namespace uMVVMCS.DIContainer
 {

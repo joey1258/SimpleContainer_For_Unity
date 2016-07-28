@@ -16,7 +16,7 @@
 
 using UnityEngine;
 
-namespace uMVVMCS
+namespace uMVVMCS.DIContainer
 {
     public class PrefabBinding
     {

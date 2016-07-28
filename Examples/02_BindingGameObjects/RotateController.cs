@@ -15,7 +15,6 @@
  */
 
 using UnityEngine;
-using uMVVMCS.DIContainer.Extensions;
 
 namespace uMVVMCS.Examples
 {
@@ -27,7 +26,7 @@ namespace uMVVMCS.Examples
         // Use this for initialization
         void Start()
         {
-            this.Inject();
+            //this.Inject();
         }
 
         // Update is called once per frame
