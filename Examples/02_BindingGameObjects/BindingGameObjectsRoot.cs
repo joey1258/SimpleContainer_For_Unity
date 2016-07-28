@@ -24,7 +24,7 @@ namespace uMVVMCS.Examples
         public override void SetupContainers()
         {
             //Create the container.
-            this.AddContainer<InjectionContainer>()
+            AddContainer<InjectionContainer>()
                 //Register any extensions the container may use.
                 .RegisterAOT<UnityContainer>()
                 //Bind a Transform component to the "Cube" game object in the scene.

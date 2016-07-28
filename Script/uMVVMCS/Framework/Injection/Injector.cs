@@ -185,12 +185,11 @@ namespace uMVVMCS.DIContainer
             object id)
         {
             object resolution = null;
-            UnityEngine.Debug.Log(type + "|" /*+ (bindings.Count == 0)*/);
 
             // 如果 AOT Resolve 前置委托不为空就执行
-            if (this.beforeResolve != null)
+            if (beforeResolve != null)
             {
-                var delegates = this.beforeResolve.GetInvocationList();
+                var delegates = beforeResolve.GetInvocationList();
                 for (int i = 0; i < delegates.Length; i++)
                 {
                     var continueExecution = ((TypeResolutionHandler)delegates[i]).Invoke(
@@ -208,26 +207,25 @@ namespace uMVVMCS.DIContainer
             Type inwardType = typeof(object);
             IList<IBinding> bindings = new List<IBinding>();
 
-            // 如果 id 为空将导致 ResolveBinding 方法返回 null，所以就算此处取了 binding 也只是无用功
-            if (id != null)
+            // 不能根据 id 是否为空来过滤，因为 unityBinding 是通过 AOT 来获取实例的，因此即使没有 
+            // id 也必须进入 ResolveBinding 方法,所以必须先获取其 binding 自身
+            // 如果类型为空 id 不为空，根据 id 来获取 binding
+            if (type == null) { bindings = binder.GetBindingsById(id); }
+            else
             {
-                // 如果类型为空 id 不为空，根据 id 来获取 binding
-                if (type == null) { bindings = this.binder.GetBindingsById(id); }
-                else
-                {
-                    // 判断参数 type 是否为数组是因为实参可能会传入类似 typeof(Type[]) 这样的值
-                    if (type.IsArray) { type.GetElementType(); }
-                    else { inwardType = type; }
-                    
-                    bindings.Add(this.binder.GetBinding(inwardType, id));
-                }
+                // 判断参数 type 是否为数组是因为实参可能会传入类似 typeof(Type[]) 这样的值
+                if (type.IsArray) { inwardType = type.GetElementType(); }
+                else { inwardType = type; }
+
+                if (id != null) { bindings.Add(binder.GetBinding(inwardType, id)); }
+                else { bindings = binder.GetBindingsByType(inwardType); }
             }
 
             IList<object> instances = new List<object>();
 
             // 如果没有获取到 binding，且 ResolutionMode 是 ALWAYS_RESOLVE，就调用 Instantiate 方法
             // 返回参数 type 的执行结果并添加到 instances 中,否则返回空
-            if (bindings.Count == 0)
+            if (bindings == null || bindings.Count == 0)
             {
                 if (resolutionMode == ResolutionMode.ALWAYS_RESOLVE)
                 {
@@ -243,7 +241,7 @@ namespace uMVVMCS.DIContainer
                 // 循环调用 ResolveBinding 方法新建实例，并且将新建成功的实例加入到 instances 中去
                 for (int i = 0; i < bindings.Count; i++)
                 {
-                    var instance = this.ResolveBinding(
+                    var instance = ResolveBinding(
                         bindings[i],
                         type,
                         member,
@@ -281,7 +279,7 @@ namespace uMVVMCS.DIContainer
             }
 
             // 如果 AOT Resolve 后置委托不为空就执行
-            if (this.afterResolve != null)
+            if (afterResolve != null)
             {
                 var delegates = this.afterResolve.GetInvocationList();
                 for (int i = 0; i < delegates.Length; i++)
@@ -314,7 +312,7 @@ namespace uMVVMCS.DIContainer
         public T Inject<T>(T instance) where T : class
         {
             var reflectedInfo = this.cache.GetInfo(instance.GetType());
-            return (T)this.Inject(instance, reflectedInfo);
+            return (T)Inject(instance, reflectedInfo);
         }
 
         /// <summary>
@@ -323,7 +321,7 @@ namespace uMVVMCS.DIContainer
         public object Inject(object instance)
         {
             var reflectedInfo = this.cache.GetInfo(instance.GetType());
-            return this.Inject(instance, reflectedInfo);
+            return Inject(instance, reflectedInfo);
         }
 
         /// <summary>
@@ -332,33 +330,33 @@ namespace uMVVMCS.DIContainer
         protected object Inject(object instance, ReflectionInfo reflectedInfo)
         {
             // 如果 AOT Inject 前置委托不为空就执行
-            if (this.beforeInject != null)
+            if (beforeInject != null)
             {
-                this.beforeInject(this, ref instance, reflectedInfo);
+                beforeInject(this, ref instance, reflectedInfo);
             }
 
             // 如果有需要注入的字段，为其执行字段注入
             if (reflectedInfo.fields.Length > 0)
             {
-                this.InjectFields(instance, reflectedInfo.fields);
+                InjectFields(instance, reflectedInfo.fields);
             }
 
             // 如果有需要注入的属性，为其执行字段注入
             if (reflectedInfo.properties.Length > 0)
             {
-                this.InjectProperties(instance, reflectedInfo.properties);
+                InjectProperties(instance, reflectedInfo.properties);
             }
 
             // 如果有需要在注入后执行的方法，为其执行该方法
             if (reflectedInfo.methods.Length > 0)
             {
-                this.InjectMethods(instance, reflectedInfo.methods);
+                InjectMethods(instance, reflectedInfo.methods);
             }
 
             // 如果 AOT Inject 后置委托不为空就执行
-            if (this.afterInject != null)
+            if (afterInject != null)
             {
-                this.afterInject(this, ref instance, reflectedInfo);
+                afterInject(this, ref instance, reflectedInfo);
             }
 
             return instance;
@@ -397,9 +395,16 @@ namespace uMVVMCS.DIContainer
                 if (!binding.condition(context)) { return null; }
             }
 
-            // 过滤 id 条件（id 和 binding.id 都不能为空且必须相等），不符合返回空
-            if (id == null || binding.id == null) { return null; }
-            if (!binding.id.Equals(id)) { return null; }
+            // 过滤 id 条件（id 和 binding.id 都不能为空且必须相等，但不单独过滤 id 或 binding.id）
+            // ，不符合返回空
+            bool resolveById = id != null;
+            bool bindingHasId = binding.id != null;
+            if ((!resolveById && bindingHasId) ||
+                (resolveById && !bindingHasId) ||
+                (resolveById && bindingHasId && !binding.id.Equals(id)))
+            {
+                return null;
+            }
 
             // 过滤实例
             object instance = null;
@@ -471,9 +476,9 @@ namespace uMVVMCS.DIContainer
             }
 
             // 如果 AOT 委托 bindingResolution 不为空执行委托
-            if (this.bindingResolution != null)
+            if (bindingResolution != null)
             {
-                this.bindingResolution(this, ref binding, ref instance);
+                bindingResolution(this, ref binding, ref instance);
             }
 
             // 返回实例
@@ -485,7 +490,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual protected object Instantiate(Type type)
         {
-            var info = this.cache.GetInfo(type);
+            var info = cache.GetInfo(type);
             object instance = null;
 
             // 如果所缓存的无参数构造函数和有参数构造函数信息都为空，抛出异常
@@ -547,10 +552,11 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual protected void InjectFields(object instance, SetterInfo[] fields)
         {
+
             for (int i = 0; i < fields.Length; i++)
             {
                 var field = fields[i];
-                var valueToSet = this.Resolve(
+                var valueToSet = Resolve(
                     field.type,
                     InjectionInto.Field,
                     instance,
@@ -568,7 +574,7 @@ namespace uMVVMCS.DIContainer
             for (int i = 0; i < properties.Length; i++)
             {
                 var property = properties[i];
-                var valueToSet = this.Resolve(
+                var valueToSet = Resolve(
                     property.type,
                     InjectionInto.Property,
                     instance,
@@ -618,7 +624,7 @@ namespace uMVVMCS.DIContainer
                 {
                     if (binding.valueList[i] is Type)
                     {
-                        var value = this.Resolve(binding.valueList[i] as Type);
+                        var value = Resolve(binding.valueList[i] as Type);
                         binding.To(value);
                     }
                     else

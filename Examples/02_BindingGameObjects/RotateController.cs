@@ -15,6 +15,7 @@
  */
 
 using UnityEngine;
+using uMVVMCS.DIContainer;
 
 namespace uMVVMCS.Examples
 {

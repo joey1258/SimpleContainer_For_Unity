@@ -78,7 +78,8 @@ namespace uMVVMCS.DIContainer
                     return component;
                 }
             }
-            else {
+            else
+            {
                 return null;
             }
         }

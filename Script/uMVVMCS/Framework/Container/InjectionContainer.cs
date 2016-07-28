@@ -128,7 +128,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 注册容器到 AOT list 
+        /// 注册容器到 AOT list，并执行容器的 OnRegister 方法
         /// </summary>
         virtual public IInjectionContainer RegisterAOT(IContainerAOT aot)
         {

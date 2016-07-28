@@ -105,7 +105,7 @@ namespace uMVVMCS.DIContainer
                         _containers[i] = containersData[i].container;
                     }
 
-                    Storing();
+                    ContainersStoring();
                 }
 
                 return _containers;
@@ -174,7 +174,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IInjectionContainer AddContainer(IInjectionContainer container)
         {
-            return this.AddContainer(container, true);
+            return AddContainer(container, true);
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 整理储存所有容器
         /// </summary>
-        virtual protected void Storing()
+        virtual protected void ContainersStoring()
         {
             for (var i = 0; i < containersData.Count; i++)
             {
