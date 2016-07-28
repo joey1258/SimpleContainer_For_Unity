@@ -112,11 +112,11 @@ namespace uMVVMCS.DIContainer
 
                 if (binding.bindingType == BindingType.TEMP && binding.value is Type)
                 {
-                    this.Add(binding.value as Type);
+                    Add(binding.value as Type);
                 }
                 else if (binding.bindingType == BindingType.SINGLETON)
                 {
-                    this.Add(binding.value.GetType());
+                    Add(binding.value.GetType());
                 }
             }
         }

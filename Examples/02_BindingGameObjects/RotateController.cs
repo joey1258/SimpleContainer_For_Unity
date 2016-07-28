@@ -15,23 +15,25 @@
  */
 
 using UnityEngine;
-using System.Collections;
+using uMVVMCS.DIContainer.Extensions;
 
 namespace uMVVMCS.Examples
 {
     public class RotateController : MonoBehaviour
     {
+        [Inject]
+        public Transform objectToRotate;
 
         // Use this for initialization
         void Start()
         {
-
+            this.Inject();
         }
 
         // Update is called once per frame
         void Update()
         {
-
+            objectToRotate.Rotate(1.0f, 1.0f, 1.0f);
         }
     }
 }

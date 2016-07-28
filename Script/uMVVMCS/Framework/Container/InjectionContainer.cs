@@ -130,14 +130,14 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 注册容器到 AOT list 
         /// </summary>
-        virtual public IInjectionContainer RegisterAOT(IContainerAOT extension)
+        virtual public IInjectionContainer RegisterAOT(IContainerAOT aot)
         {
             // 如果 List<IContainerAOT> AOT 为空,将其初始化
             if (AOT == null) AOT = new List<IContainerAOT>();
             // 添加参数到 list
-            AOT.Add(extension);
+            AOT.Add(aot);
             // 执行 OnRegister 方法
-            extension.OnRegister(this);
+            aot.OnRegister(this);
 
             return this;
         }

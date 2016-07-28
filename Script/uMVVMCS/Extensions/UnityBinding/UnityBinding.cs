@@ -97,7 +97,7 @@ namespace uMVVMCS.DIContainer.Extensions
             }
             // 否则用参数 name 查找 GameObject
             else { gameObject = GameObject.Find(name); }
-
+            
             // 将 gameObject 设为 binding 的值
             SetValueAddComponent(binding, gameObject, type, isGameObject);
             binding.binder.Storing(binding);
@@ -364,7 +364,7 @@ namespace uMVVMCS.DIContainer.Extensions
             else
             {
                 var component = gameObject.GetComponent(type);
-
+                //UnityEngine.Debug.Log(component == null);
                 if (component == null)
                 {
                     component = gameObject.AddComponent(type);

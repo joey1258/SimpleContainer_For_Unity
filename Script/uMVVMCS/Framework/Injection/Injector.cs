@@ -185,6 +185,7 @@ namespace uMVVMCS.DIContainer
             object id)
         {
             object resolution = null;
+            UnityEngine.Debug.Log(type + "|" /*+ (bindings.Count == 0)*/);
 
             // 如果 AOT Resolve 前置委托不为空就执行
             if (this.beforeResolve != null)
@@ -216,8 +217,8 @@ namespace uMVVMCS.DIContainer
                 {
                     // 判断参数 type 是否为数组是因为实参可能会传入类似 typeof(Type[]) 这样的值
                     if (type.IsArray) { type.GetElementType(); }
-
-                    inwardType = type;
+                    else { inwardType = type; }
+                    
                     bindings.Add(this.binder.GetBinding(inwardType, id));
                 }
             }
@@ -228,9 +229,9 @@ namespace uMVVMCS.DIContainer
             // 返回参数 type 的执行结果并添加到 instances 中,否则返回空
             if (bindings.Count == 0)
             {
-                if (this.resolutionMode == ResolutionMode.ALWAYS_RESOLVE)
+                if (resolutionMode == ResolutionMode.ALWAYS_RESOLVE)
                 {
-                    instances.Add(this.Instantiate(type as Type));
+                    instances.Add(Instantiate(type as Type));
                 }
                 else
                 {
@@ -404,9 +405,9 @@ namespace uMVVMCS.DIContainer
             object instance = null;
 
             // 如果 AOT 委托 BindingEvaluationHandler 不为空就执行
-            if (this.bindingEvaluation != null)
+            if (bindingEvaluation != null)
             {
-                var delegates = this.bindingEvaluation.GetInvocationList();
+                var delegates = bindingEvaluation.GetInvocationList();
                 for (int i = 0; i < delegates.Length; i++)
                 {
                     instance = ((BindingEvaluationHandler)delegates[i]).Invoke(this, ref binding);
