@@ -30,7 +30,7 @@ namespace uMVVMCS_NUitTests
         #region Bind
 
         /// <summary>
-        /// 测试 Bind 方法是否生成了 TEMP 类型的 binding,值约束为 Multiple
+        /// 测试 Bind 方法是否生成了 ADDRESS 类型的 binding,值约束为 Multiple
         /// </summary>
         [Test]
         public void Bind_CreateTempBinding_True()
@@ -43,7 +43,7 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(
                 true, 
                 binding != null && 
-                binding.bindingType == BindingType.TEMP &&
+                binding.bindingType == BindingType.ADDRESS &&
                 binding.constraint == ConstraintType.MULTIPLE);
         }
 
@@ -461,14 +461,14 @@ namespace uMVVMCS_NUitTests
                 .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() });
@@ -492,7 +492,7 @@ namespace uMVVMCS_NUitTests
                 .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
@@ -500,14 +500,14 @@ namespace uMVVMCS_NUitTests
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
@@ -535,14 +535,14 @@ namespace uMVVMCS_NUitTests
             binder.MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() });
@@ -562,7 +562,7 @@ namespace uMVVMCS_NUitTests
             binder.MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
@@ -570,14 +570,14 @@ namespace uMVVMCS_NUitTests
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })

@@ -55,10 +55,10 @@ namespace uMVVMCS.DIContainer
     public enum BindingType
     {
         /// <summary> 
-        /// binging 的 value 属性为 Type，如果设为实例，将会自动将实例转为 Type
+        /// binging 的 value 属性为 Type，或 prefab 路径信息类等，用于储存将要多次使用或创建的类型或路径
         /// 实例化的结果不会储存并覆盖到 value
         /// </summary>
-        TEMP,
+        ADDRESS,
         /// <summary> 
         /// bingding 的 value 为类型或实例，如果是类型，Inject 系统会自动为其创建实例并为实例执行注入
         /// 实例将会保存并覆盖到 bingding 的 value，以保证每次获取的都是同一个实例。

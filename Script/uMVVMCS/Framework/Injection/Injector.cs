@@ -73,7 +73,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public T Resolve<T>()
         {
-            return (T)this.Resolve(typeof(T), InjectionInto.None, null, null);
+            return (T)Resolve(typeof(T), InjectionInto.None, null, null);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public T Resolve<T>(object identifier)
         {
-            return (T)this.Resolve(typeof(T), InjectionInto.None, null, identifier);
+            return (T)Resolve(typeof(T), InjectionInto.None, null, identifier);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public object Resolve(Type type, object identifier)
         {
-            return this.Resolve(type, InjectionInto.None, null, identifier);
+            return Resolve(type, InjectionInto.None, null, identifier);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public object Resolve(Type type)
         {
-            return this.Resolve(type, InjectionInto.None, null, null);
+            return Resolve(type, InjectionInto.None, null, null);
         }
 
         /// <summary>
@@ -223,8 +223,8 @@ namespace uMVVMCS.DIContainer
 
             IList<object> instances = new List<object>();
 
-            // 如果没有获取到 binding，且 ResolutionMode 是 ALWAYS_RESOLVE，就调用 Instantiate 方法
-            // 返回参数 type 的执行结果并添加到 instances 中,否则返回空
+            // 如果没有获取到 binding(也就是说无 id 或无匹配)，且 ResolutionMode 是 ALWAYS_RESOLVE，
+            // 就调用 Instantiate 方法返回参数 type 的执行结果并添加到 instances 中,否则返回空
             if (bindings == null || bindings.Count == 0)
             {
                 if (resolutionMode == ResolutionMode.ALWAYS_RESOLVE)
@@ -425,9 +425,9 @@ namespace uMVVMCS.DIContainer
 
                 switch (binding.bindingType)
                 {
-                    // 如果实例类型为 TEMP，获取对应的完成注入后的实例
+                    // 如果实例类型为 ADDRESS，获取对应的完成注入后的实例
                     // 不保存实例化结果到 binding.value
-                    case BindingType.TEMP:
+                    case BindingType.ADDRESS:
                         if(binding.constraint == ConstraintType.MULTIPLE)
                         {
                             object[] list = new object[length];
@@ -552,7 +552,6 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual protected void InjectFields(object instance, SetterInfo[] fields)
         {
-
             for (int i = 0; i < fields.Length; i++)
             {
                 var field = fields[i];
@@ -616,7 +615,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual protected void OnBeforeAddBinding(IBinder source, ref IBinding binding)
         {
-            if (binding.bindingType != BindingType.TEMP)
+            if (binding.bindingType != BindingType.ADDRESS)
             {
                 // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
                 int length = binding.valueList.Count;

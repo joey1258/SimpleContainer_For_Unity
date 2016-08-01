@@ -30,7 +30,7 @@ namespace uMVVMCS_NUitTests
         #region ToSelf
 
         /// <summary>
-        /// 测试 ToSelf 方法是否使 TEMP 类型的无 id binding 的值约束转换为 SINGLE 类型
+        /// 测试 ToSelf 方法是否使 ADDRESS 类型的无 id binding 的值约束转换为 SINGLE 类型
         /// 由于绑定自身的type作为自己的值的缘故，自身的值只有一个，所以值的类型也没有必要保留为 MULTIPLE
         /// </summary>
         [Test]
@@ -45,7 +45,7 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试 ToSelf 方法是否使 TEMP 类型的无 id binding 是否被 binder 保存
+        /// 测试 ToSelf 方法是否使 ADDRESS 类型的无 id binding 是否被 binder 保存
         /// </summary>
         [Test]
         public void ToSelf_NullId_BinderSaveCorrect()
@@ -59,7 +59,7 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试 ToSelf 方法是否使 TEMP 类型的有 id binding 的值约束转换为 SINGLE 类型
+        /// 测试 ToSelf 方法是否使 ADDRESS 类型的有 id binding 的值约束转换为 SINGLE 类型
         /// 由于绑定自身的type作为自己的值的缘故，自身的值只有一个，所以值的类型也没有必要保留为 MULTIPLE
         /// </summary>
         [Test]
@@ -74,7 +74,7 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试 ToSelf 方法是否使 TEMP 类型的有 id binding 是否被 binder 保存
+        /// 测试 ToSelf 方法是否使 ADDRESS 类型的有 id binding 是否被 binder 保存
         /// </summary>
         [Test]
         public void ToSelf_HasId_BinderSaveCorrect()
@@ -95,7 +95,7 @@ namespace uMVVMCS_NUitTests
         #region To（type）
 
         /// <summary>
-        /// 测试 To（type） 有 id 的 TEMP 类型 binding,binder 是否正确保存
+        /// 测试 To（type） 有 id 的 ADDRESS 类型 binding,binder 是否正确保存
         /// </summary>
         [Test]
         public void ToType_TempBindingNullId_BinderSaveCorrect()
@@ -109,7 +109,7 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试 To（type） 有 id 的 TEMP 类型 binding,binder 是否正确保存
+        /// 测试 To（type） 有 id 的 ADDRESS 类型 binding,binder 是否正确保存
         /// </summary>
         [Test]
         public void ToType_TempBindingHasId_BinderSaveCorrect()
@@ -181,7 +181,7 @@ namespace uMVVMCS_NUitTests
         #region To（instance）
 
         /// <summary>
-        /// 测试 To（instance） TEMP 类型 binding,binder 是否正确保存
+        /// 测试 To（instance） ADDRESS 类型 binding,binder 是否正确保存
         /// </summary>
         [Test]
         public void ToInstance_TempBinding_BinderSaveCorrect()
@@ -199,7 +199,7 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试 To（instance） TEMP 类型 binding,bindingType 是否正确转换为 Singleton
+        /// 测试 To（instance） ADDRESS 类型 binding,bindingType 是否正确转换为 Singleton
         /// </summary>
         [Test]
         public void ToInstance_TempBinding_BindingTypeChangeTOSingleton()
@@ -219,7 +219,7 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试 To（instance） TEMP 类型 binding,值约束是否正确转换为 Single
+        /// 测试 To（instance） ADDRESS 类型 binding,值约束是否正确转换为 Single
         /// </summary>
         [Test]
         public void ToInstance_TempBinding_ConstraintChangeTOSingle()
@@ -506,7 +506,7 @@ namespace uMVVMCS_NUitTests
         #region ReBind
 
         /// <summary>
-        /// 测试 ReBind TEMP 类型 binding,binder 是否正确保存
+        /// 测试 ReBind ADDRESS 类型 binding,binder 是否正确保存
         /// </summary>
         [Test]
         public void ReBind_TempBinding_BinderSaveCorrect()
@@ -697,7 +697,7 @@ namespace uMVVMCS_NUitTests
         #region Chain
 
         /// <summary>
-        /// 测试链式添加值给 TEMP 类型 binding,binder 是否正确保存以及后保存的值是否覆盖之前的值
+        /// 测试链式添加值给 ADDRESS 类型 binding,binder 是否正确保存以及后保存的值是否覆盖之前的值
         /// </summary>
         [Test]
         public void ChainToSelf_TempBindingToType_BinderSaveAndValueOverWhiteCorrect()
@@ -714,7 +714,7 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试链式添加值给 TEMP 类型 binding,binder 是否正确保存以及后保存的值是否覆盖之前的值
+        /// 测试链式添加值给 ADDRESS 类型 binding,binder 是否正确保存以及后保存的值是否覆盖之前的值
         /// 由于后保存的是实例，所以当添加实例时 binding 的类型被改变了，所以 binder 进行了保存
         /// </summary>
         [Test]
@@ -733,8 +733,8 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试链式添加值给 TEMP 类型 binding,binder 是否正确保存以及后保存的值是否覆盖之前的值
-        /// 由于保存实例时已经改变了 binding 的类型，而后保存的 ToSelf 只会改变约束类型，所以 binder 还是会进行保存（同时还由于第一保存实例时 binder 已经进行过保存了，而 ToSelf 并不会调用 UnBind 方法，所以即使转换为 TEMP 类型也一样不会从 binder 中移除
+        /// 测试链式添加值给 ADDRESS 类型 binding,binder 是否正确保存以及后保存的值是否覆盖之前的值
+        /// 由于保存实例时已经改变了 binding 的类型，而后保存的 ToSelf 只会改变约束类型，所以 binder 还是会进行保存（同时还由于第一保存实例时 binder 已经进行过保存了，而 ToSelf 并不会调用 UnBind 方法，所以即使转换为 ADDRESS 类型也一样不会从 binder 中移除
         /// </summary>
         [Test]
         public void ChainTo_TempBindingToSelf_BinderSaveAndValueOverWhiteCorrect()
@@ -752,7 +752,7 @@ namespace uMVVMCS_NUitTests
         }
 
         /// <summary>
-        /// 测试链式添加值给 TEMP 类型 binding,值的数量是否正确
+        /// 测试链式添加值给 ADDRESS 类型 binding,值的数量是否正确
         /// </summary>
         [Test]
         public void ChainMultipleTo_TempBindingTo_ValueNumberCorrect()

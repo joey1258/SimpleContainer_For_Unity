@@ -97,7 +97,7 @@ namespace uMVVMCS.DIContainer
             for (int i = 0; i < length; i++)
             {
                 ConstraintType cti = ConstraintType.MULTIPLE;
-                if (bindingType[i] != BindingType.TEMP && 
+                if (bindingType[i] != BindingType.ADDRESS && 
                     bindingType[i] != BindingType.MULTITON)
                 {
                     cti = ConstraintType.SINGLE;
@@ -234,7 +234,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例,并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
+        /// 返回一个新的Binding实例,并设置指定类型给 type, BindingType 为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {

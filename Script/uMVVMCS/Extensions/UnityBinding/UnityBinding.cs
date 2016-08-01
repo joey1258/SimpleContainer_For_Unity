@@ -80,7 +80,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public static IBinding ToGameObject(this IBinding binding, Type type, string name)
         {
-            if (binding.bindingType == BindingType.TEMP)
+            if (binding.bindingType == BindingType.ADDRESS)
             {
                 binding.SetBindingType(BindingType.SINGLETON);
                 binding.SetConstraint(ConstraintType.SINGLE);
@@ -119,7 +119,7 @@ namespace uMVVMCS.DIContainer
             Type type,
             GameObject[] gameObjects)
         {
-            if (binding.bindingType == BindingType.TEMP)
+            if (binding.bindingType == BindingType.ADDRESS)
             {
                 binding.SetBindingType(BindingType.MULTITON);
                 binding.SetConstraint(ConstraintType.MULTIPLE);
@@ -173,7 +173,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public static IBinding ToGameObjectWithTag(this IBinding binding, Type type, string tag)
         {
-            if (binding.bindingType == BindingType.TEMP)
+            if (binding.bindingType == BindingType.ADDRESS)
             {
                 binding.SetBindingType(BindingType.SINGLETON);
                 binding.SetConstraint(ConstraintType.SINGLE);
@@ -239,7 +239,7 @@ namespace uMVVMCS.DIContainer
             var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
             TypeFilter(binding, type, isGameObject);
 
-            if (binding.bindingType == BindingType.TEMP ||
+            if (binding.bindingType == BindingType.ADDRESS ||
                 binding.bindingType == BindingType.SINGLETON)
             {
                 binding.SetBindingType(BindingType.MULTITON);
@@ -265,7 +265,7 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
-        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；TEMP 类型 binding
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 binding
         /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
         /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
@@ -276,7 +276,7 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
-        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；TEMP 类型 binding
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 binding
         /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
         /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
@@ -287,12 +287,18 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
-        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；TEMP 类型 binding
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 binding
         /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
         /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
         public static IBinding ToPrefab(this IBinding binding, Type type, string path)
         {
+            if (binding.bindingType == BindingType.ADDRESS)
+            {
+                binding.SetBindingType(BindingType.SINGLETON);
+                binding.SetConstraint(ConstraintType.SINGLE);
+            }
+
             var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
             TypeFilter(binding, type, isGameObject);
 

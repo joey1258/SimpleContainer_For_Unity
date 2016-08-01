@@ -25,7 +25,7 @@ namespace uMVVMCS.Examples
 	public class PrefabsRoot : ContextRoot {
 		public override void SetupContainers() {
 			//Create the container.
-			this.AddContainer<InjectionContainer>()
+			AddContainer<InjectionContainer>()
 				//Register any extensions the container may use.
 				.RegisterAOT<UnityContainer>()
 				//Bind the "Cube" prefab. It will be injected in CubeRotator.

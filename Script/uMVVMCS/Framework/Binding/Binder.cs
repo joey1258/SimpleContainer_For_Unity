@@ -15,8 +15,8 @@
  */
 
 /*
- * 当 binding 为 TEMP 类型时其值只能为 Type，其会对相同的值进行过滤（对 typeBindings 进行遍历）
- * 因此 TEMP 类型的 binding 早于其它类型的 binding 添加的效率将有别于相反的顺序
+ * 当 binding 为 ADDRESS 类型时其值只能为 Type，其会对相同的值进行过滤（对 typeBindings 进行遍历）
+ * 因此 ADDRESS 类型的 binding 早于其它类型的 binding 添加的效率将有别于相反的顺序
  */
 
 using System;
@@ -58,19 +58,19 @@ namespace uMVVMCS.DIContainer
         #region Bind
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {
-            return Bind(typeof(T), BindingType.TEMP);
+            return Bind(typeof(T), BindingType.ADDRESS);
         }
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind(Type type)
         {
-            return Bind(type, BindingType.TEMP);
+            return Bind(type, BindingType.ADDRESS);
         }
 
         /// <summary>
@@ -489,8 +489,8 @@ namespace uMVVMCS.DIContainer
             // 如果 id 为空且未添加过相同的binding，就储存到 typeBindings
             if (binding.id == null)
             {
-                // 如果尚未被添加过，且不是 TEMP 类型才添加到 typeBindings 中
-                if (binding.bindingType != BindingType.TEMP && !exist)
+                // 如果尚未被添加过，且不是 ADDRESS 类型才添加到 typeBindings 中
+                if (binding.bindingType != BindingType.ADDRESS && !exist)
                 {
                     typeBindings[binding.type].Add(binding);
                 }

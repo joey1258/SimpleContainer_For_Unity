@@ -104,13 +104,13 @@ namespace uMVVMCS.DIContainer
         {
             var bindings = binder.GetAllBindings();
 
-            // 遍历所有 binding，如果是 TEMP 类型则缓存其 Type 类型的值；
+            // 遍历所有 binding，如果是 ADDRESS 类型则缓存其 Type 类型的值；
             // 如果是 SINGLETON 类型，缓存 value 属性的值的类型
             for (int i = 0; i < bindings.Count; i++)
             {
                 var binding = bindings[i];
 
-                if (binding.bindingType == BindingType.TEMP && binding.value is Type)
+                if (binding.bindingType == BindingType.ADDRESS && binding.value is Type)
                 {
                     Add(binding.value as Type);
                 }

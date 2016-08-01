@@ -50,14 +50,13 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 为 TEMP 类型 binding 返回实例化并加载好组件的 gameObject(在 Injector 类的 
+        /// 为 ADDRESS 类型 binding 返回实例化并加载好组件的 gameObject(在 Injector 类的 
         /// ResolveBinding 方法中触发)
         /// </summary>
         protected object OnBindingEvaluation(IInjector source, ref IBinding binding)
         {
-            //Checks whether a prefab should be instantiated.
             if (binding.value is PrefabBinding &&
-                binding.bindingType == BindingType.TEMP)
+                binding.bindingType == BindingType.ADDRESS)
             {
                 var prefabBinding = (PrefabBinding)binding.value;
                 var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabBinding.prefab);
