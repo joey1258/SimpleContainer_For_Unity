@@ -24,6 +24,11 @@ namespace uMVVMCS.DIContainer
         #region property
 
         /// <summary>
+        /// 当前 binding 是否已经执行过注入
+        /// </summary>
+        bool hasBeenInjected { get; }
+
+        /// <summary>
         /// binder 属性
         /// </summary>
         IBinder binder { get; }
@@ -180,6 +185,11 @@ namespace uMVVMCS.DIContainer
         /// 设置 binding 的值
         /// </summary>
         IBinding SetValue(object obj);
+
+        /// <summary>
+        /// 设置 binding 的 hasBeenInjected
+        /// </summary>
+        IBinding SetInjected(bool b);
 
         /// <summary>
         /// 设置 binding 的 ConstraintType

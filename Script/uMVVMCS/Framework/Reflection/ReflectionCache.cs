@@ -59,9 +59,9 @@ namespace uMVVMCS.DIContainer
                 return;
             }
 
-            if (!this.Contains(type))
+            if (!Contains(type))
             {
-                this.infos.Add(type, reflectionFactory.Create(type));
+                infos.Add(type, reflectionFactory.Create(type));
             }
         }
 
@@ -70,9 +70,9 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public void Remove(Type type)
         {
-            if (this.Contains(type))
+            if (Contains(type))
             {
-                this.infos.Remove(type);
+                infos.Remove(type);
             }
         }
 
@@ -81,12 +81,12 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public ReflectionInfo GetInfo(Type type)
         {
-            if (!this.Contains(type))
+            if (!Contains(type))
             {
-                this.Add(type);
+                Add(type);
             }
 
-            return this.infos[type];
+            return infos[type];
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public bool Contains(Type type)
         {
-            return this.infos.ContainsKey(type);
+            return infos.ContainsKey(type);
         }
 
         /// <summary>

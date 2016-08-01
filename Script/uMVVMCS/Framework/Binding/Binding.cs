@@ -17,8 +17,7 @@
 /*
  * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类
  * id 用于快速获取 binding，如果需要同1个类型的多个实例，可以将其以数组的形式保存在同一个 binding
- * ADDRESS 类型的 Binding 只能储存类型值，同时不会被储存到 binder
- * 去除值约束只保留单列与复数两个类型，去除同样必须保存为单例的 POOL 类型
+ * ADDRESS 类型的 Binding 只能储存类型值，或者 prefab 信息类等可供复用的类型
  */
 
 using System;
@@ -35,6 +34,10 @@ namespace uMVVMCS.DIContainer
             _binder = b;
 
             _type = t;
+
+            _hasBeenInjected = false;
+
+            _value = new List<object>();
         }
 
         public Binding(IBinder b, Type t, BindingType bt)
@@ -44,6 +47,10 @@ namespace uMVVMCS.DIContainer
             _type = t;
 
             _bindingType = bt;
+
+            _hasBeenInjected = false;
+
+            _value = new List<object>();
         }
 
         public Binding(IBinder b, Type t, BindingType bt, ConstraintType c)
@@ -56,6 +63,8 @@ namespace uMVVMCS.DIContainer
 
             _constraint = c;
 
+            _hasBeenInjected = false;
+
             _value = new List<object>();
         }
 
@@ -63,7 +72,17 @@ namespace uMVVMCS.DIContainer
 
         #region IBinding implementation 
 
+
         #region property
+
+        /// <summary>
+        /// 当前 binding 是否已经执行过注入
+        /// </summary>
+        public bool hasBeenInjected
+        {
+            get { return _hasBeenInjected; }
+        }
+        protected bool _hasBeenInjected = false;
 
         /// <summary>
         /// binder 属性
@@ -91,7 +110,8 @@ namespace uMVVMCS.DIContainer
         {
             get
             {
-                if(_value == null) { _value = new List<object>(); }
+                if (_value == null) { _value = new List<object>(); }
+                if (_value.Count == 0) { return null; }
                 return _value[0];
             }
         }
@@ -507,6 +527,15 @@ namespace uMVVMCS.DIContainer
             return this;
         }
 
+        /// <summary>
+        /// 设置 binding 的 hasBeenInjected
+        /// </summary>
+        virtual public IBinding SetInjected(bool b)
+        {
+            _hasBeenInjected = b;
+            return this;
+        }
+
         #endregion
 
         /// <summary>
@@ -520,14 +549,16 @@ namespace uMVVMCS.DIContainer
             "Id: {3}\n"+
             "BindingType: {4}\n" +
             "constraint: {5}\n" +
-            "Conditions: {6}\n",
-            this.type.FullName,
-            (this.value == null ? "null" : this.value.ToString()),
-            (this.value is Type ? "type" : "instance"),
-            (this.id == null ? "null" : this.id.ToString()),
-            this.bindingType.ToString(),
-            this.constraint.ToString(),
-            (this.condition == null ? "no" : "yes")
+            "hasBeenInjected: {6}\n" +
+            "Conditions: {7}\n",
+            type.FullName,
+            (value == null ? "null" : this.value.ToString()),
+            (value is Type ? "type" : "instance"),
+            (id == null ? "null" : this.id.ToString()),
+            bindingType.ToString(),
+            constraint.ToString(),
+            hasBeenInjected == true ? "true" : "false",
+            (condition == null ? "no" : "yes")
             );
         }
     }

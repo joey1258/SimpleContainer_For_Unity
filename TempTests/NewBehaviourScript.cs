@@ -9,13 +9,16 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        //Arrange 
-        IBinder binder = new Binder();
-        IBinding binding = binder.BindMultiton<int>().To(new object[] { 1, 2, 3, 4, 5, 6 });
-        //Act
-        binding.RemoveValue(new object[] { 1, 2 });
-
-        print(binding.valueList.Count);
+        List<string> nums = new List<string>();
+        nums.Add(null);
+        print(nums[0]);
+        nums.Add("1");
+        nums.Add("1");
+        nums.Add("1");
+        nums.Add("1");
+        nums.Add("1");
+        nums.Add("1");
+        print(nums.Count);
     }
 
     // Update is called once per frame

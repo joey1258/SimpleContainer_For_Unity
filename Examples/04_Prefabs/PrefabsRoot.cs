@@ -29,7 +29,7 @@ namespace uMVVMCS.Examples
 				//Register any extensions the container may use.
 				.RegisterAOT<UnityContainer>()
 				//Bind the "Cube" prefab. It will be injected in CubeRotator.
-				.Bind<Transform>().ToPrefab("04_Prefabs/Cube").As("cube")
+				.BindSingleton<Transform>().ToPrefab("04_Prefabs/Cube").As("cube")
 				//Bind the "Plane" prefab. It exists just to make the scene less empty.
 				.Bind<GameObject>().ToPrefab("04_Prefabs/Plane");
 		}

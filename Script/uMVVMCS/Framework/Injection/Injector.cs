@@ -615,21 +615,22 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual protected void OnBeforeAddBinding(IBinder source, ref IBinding binding)
         {
-            if (binding.bindingType != BindingType.ADDRESS)
+            // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
+            int length = binding.valueList.Count;
+            for (int i = 0; i < length; i++)
             {
-                // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
-                int length = binding.valueList.Count;
-                for (int i = 0; i < length; i++)
+                if (binding.valueList[i] is Type)
                 {
-                    if (binding.valueList[i] is Type)
+                    var value = Resolve(binding.valueList[i] as Type);
+                    binding.To(value);
+                }
+                else
+                {
+                    if (!binding.hasBeenInjected)
                     {
-                        var value = Resolve(binding.valueList[i] as Type);
-                        binding.To(value);
-                    }
-                    else
-                    {
-                        // hasBeenInjected 判断放在容器类中更为合适，所以这里不做注入状态检查
+                        // 如果未执行注入就执行注入并将 hasBeenInjected 设为真
                         Inject(binding.valueList[i]);
+                        binding.SetInjected(true);
                     }
                 }
             }

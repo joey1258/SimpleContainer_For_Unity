@@ -471,7 +471,7 @@ namespace uMVVMCS.DIContainer
             AddBinding(binding);
 
             // 如果 AOT 后置委托不为空就执行它
-            if (this.afterAddBinding != null) { this.afterAddBinding(this, ref binding); }
+            if (afterAddBinding != null) { afterAddBinding(this, ref binding); }
         }
 
         /// <summary>
@@ -486,14 +486,10 @@ namespace uMVVMCS.DIContainer
 
             bool exist = typeBindings[binding.type].Contains(binding);
 
-            // 如果 id 为空且未添加过相同的binding，就储存到 typeBindings
             if (binding.id == null)
             {
-                // 如果尚未被添加过，且不是 ADDRESS 类型才添加到 typeBindings 中
-                if (binding.bindingType != BindingType.ADDRESS && !exist)
-                {
-                    typeBindings[binding.type].Add(binding);
-                }
+                // 如果尚未被添加过才添加到 typeBindings 中
+                if (!exist) { typeBindings[binding.type].Add(binding); }
             }
             // 不为空时将引用储存到 bindingStorage 和 idBindings
             else

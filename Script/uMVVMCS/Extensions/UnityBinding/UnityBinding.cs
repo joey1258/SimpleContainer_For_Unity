@@ -293,12 +293,6 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public static IBinding ToPrefab(this IBinding binding, Type type, string path)
         {
-            if (binding.bindingType == BindingType.ADDRESS)
-            {
-                binding.SetBindingType(BindingType.SINGLETON);
-                binding.SetConstraint(ConstraintType.SINGLE);
-            }
-
             var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
             TypeFilter(binding, type, isGameObject);
 
@@ -309,10 +303,21 @@ namespace uMVVMCS.DIContainer
                 throw new BindingSystemException(BindingSystemException.PREFAB_IS_NULL);
             }
 
-            var prefabBinding = new PrefabBinding(prefab, type);
+            if(binding.bindingType == BindingType.ADDRESS)
+            {
+                var prefabBinding = new PrefabBinding(prefab, type);
 
-            // 将 gameObject 设为 binding 的值
-            binding.SetValue(prefabBinding);
+                // 将 gameObject 设为 binding 的值
+                binding.SetValue(prefabBinding);
+            }
+            else if (binding.bindingType == BindingType.ADDRESS)
+            {
+                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefab);
+
+                // 将 gameObject 设为 binding 的值
+                SetValueAddComponent(binding, gameObject, type, isGameObject);
+            }
+
             binding.binder.Storing(binding);
 
             return binding;

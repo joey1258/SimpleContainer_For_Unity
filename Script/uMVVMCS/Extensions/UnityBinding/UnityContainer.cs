@@ -55,6 +55,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         protected object OnBindingEvaluation(IInjector source, ref IBinding binding)
         {
+            UnityEngine.Debug.Log(111);
             if (binding.value is PrefabBinding &&
                 binding.bindingType == BindingType.ADDRESS)
             {
