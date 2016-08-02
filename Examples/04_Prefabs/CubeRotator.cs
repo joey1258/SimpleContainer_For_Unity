@@ -47,7 +47,7 @@ namespace uMVVMCS.Examples
 		/// Start is called after PostConstruct.
 		/// </summary>
 		protected void Start() {
-			//this.Inject();
+			this.Inject();
 		}
 
 		protected void Update () {

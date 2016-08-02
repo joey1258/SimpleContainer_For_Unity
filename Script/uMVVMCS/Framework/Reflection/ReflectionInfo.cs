@@ -23,7 +23,7 @@ namespace uMVVMCS.DIContainer
     public class ReflectionInfo
     {
         /// <summary>
-        /// 反射类型
+        /// 类型
         /// </summary>
         public Type type { get; set; }
 

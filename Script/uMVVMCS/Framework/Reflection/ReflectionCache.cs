@@ -110,13 +110,18 @@ namespace uMVVMCS.DIContainer
             {
                 var binding = bindings[i];
 
-                if (binding.bindingType == BindingType.ADDRESS && binding.value is Type)
+                int length = binding.valueList.Count;
+                for (int n = 0; n < length; n++)
                 {
-                    Add(binding.value as Type);
-                }
-                else if (binding.bindingType == BindingType.SINGLETON)
-                {
-                    Add(binding.value.GetType());
+                    if (binding.bindingType == BindingType.ADDRESS && binding.value is Type)
+                    {
+                        Add(binding.valueList[n] as Type);
+                    }
+                    else if (binding.bindingType == BindingType.SINGLETON ||
+                        binding.bindingType == BindingType.MULTITON)
+                    {
+                        Add(binding.valueList[n].GetType());
+                    }
                 }
             }
         }

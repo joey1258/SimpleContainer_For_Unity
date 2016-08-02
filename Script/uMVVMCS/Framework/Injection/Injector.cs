@@ -626,11 +626,10 @@ namespace uMVVMCS.DIContainer
                 }
                 else
                 {
-                    if (!binding.hasBeenInjected)
+                    // 如果当前 binder 中没有重复的值才进行注入(避免重复注入)
+                    if (!InjectionUtil.IsExistOnBinder(binding.valueList[i], binder))
                     {
-                        // 如果未执行注入就执行注入并将 hasBeenInjected 设为真
                         Inject(binding.valueList[i]);
-                        binding.SetInjected(true);
                     }
                 }
             }

@@ -42,7 +42,7 @@ namespace uMVVMCS
 				for (var i = 0; i < attributes.Length; i++)
                 {
 					var attribute = attributes[i];
-                    // 如果是 InjectFromContainer 特性，用特性的 id 执行注入
+                    // 如需根据容器的 id 进行匹配，将 InjectFromContainer 的 id 作为要对照的 id 传入
                     if (attribute is InjectFromContainer)
                     {
 						Inject(obj, (attribute as InjectFromContainer).id);
@@ -70,9 +70,10 @@ namespace uMVVMCS
                 // 遍历 list，如果容器 id 不为空且和参数 id 相等，injectOnContainer 为真
                 var injectOnContainer = (container.id != null && container.id.Equals(id));
 
-                // 如参数 id 为空或 injectOnContainer 为真，且参数 obj 非单例，就为当前容器注入 obj
+                // 如参数 id 为空或 id 与容器 id 相等，且参数 obj 不与容器中任何 binding 的值重复，
+                // 就为当前容器注入 obj(避免重复注入)
                 if ((id == null || injectOnContainer) && 
-                    !IsSingletonOnContainer(obj, container))
+                    !IsExistOnContainer(obj, container))
                 {
 					container.Inject(obj);
 				}
@@ -82,7 +83,7 @@ namespace uMVVMCS
 		/// <summary>
 		/// 返回指定容器中的 object 是否是单例
 		/// </summary>
-		public static bool IsSingletonOnContainer(object obj, IInjectionContainer container)
+		public static bool IsExistOnContainer(object obj, IInjectionContainer container)
         {
 			var isSingleton = false;
 			var bindings = container.GetBindingsByType(obj.GetType());
@@ -91,14 +92,44 @@ namespace uMVVMCS
 			
 			for (var i = 0; i < bindings.Count; i++)
             {
-				if (bindings[i].value == obj)
+                int length = bindings[i].valueList.Count;
+                for (int n = 0; n < length; n++)
                 {
-                    isSingleton = true;
-                    break;
+                    if (bindings[i].valueList[n] == obj)
+                    {
+                        isSingleton = true;
+                        return isSingleton;
+                    }
                 }
 			}
 			
 			return isSingleton;
-		}
-	}
+        }
+
+        /// <summary>
+        /// 返回指定 binder 中的 object 是否是单例
+        /// </summary>
+        public static bool IsExistOnBinder(object obj, IBinder binder)
+        {
+            var isSingleton = false;
+            var bindings = binder.GetBindingsByType(obj.GetType());
+
+            if (bindings == null) { return false; }
+
+            for (var i = 0; i < bindings.Count; i++)
+            {
+                int length = bindings[i].valueList.Count;
+                for (int n = 0; n < length; n++)
+                {
+                    if (bindings[i].valueList[n] == obj)
+                    {
+                        isSingleton = true;
+                        return isSingleton;
+                    }
+                }
+            }
+
+            return isSingleton;
+        }
+    }
 }

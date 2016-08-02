@@ -35,8 +35,6 @@ namespace uMVVMCS.DIContainer
 
             _type = t;
 
-            _hasBeenInjected = false;
-
             _value = new List<object>();
         }
 
@@ -47,8 +45,6 @@ namespace uMVVMCS.DIContainer
             _type = t;
 
             _bindingType = bt;
-
-            _hasBeenInjected = false;
 
             _value = new List<object>();
         }
@@ -63,8 +59,6 @@ namespace uMVVMCS.DIContainer
 
             _constraint = c;
 
-            _hasBeenInjected = false;
-
             _value = new List<object>();
         }
 
@@ -74,15 +68,6 @@ namespace uMVVMCS.DIContainer
 
 
         #region property
-
-        /// <summary>
-        /// 当前 binding 是否已经执行过注入
-        /// </summary>
-        public bool hasBeenInjected
-        {
-            get { return _hasBeenInjected; }
-        }
-        protected bool _hasBeenInjected = false;
 
         /// <summary>
         /// binder 属性
@@ -504,8 +489,6 @@ namespace uMVVMCS.DIContainer
             }
             else { _value.Add(o); }
 
-            binder.Storing(this);
-
             return this;
         }
 
@@ -527,15 +510,6 @@ namespace uMVVMCS.DIContainer
             return this;
         }
 
-        /// <summary>
-        /// 设置 binding 的 hasBeenInjected
-        /// </summary>
-        virtual public IBinding SetInjected(bool b)
-        {
-            _hasBeenInjected = b;
-            return this;
-        }
-
         #endregion
 
         /// <summary>
@@ -549,15 +523,13 @@ namespace uMVVMCS.DIContainer
             "Id: {3}\n"+
             "BindingType: {4}\n" +
             "constraint: {5}\n" +
-            "hasBeenInjected: {6}\n" +
-            "Conditions: {7}\n",
+            "Conditions: {6}\n",
             type.FullName,
             (value == null ? "null" : this.value.ToString()),
             (value is Type ? "type" : "instance"),
             (id == null ? "null" : this.id.ToString()),
             bindingType.ToString(),
             constraint.ToString(),
-            hasBeenInjected == true ? "true" : "false",
             (condition == null ? "no" : "yes")
             );
         }

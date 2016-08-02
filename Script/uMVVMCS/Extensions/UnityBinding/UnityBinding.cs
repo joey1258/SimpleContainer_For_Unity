@@ -310,7 +310,8 @@ namespace uMVVMCS.DIContainer
                 // 将 gameObject 设为 binding 的值
                 binding.SetValue(prefabBinding);
             }
-            else if (binding.bindingType == BindingType.ADDRESS)
+            else if (binding.bindingType == BindingType.SINGLETON ||
+                binding.bindingType == BindingType.MULTITON)
             {
                 var gameObject = (GameObject)MonoBehaviour.Instantiate(prefab);
 
@@ -375,7 +376,6 @@ namespace uMVVMCS.DIContainer
             else
             {
                 var component = gameObject.GetComponent(type);
-                //UnityEngine.Debug.Log(component == null);
                 if (component == null)
                 {
                     component = gameObject.AddComponent(type);
