@@ -28,6 +28,7 @@ namespace uMVVMCS.DIContainer
         private const string GAMEOBJECT_IS_NULL = "GameObject is null";
         private const string PREFAB_IS_NULL = "prefab is null";
         private const string RESOURCE_IS_NULL = "resource is null";
+        private const string VALUE_ISNOT_PREFAB = "The value must be PrefabInfo.";
 
         #endregion
 
@@ -488,28 +489,64 @@ namespace uMVVMCS.DIContainer
         }
 
         #endregion
-        
-        #region ToResource
+
+        #region ToInstantiate
 
         /// <summary>
-        /// 将从指定路径中读取的资源作为 binding 的值
+        /// 实例化 binding 的 PrefabInfo 类型值1次,但不提供操作实例化结果的方式
         /// </summary>
-        /// <remarks>
-        /// 只有绑定场景中不会被销毁的游戏物体才可以防止对已销毁的对象的引用
-        /// </remarks>
-        public static IBinding ToResource(this IBinding binding, string path)
+        public static IBinding ToInstantiate(this IBinding binding, string path)
         {
-            if (!TypeUtils.IsAssignable(typeof(UnityEngine.Object), binding.type))
+            return ToInstantiate(binding, path, null, 1);
+        }
+
+        /// <summary>
+        /// 实例化 binding 的 PrefabInfo 类型值1次，并提供一个可供操作实例化结果的委托
+        /// </summary>
+        public static IBinding ToInstantiate(this IBinding binding, string path, Action<object> handle)
+        {
+            return ToInstantiate(binding, path, handle, 1);
+        }
+
+        /// <summary>
+        /// 实例化 binding 的 PrefabInfo 类型值指定次数，并提供一个可供操作实例化结果的委托
+        /// </summary>
+        public static IBinding ToInstantiate(this IBinding binding, string path, Action<object> handle, int times)
+        {
+            if (!(binding.value is PrefabInfo)){ throw new Exception(VALUE_ISNOT_PREFAB); }
+
+            var prefabInfo = (PrefabInfo)binding.value;
+
+            if (prefabInfo.type.Equals(typeof(GameObject)))
             {
-                throw new Exception(TYPE_NOT_OBJECT);
+                GameObject[] gameObjectList = new GameObject[times];
+
+                for (int i = 0; i < times; i++)
+                {
+                    var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
+                    gameObjectList[i] = gameObject;
+                }
+
+                if (handle != null) { handle(gameObjectList); }
             }
+            else
+            {
+                Component[] componentList = new Component[times];
 
-            var resource = Resources.Load(path);
-            if (resource == null) { throw new Exception(TYPE_NOT_OBJECT); }
+                for (int i = 0; i < times; i++)
+                {
+                    var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
+                    var component = gameObject.GetComponent(prefabInfo.type);
 
-            // 将 gameObject 设为 binding 的值
-            binding.SetValue(resource);
-            binding.binder.Storing(binding);
+                    if (component == null)
+                    {
+                        component = gameObject.AddComponent(prefabInfo.type);
+                        componentList[i] = component;
+                    }
+                }
+
+                if (handle != null) { handle(componentList); }
+            }
 
             return binding;
         }
