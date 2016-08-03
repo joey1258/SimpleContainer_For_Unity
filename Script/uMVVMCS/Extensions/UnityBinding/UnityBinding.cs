@@ -265,9 +265,9 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
-        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 binding
-        /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
-        /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
         public static IBinding ToPrefab(this IBinding binding, string path)
         {
@@ -276,9 +276,9 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
-        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 binding
-        /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
-        /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
         public static IBinding ToPrefab<T>(this IBinding binding, string path) where T : Component
         {
@@ -287,28 +287,88 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         /// 在场景中实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
-        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 binding
-        /// 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，所以不必
-        /// 关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
         public static IBinding ToPrefab(this IBinding binding, Type type, string path)
         {
             var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
             TypeFilter(binding, type, isGameObject);
 
-            // 此处需要思考如何与 ResManager 结合
-            var prefab = Resources.Load(path);
-            if (prefab == null)
+            var prefabInfo = new PrefabInfo(path, type);
+            if (prefabInfo.prefab == null)
             {
                 throw new BindingSystemException(BindingSystemException.PREFAB_IS_NULL);
             }
 
             if(binding.bindingType == BindingType.ADDRESS)
             {
-                var prefabBinding = new PrefabBinding(prefab, type);
+                // 将 prefabInfo 设为 binding 的值
+                binding.SetValue(prefabInfo);
+            }
+            else if (binding.bindingType == BindingType.SINGLETON ||
+                binding.bindingType == BindingType.MULTITON)
+            {
+                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
 
                 // 将 gameObject 设为 binding 的值
-                binding.SetValue(prefabBinding);
+                SetValueAddComponent(binding, gameObject, type, isGameObject);
+            }
+
+            binding.binder.Storing(binding);
+
+            return binding;
+        }
+
+        #endregion
+
+        #region ToPrefabAsync
+
+        /// <summary>
+        /// 在场景中异步实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// </summary>
+        public static IBinding ToPrefabAsync(this IBinding binding, string path)
+        {
+            return binding.ToPrefabAsync(binding.type, path);
+        }
+
+        /// <summary>
+        /// 在场景中异步实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// </summary>
+        public static IBinding ToPrefabAsync<T>(this IBinding binding, string path) where T : Component
+        {
+            return binding.ToPrefabAsync(typeof(T), path);
+        }
+
+        /// <summary>
+        /// 在场景中异步实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// </summary>
+        public static IBinding ToPrefabAsync(this IBinding binding, Type type, string path)
+        {
+            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
+            TypeFilter(binding, type, isGameObject);
+
+            var prefabInfo = new PrefabInfo(path, type);
+            if (prefab == null)
+            {
+                throw new BindingSystemException(BindingSystemException.PREFAB_IS_NULL);
+            }
+
+            if (binding.bindingType == BindingType.ADDRESS)
+            {
+
+                // 将 gameObject 设为 binding 的值
+                binding.SetValue(prefabInfo);
             }
             else if (binding.bindingType == BindingType.SINGLETON ||
                 binding.bindingType == BindingType.MULTITON)

@@ -53,7 +53,7 @@ namespace uMVVMCS
         /// <summary>
         /// 用 path 来索引的索引器
         /// </summary>
-        public object this[string path] { get { return GetInfo(path).AssetObject; } }
+        public object this[string path] { get { return GetInfo(path).asset; } }
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace uMVVMCS
             if (!Contains(path))
             {
                 AssetInfo _assetInfo = new AssetInfo();
-                _assetInfo.Path = path;
+                _assetInfo.path = path;
                 infos.Add(path, _assetInfo);
 
                 infos.Add(path, _assetInfo);
@@ -103,7 +103,7 @@ namespace uMVVMCS
             }
 
             //计算已经开启了几次该类型资源
-            infos[path].RefCount++;
+            infos[path].refCount++;
             return infos[path];
         }
 
@@ -122,7 +122,7 @@ namespace uMVVMCS
         {
             if (infos.ContainsKey(path))
             {
-                Resources.UnloadAsset(infos[path].AssetObject);
+                Resources.UnloadAsset(infos[path].asset);
             }
 
             infos[path] = null;

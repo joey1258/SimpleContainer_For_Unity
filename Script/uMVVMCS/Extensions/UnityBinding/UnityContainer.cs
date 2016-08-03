@@ -53,12 +53,14 @@ namespace uMVVMCS.DIContainer
         /// 为 ADDRESS 类型 binding 返回实例化并加载好组件的 gameObject(在 Injector 类的 
         /// ResolveBinding 方法中触发)
         /// </summary>
-        protected object OnBindingEvaluation(IInjector source, ref IBinding binding)
+        protected object OnBindingEvaluation(
+            IInjector source, 
+            ref IBinding binding)
         {
-            if (binding.value is PrefabBinding &&
+            if (binding.value is PrefabInfo &&
                 binding.bindingType == BindingType.ADDRESS)
             {
-                var prefabBinding = (PrefabBinding)binding.value;
+                var prefabBinding = (PrefabInfo)binding.value;
                 var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabBinding.prefab);
 
                 if (prefabBinding.type.Equals(typeof(GameObject)))

@@ -13,20 +13,50 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  */
-
+ 
 using System;
 using System.Collections;
 
-namespace uMVVMCS
+namespace uMVVMCS.DIContainer
 {
-    public class AssetInfo
+    public class PrefabInfo
     {
+        #region constructor
+
+        public PrefabInfo(UnityEngine.Object prefab, string path, Type type)
+        {
+            _prefab = prefab;
+            this.path = path;
+            this.type = type;
+        }
+
+        public PrefabInfo(string path, Type type)
+        {
+            this.path = path;
+            this.type = type;
+        }
+
+        #endregion
+
         #region property
 
         /// <summary>
-        /// 资源类型(Class)
+        /// 资源对象
         /// </summary>
-        public Type assetType { get; set; }
+        public UnityEngine.Object prefab
+        {
+            get
+            {
+                if (_prefab == null) { _ResourcesLoad(); }
+                return _prefab;
+            }
+        }
+        private UnityEngine.Object _prefab;
+
+        /// <summary>
+        /// prefab 上的组件
+        /// </summary>
+        public Type type { get; set; }
 
         /// <summary>
         /// 资源路径
@@ -39,29 +69,35 @@ namespace uMVVMCS
         public int refCount { get; set; }
 
         /// <summary>
-        /// 通过资源对象是否为空来判断是否已经加载
+        /// 资源对象是否已经加载
         /// </summary>
         public bool isLoaded
         {
-            get { return _asset != null; }
+            get { return prefab != null; }
         }
-
-        /// <summary>
-        /// 资源对象
-        /// </summary>
-        public UnityEngine.Object asset
-        {
-            get
-            {
-                if (_asset == null) { _ResourcesLoad(); }
-                return _asset;
-            }
-        }
-        private UnityEngine.Object _asset;
 
         #endregion
 
         #region functions
+
+        /// <summary>
+        /// 加载资源
+        /// </summary>
+        private void _ResourcesLoad()
+        {
+            try
+            {
+                _prefab = UnityEngine.Resources.Load(path);
+                if (_prefab == null)
+                {
+                    UnityEngine.Debug.Log("Resources Load Failure! path:" + path);
+                }
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError(e.ToString());
+            }
+        }
 
         /// <summary>
         /// 协程加载资源
@@ -71,28 +107,9 @@ namespace uMVVMCS
             while (true)
             {
                 yield return null;
-                if (_asset == null) { _ResourcesLoad(); yield return null; }
-                if (_loaded != null) _loaded(_asset);
+                if (_prefab == null) { _ResourcesLoad(); yield return null; }
+                if (_loaded != null) _loaded(_prefab);
                 yield break;
-            }
-        }
-
-        /// <summary>
-        /// 加载资源
-        /// </summary>
-        private void _ResourcesLoad()
-        {
-            try
-            {
-                _asset = UnityEngine.Resources.Load(path);
-                if (_asset == null)
-                {
-                    UnityEngine.Debug.Log("Resources Load Failure! path:" + path);
-                }
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError(e.ToString());
             }
         }
 
@@ -110,7 +127,7 @@ namespace uMVVMCS
         public IEnumerator GetAsyncObject(Action<UnityEngine.Object> _loaded, Action<float> _progress)
         {
             // 如果不为空就代表还有东西要加载
-            if (_asset != null) { _loaded(_asset); yield break; }
+            if (_prefab != null) { _loaded(_prefab); yield break; }
 
             // 为空就代表已经加载完毕
             UnityEngine.ResourceRequest _resRequest = UnityEngine.Resources.LoadAsync(path);
@@ -132,9 +149,9 @@ namespace uMVVMCS
             }
 
             // 
-            _asset = _resRequest.asset;
+            _prefab = _resRequest.asset;
             if (_loaded != null)
-                _loaded(_asset);
+                _loaded(_prefab);
 
             yield return _resRequest;
         }
@@ -142,4 +159,3 @@ namespace uMVVMCS
         #endregion
     }
 }
-
