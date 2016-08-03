@@ -14,5 +14,11 @@
  *		limitations under the License.
  */
 
-namespace uMVVMCS { public class CoroutineUtil : DDOLSingleton<CoroutineUtil> { } }
-
+namespace uMVVMCS
+{
+    public static class Constants
+    {
+        public static string RootName = "SceneRoot";
+        public static string DDOLRootName = "DDOLRoot";
+    }
+}

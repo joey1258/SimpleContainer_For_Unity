@@ -21,7 +21,7 @@ namespace uMVVMCS
     /// <summary>
     /// Mono singleton.
     /// </summary>
-    public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
+    public abstract class DDOLSingleton<T> : MonoBehaviour where T : DDOLSingleton<T>
     {
         protected static T _Instance = null;
 
@@ -31,10 +31,10 @@ namespace uMVVMCS
             {
                 if (_Instance == null)
                 {
-                    GameObject go = GameObject.Find("Root");
+                    GameObject go = GameObject.Find(Constants.DDOLRootName);
                     if (go == null)
                     {
-                        go = new GameObject("Root");
+                        go = new GameObject(Constants.DDOLRootName);
                         DontDestroyOnLoad(go);
                     }
                     _Instance = go.AddComponent<T>();

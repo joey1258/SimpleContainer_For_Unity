@@ -126,10 +126,8 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public IEnumerator GetAsyncObject(Action<UnityEngine.Object> _loaded, Action<float> _progress)
         {
-            // 如果不为空就代表还有东西要加载
             if (_prefab != null) { _loaded(_prefab); yield break; }
-
-            // 为空就代表已经加载完毕
+            
             UnityEngine.ResourceRequest _resRequest = UnityEngine.Resources.LoadAsync(path);
 
             // 进度判断值不能为1，否则会卡住

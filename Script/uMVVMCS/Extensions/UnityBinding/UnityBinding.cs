@@ -353,12 +353,21 @@ namespace uMVVMCS.DIContainer
         /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
         /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
         /// </summary>
-        public static IBinding ToPrefabAsync(this IBinding binding, Type type, string path)
+        public static IBinding ToPrefabAsync(
+            this IBinding binding, 
+            Type type, 
+            string path,
+            Action<UnityEngine.Object> _loaded, 
+            Action<float> _progress)
         {
             var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
             TypeFilter(binding, type, isGameObject);
 
+            var prefab = Resources.LoadAsync(path);
             var prefabInfo = new PrefabInfo(path, type);
+
+            CoroutineUtil.Instance.StartCoroutine(prefabInfo.GetAsyncObject(_loaded, _progress));
+
             if (prefab == null)
             {
                 throw new BindingSystemException(BindingSystemException.PREFAB_IS_NULL);
