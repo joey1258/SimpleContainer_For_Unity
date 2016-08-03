@@ -109,6 +109,7 @@ namespace uMVVMCS
         /// </summary>
         public IEnumerator GetAsyncObject(Action<UnityEngine.Object> _loaded, Action<float> _progress)
         {
+            // 执行 yield break 之后不再执行下面语句  
             if (_asset != null) { _loaded(_asset); yield break; }
             
             UnityEngine.ResourceRequest _resRequest = UnityEngine.Resources.LoadAsync(path);

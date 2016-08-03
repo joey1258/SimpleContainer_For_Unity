@@ -21,6 +21,16 @@ namespace uMVVMCS.DIContainer
 {
     public static class UnityBinding
     {
+        #region exception text
+
+        private const string TYPE_NOT_OBJECT = "The type must be UnityEngine.Object.";
+        private const string TYPE_NOT_COMPONENT = "The type must be UnityEngine.Component.";
+        private const string GAMEOBJECT_IS_NULL = "GameObject is null";
+        private const string PREFAB_IS_NULL = "prefab is null";
+        private const string RESOURCE_IS_NULL = "resource is null";
+
+        #endregion
+
         #region ToGameObject
 
         /// <summary>
@@ -297,12 +307,9 @@ namespace uMVVMCS.DIContainer
             TypeFilter(binding, type, isGameObject);
 
             var prefabInfo = new PrefabInfo(path, type);
-            if (prefabInfo.prefab == null)
-            {
-                throw new BindingSystemException(BindingSystemException.PREFAB_IS_NULL);
-            }
+            if (prefabInfo.prefab == null) { throw new Exception(PREFAB_IS_NULL); }
 
-            if(binding.bindingType == BindingType.ADDRESS)
+            if (binding.bindingType == BindingType.ADDRESS)
             {
                 // 将 prefabInfo 设为 binding 的值
                 binding.SetValue(prefabInfo);
@@ -333,7 +340,15 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public static IBinding ToPrefabAsync(this IBinding binding, string path)
         {
-            return binding.ToPrefabAsync(binding.type, path);
+            return binding.ToPrefabAsync(binding.type, path, null, null);
+        }
+        public static IBinding ToPrefabAsync(this IBinding binding, string path, Action<UnityEngine.Object> _loaded)
+        {
+            return binding.ToPrefabAsync(binding.type, path, _loaded, null);
+        }
+        public static IBinding ToPrefabAsync(this IBinding binding, string path, Action<float> _progress)
+        {
+            return binding.ToPrefabAsync(binding.type, path, null, _progress);
         }
 
         /// <summary>
@@ -344,7 +359,19 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public static IBinding ToPrefabAsync<T>(this IBinding binding, string path) where T : Component
         {
-            return binding.ToPrefabAsync(typeof(T), path);
+            return binding.ToPrefabAsync(typeof(T), path, null, null);
+        }
+        public static IBinding ToPrefabAsync<T>(this IBinding binding, string path, Action<UnityEngine.Object> _loaded) where T : Component
+        {
+            return binding.ToPrefabAsync(typeof(T), path, _loaded, null);
+        }
+        public static IBinding ToPrefabAsync<T>(this IBinding binding, string path, Action<float> _progress) where T : Component
+        {
+            return binding.ToPrefabAsync(typeof(T), path, null, _progress);
+        }
+        public static IBinding ToPrefabAsync<T>(this IBinding binding, string path, Action<UnityEngine.Object> _loaded, Action<float> _progress) where T : Component
+        {
+            return binding.ToPrefabAsync(typeof(T), path, _loaded, _progress);
         }
 
         /// <summary>
@@ -363,26 +390,20 @@ namespace uMVVMCS.DIContainer
             var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
             TypeFilter(binding, type, isGameObject);
 
-            var prefab = Resources.LoadAsync(path);
             var prefabInfo = new PrefabInfo(path, type);
+            prefabInfo.GetAsyncObject(_loaded, _progress);
 
-            CoroutineUtil.Instance.StartCoroutine(prefabInfo.GetAsyncObject(_loaded, _progress));
-
-            if (prefab == null)
-            {
-                throw new BindingSystemException(BindingSystemException.PREFAB_IS_NULL);
-            }
+            if (prefabInfo.prefab == null) { throw new Exception(PREFAB_IS_NULL); }
 
             if (binding.bindingType == BindingType.ADDRESS)
             {
-
-                // 将 gameObject 设为 binding 的值
+                // 将 prefabInfo 设为 binding 的值
                 binding.SetValue(prefabInfo);
             }
             else if (binding.bindingType == BindingType.SINGLETON ||
                 binding.bindingType == BindingType.MULTITON)
             {
-                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefab);
+                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
 
                 // 将 gameObject 设为 binding 的值
                 SetValueAddComponent(binding, gameObject, type, isGameObject);
@@ -394,7 +415,80 @@ namespace uMVVMCS.DIContainer
         }
 
         #endregion
+        
+        #region ToPrefabCoroutine
 
+        /// <summary>
+        /// 在场景中异步实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// </summary>
+        public static IBinding ToPrefabCoroutine(this IBinding binding, string path)
+        {
+            return binding.ToPrefabCoroutine(binding.type, path, null);
+        }
+        public static IBinding ToPrefabCoroutine(this IBinding binding, string path, Action<UnityEngine.Object> _loaded)
+        {
+            return binding.ToPrefabCoroutine(binding.type, path, _loaded);
+        }
+
+        /// <summary>
+        /// 在场景中异步实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// </summary>
+        public static IBinding ToPrefabCoroutine<T>(this IBinding binding, string path) where T : Component
+        {
+            return binding.ToPrefabCoroutine(typeof(T), path, null);
+        }
+        public static IBinding ToPrefabCoroutine<T>(this IBinding binding, string path, Action<UnityEngine.Object> _loaded) where T : Component
+        {
+            return binding.ToPrefabCoroutine(typeof(T), path, _loaded);
+        }
+
+        /// <summary>
+        /// 在场景中异步实例化一个指定的 prefab，如果 binding.type 是 GameObject，则将 GameObject 作为
+        /// binding 的值；如果是组件而实例化时 prefab 上没有，则会在实例化时进行添加；ADDRESS 类型 
+        /// binding 在每次调用ResolveBinding 方法中响应 bindingEvaluation 类型事件时都会进行实例化，
+        /// 所以不必关注是否被销毁；而其他类型的 binding 仍然需要关注
+        /// </summary>
+        public static IBinding ToPrefabCoroutine(
+            this IBinding binding,
+            Type type,
+            string path,
+            Action<UnityEngine.Object> _loaded)
+        {
+            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
+            TypeFilter(binding, type, isGameObject);
+
+            var prefabInfo = new PrefabInfo(path, type);
+            prefabInfo.GetCoroutineObject(_loaded);
+
+            if (prefabInfo.prefab == null) { throw new Exception(PREFAB_IS_NULL); }
+
+            if (binding.bindingType == BindingType.ADDRESS)
+            {
+                // 将 prefabInfo 设为 binding 的值
+                binding.SetValue(prefabInfo);
+            }
+            else if (binding.bindingType == BindingType.SINGLETON ||
+                binding.bindingType == BindingType.MULTITON)
+            {
+                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
+
+                // 将 gameObject 设为 binding 的值
+                SetValueAddComponent(binding, gameObject, type, isGameObject);
+            }
+
+            binding.binder.Storing(binding);
+
+            return binding;
+        }
+
+        #endregion
+        
         #region ToResource
 
         /// <summary>
@@ -407,14 +501,11 @@ namespace uMVVMCS.DIContainer
         {
             if (!TypeUtils.IsAssignable(typeof(UnityEngine.Object), binding.type))
             {
-                throw new BindingSystemException(BindingSystemException.TYPE_NOT_OBJECT);
+                throw new Exception(TYPE_NOT_OBJECT);
             }
 
             var resource = Resources.Load(path);
-            if (resource == null)
-            {
-                throw new BindingSystemException(BindingSystemException.RESOURCE_IS_NULL);
-            }
+            if (resource == null) { throw new Exception(TYPE_NOT_OBJECT); }
 
             // 将 gameObject 设为 binding 的值
             binding.SetValue(resource);
@@ -431,10 +522,7 @@ namespace uMVVMCS.DIContainer
             bool typeIsGameObject)
         {
             // 如果参数 gameObject 为空就抛出异常
-            if (gameObject == null)
-            {
-                throw new BindingSystemException(BindingSystemException.GAMEOBJECT_IS_NULL);
-            }
+            if (gameObject == null) { throw new Exception(GAMEOBJECT_IS_NULL); }
 
             // 如果参数 type 是 GameObject 类型,就将 gameObject 作为 binding 的值
             if (typeIsGameObject)
@@ -464,10 +552,8 @@ namespace uMVVMCS.DIContainer
 
             // 过滤既不是 GameObject 也不是 Component 的 type 参数
             var isComponent = TypeUtils.IsAssignable(typeof(Component), type);
-            if (!isGameObject && !isComponent)
-            {
-                throw new BindingSystemException(BindingSystemException.TYPE_NOT_COMPONENT);
-            }
+
+            if (!isGameObject && !isComponent) { throw new Exception(TYPE_NOT_COMPONENT); }
         }
     }
 }

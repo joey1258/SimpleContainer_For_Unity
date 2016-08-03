@@ -47,7 +47,7 @@ namespace uMVVMCS.DIContainer
         {
             get
             {
-                if (_prefab == null) { _ResourcesLoad(); }
+                if (_prefab == null) { ResourcesLoad(); }
                 return _prefab;
             }
         }
@@ -83,7 +83,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 加载资源
         /// </summary>
-        private void _ResourcesLoad()
+        private void ResourcesLoad()
         {
             try
             {
@@ -102,13 +102,13 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 协程加载资源
         /// </summary>
-        public IEnumerator GetCoroutineObject(Action<UnityEngine.Object> _loaded)
+        public IEnumerator GetCoroutineObject(Action<UnityEngine.Object> _loader)
         {
             while (true)
             {
                 yield return null;
-                if (_prefab == null) { _ResourcesLoad(); yield return null; }
-                if (_loaded != null) _loaded(_prefab);
+                if (_prefab == null) { ResourcesLoad(); yield return null; }
+                if (_loader != null) _loader(_prefab);
                 yield break;
             }
         }
@@ -116,17 +116,18 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 异步加载资源
         /// </summary>
-        public IEnumerator GetAsyncObject(Action<UnityEngine.Object> _loaded)
+        public IEnumerator GetAsyncObject(Action<UnityEngine.Object> _loader)
         {
-            return GetAsyncObject(_loaded, null);
+            return GetAsyncObject(_loader, null);
         }
 
         /// <summary>
         /// 异步加载资源(带进度条功能)
         /// </summary>
-        public IEnumerator GetAsyncObject(Action<UnityEngine.Object> _loaded, Action<float> _progress)
+        public IEnumerator GetAsyncObject(Action<UnityEngine.Object> _loader, Action<float> _progress)
         {
-            if (_prefab != null) { _loaded(_prefab); yield break; }
+            // 如果 _prefab 不为空说明已经读取完成，执行 yield break 之后不再执行下面语句  
+            if (_prefab != null) { _loader(_prefab); yield break; }
             
             UnityEngine.ResourceRequest _resRequest = UnityEngine.Resources.LoadAsync(path);
 
@@ -146,10 +147,9 @@ namespace uMVVMCS.DIContainer
                 yield return null;
             }
 
-            // 
             _prefab = _resRequest.asset;
-            if (_loaded != null)
-                _loaded(_prefab);
+
+            if (_loader != null) { _loader(_prefab); }
 
             yield return _resRequest;
         }

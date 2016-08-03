@@ -28,7 +28,7 @@ namespace uMVVMCS
     /// </summary>
     public class ResourcesCache
     {
-
+        /*
         private Dictionary<string, AssetInfo> dicAssetInfo = null;
 
         public override void Init()
@@ -213,6 +213,6 @@ namespace uMVVMCS
             //TODO:: AssetBundle unload
         }
 
-        #endregion
+        #endregion*/
     }
 }
