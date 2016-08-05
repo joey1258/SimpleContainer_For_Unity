@@ -118,34 +118,34 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 异步加载资源(带进度条功能)
         /// </summary>
-        public IEnumerator GetAsyncObject(Action<UnityEngine.Object> handle, Action<float> _progress)
+        public IEnumerator GetAsyncObject(Action<UnityEngine.Object> handle, Action<float> progress)
         {
             // 如果 _prefab 不为空说明已经读取完成，执行 yield break 之后不再执行下面语句  
             if (_prefab != null) { handle(_prefab); yield break; }
             
-            UnityEngine.ResourceRequest _resRequest = UnityEngine.Resources.LoadAsync(path);
+            UnityEngine.ResourceRequest resRequest = UnityEngine.Resources.LoadAsync(path);
 
             // 进度判断值不能为1，否则会卡住
-            while (_resRequest.progress < 0.9)
+            while (resRequest.progress < 0.9)
             {
-                if (_progress != null)
-                    _progress(_resRequest.progress);
+                if (progress != null)
+                    progress(resRequest.progress);
                 yield return null;
             }
 
             // 在0.9~1之间如果未完成继续读取
-            while (!_resRequest.isDone)
+            while (!resRequest.isDone)
             {
-                if (_progress != null)
-                    _progress(_resRequest.progress);
+                if (progress != null)
+                    progress(resRequest.progress);
                 yield return null;
             }
 
-            _prefab = _resRequest.asset;
+            _prefab = resRequest.asset;
 
             if (handle != null) { handle(_prefab); }
 
-            yield return _resRequest;
+            yield return resRequest;
         }
 
         #endregion
