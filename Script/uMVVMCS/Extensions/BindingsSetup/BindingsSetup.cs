@@ -20,22 +20,34 @@ namespace uMVVMCS.DIContainer
 {
     public static class BindingsSetup
     {
+        #region Inner Class
+
         /// <summary>
         /// 设置 binding 的优先级
         /// </summary>
-        private class PrioritizedSetup
+        private class PrioritizedSetup : IComparable<PrioritizedSetup>
         {
             public IBindingsSetup setup;
             public int priority;
+
+            #region IComparable implementation 
+
+            public int CompareTo(PrioritizedSetup other)
+            {
+                if (other == null) { return 1; }
+                else { return -priority.CompareTo(other.priority); }
+            }
+
+            #endregion
         }
+
+        #endregion
+
+        #region functions
 
         /// <summary>
         /// Setups bindings in the container.
         /// </summary>
-        /// <typeparam name="T">The bindings setup object type.</typeparam>
-        /// <param name="container">Container in which the bindings will be setup.</param>
-        /// <param name="setup">The bindings setup.</param>
-        /// <returns>The injection container for chaining.</returns>
         public static IInjectionContainer SetupBindings<T>(this IInjectionContainer container) where T : IBindingsSetup, new()
         {
             container.SetupBindings(typeof(T));
@@ -46,9 +58,6 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// Setups bindings in the container.
         /// </summary>
-        /// <param name="container">Container in which the bindings will be setup.</param>
-        /// <param name="type">The bindings setup object type.</param>
-        /// <returns>The injection container for chaining.</returns>
         public static IInjectionContainer SetupBindings(this IInjectionContainer container, Type type)
         {
             var setup = container.Resolve(type);
@@ -60,9 +69,6 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// Setups bindings in the container.
         /// </summary>
-        /// <param name="container">Container in which the bindings will be setup.</param>
-        /// <param name="setup">The bindings setup.</param>
-        /// <returns>The injection container for chaining.</returns>
         public static IInjectionContainer SetupBindings(this IInjectionContainer container, IBindingsSetup setup)
         {
             setup.SetupBindings(container);
@@ -74,10 +80,6 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// Setups bindings in the container from a given namespace and its children namespaces.
         /// </summary>
-        /// <param name="container">Container in which the bindings will be setup.</param>
-        /// <param name="namespaceName">Namespace name.</param>
-        /// <param name="setup">The bindings setup.</param>
-        /// <returns>The injection container for chaining.</returns>
         public static IInjectionContainer SetupBindings(this IInjectionContainer container, string namespaceName)
         {
             container.SetupBindings(namespaceName, true);
@@ -88,38 +90,36 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// Setups bindings in the container from a given <paramref name="namespace"/>.
         /// </summary>
-        /// <param name="container">Container in which the bindings will be setup.</param>
-        /// <param name="namespaceName">Namespace name.</param>
-        /// <param name="includeChildren">Indicates whether child namespaces should be included.</param>
-        /// <param name="setup">The bindings setup.</param>
-        /// <returns>The injection container for chaining.</returns>
         public static IInjectionContainer SetupBindings(this IInjectionContainer container,
              string namespaceName,
              bool includeChildren)
         {
+            // 获取指定命名空间中的类型数组
             var setups = TypeUtils.GetAssignableTypes(
                 typeof(IBindingsSetup), namespaceName, includeChildren);
-            var prioritizedSetups = new PrioritizedBindingSetup[setups.Length];
+            // 新建一个和获取到的类型数组同等长度的内部类数组
+            var prioritizedSetups = new PrioritizedSetup[setups.Length];
 
-            //Adds setups to "priority" with priority definitions.
-            for (var setupIndex = 0; setupIndex < setups.Length; setupIndex++)
+            for (var i = 0; i < setups.Length; i++)
             {
-                var setup = (IBindingsSetup)container.Resolve(setups[setupIndex]);
-                var attributes = setup.GetType().GetCustomAttributes(typeof(BindingPriority), true);
+                // 使用指定容器获取类型的经过注入后的类型实例
+                var setup = (IBindingsSetup)container.Resolve(setups[i]);
+                var attributes = setup.GetType().GetCustomAttributes(typeof(Priority), true);
 
+                // 如果获取到了[Priority]特性，就将类型的实例和其优先级数字新建为一个新的内部类加入数组
                 if (attributes.Length > 0)
                 {
-                    var bindindPriority = attributes[0] as BindingPriority;
-                    prioritizedSetups[setupIndex] = new PrioritizedBindingSetup()
+                    var bindingPriority = attributes[0] as Priority;
+                    prioritizedSetups[i] = new PrioritizedSetup()
                     {
                         setup = setup,
-                        priority = bindindPriority.priority
+                        priority = bindingPriority.priority
                     };
                 }
                 else
                 {
-                    //If the binding has no priority, saves it with priority 0.
-                    prioritizedSetups[setupIndex] = new PrioritizedBindingSetup()
+                    // 如果没有获取到，就用实例和优先级数字0来新建一个内部类加入数组
+                    prioritizedSetups[i] = new PrioritizedSetup()
                     {
                         setup = setup,
                         priority = 0
@@ -127,8 +127,9 @@ namespace uMVVMCS.DIContainer
                 }
             }
 
-            //Orders the priority list and executes the setups.
-            prioritizedSetups = prioritizedSetups.OrderByDescending(setup => setup.priority).ToArray();
+            // 对数组进行排序
+            Array.Sort(prioritizedSetups);
+            // 逐一执行
             for (var setupIndex = 0; setupIndex < prioritizedSetups.Length; setupIndex++)
             {
                 prioritizedSetups[setupIndex].setup.SetupBindings(container);
@@ -136,5 +137,7 @@ namespace uMVVMCS.DIContainer
 
             return container;
         }
+
+        #endregion
     }
 }
