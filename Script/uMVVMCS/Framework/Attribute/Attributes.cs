@@ -46,7 +46,7 @@ namespace uMVVMCS
     /// <summary>
     /// [Priority]标记一个方法的优先级，以便决定执行顺序。
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class Priority : Attribute
     {
         public int priority;
