@@ -26,11 +26,6 @@ namespace uMVVMCS.DIContainer
         IInjectionContainer[] containers { get; }
 
         /// <summary>
-        /// 容器仓库 (储存 containersData List 中 id 不为空的binding，并用 type 和 id 索引)
-        /// </summary>
-        Storage<IInjectionContainer> containersStorage { get; }
-
-        /// <summary>
         /// 用新创建的容器和 true 创建一个 InjectionContainerData，并添加到 containersData List
         /// </summary>
         IInjectionContainer AddContainer<T>() where T : IInjectionContainer, new();

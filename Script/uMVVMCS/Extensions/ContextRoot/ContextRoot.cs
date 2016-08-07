@@ -20,7 +20,7 @@ using System.Collections.Generic;
 
 namespace uMVVMCS.DIContainer
 {
-    public abstract class ContextRoot : MonoBehaviour//, IContextRoot
+    public abstract class ContextRoot : MonoBehaviour, IContextRoot
     {
         #region Inner Class
 
@@ -141,7 +141,6 @@ namespace uMVVMCS.DIContainer
         {
             // SceneInjector 应该比其它任何 Start 方法都早执行
             //this.gameObject.AddComponent<SceneInjector>();
-            SceneInjector();
 
             Init();
         }
@@ -229,74 +228,6 @@ namespace uMVVMCS.DIContainer
                         throw new InjectionSystemException(InjectionSystemException.SAME_OBJECT);
                     }
                 }
-            }
-        }
-
-        #endregion
-
-        #region sceneInjector
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void SceneInjector()
-        {
-            // 获取当前物体上的 ContextRoot组件
-            // var contextRoot = this.GetComponent<ContextRoot>();
-
-            // 设置基类类型：contextRoot.baseBehaviourTypeName 等于 "UnityEngine.MonoBehaviour"
-            // 时就赋值为 typeof(MonoBehaviour)；否则就根据 baseBehaviourTypeName 获取类型来赋值
-            var baseType = (baseBehaviourTypeName == "UnityEngine.MonoBehaviour" ?
-                typeof(MonoBehaviour) : TypeUtils.GetType(baseBehaviourTypeName));
-
-            switch (injectionType)
-            {
-                // injectionType 为 Children 对当前 Transform 的所有子节点所挂载的所有组件进行注入
-                case ContextRoot.MonoBehaviourInjectionType.Children:
-                    InjectOnChildren(baseType);
-                    break;
-
-                // 如果 injectionType 为 BaseType 获取所有MONO文件实例并注入指定类型
-                case ContextRoot.MonoBehaviourInjectionType.BaseType:
-                    InjectFromBaseType(baseType);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// 对当前 Transform 的所有子节点所挂载的所有组件进行注入
-        /// </summary>
-        public void InjectOnChildren(Type baseType)
-        {
-            // 获取自身的类型
-            var sceneInjectorType = GetType();
-            // 获取 Transform 所有子节点中的所有指定类型组件 （数组）
-            var components = GetComponent<Transform>().GetComponentsInChildren(baseType, true);
-
-            foreach (var component in components)
-            {
-                // 如果当前组件是 ContextRoot 或是自身，忽略注入
-                var componentType = component.GetType();
-                if (componentType == sceneInjectorType ||
-                    TypeUtils.IsAssignable(typeof(ContextRoot), componentType)) { continue; }
-
-                ((MonoBehaviour)component).Inject();
-            }
-        }
-
-        /// <summary>
-        /// Performs injection on all behaviours of a given <paramref name="baseType"/>.
-        /// 获取所有MONO文件实例并注入指定类型
-        /// </summary>
-        /// <param name="baseType">Base type to perform injection.</param>
-        public void InjectFromBaseType(Type baseType)
-        {
-            // 获取所有 MonoBehaviour 类型文件
-            var components = (MonoBehaviour[])Resources.FindObjectsOfTypeAll(baseType);
-            // 循环注入
-            for (var index = 0; index < components.Length; index++)
-            {
-                components[index].Inject();
             }
         }
 

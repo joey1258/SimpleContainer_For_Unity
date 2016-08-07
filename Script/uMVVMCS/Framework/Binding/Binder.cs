@@ -134,20 +134,16 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
-            bool notNull = (types != null && 
-                bindingTypes != null &&
-                types.Length != 0 && 
-                bindingTypes.Length != 0);
-
-            if (!notNull)
+            if (types == null || types.Length == 0)
             {
-                throw new BindingSystemException(
-                    string.Format(BindingSystemException.NULL_PARAMETER,
-                    "[IBinding MultipleBind]",
-                    "[types] || [bindingTypes]"));
+                throw new ArgumentNullException("types");
+            }
+            if (bindingTypes == null || bindingTypes.Length == 0)
+            {
+                throw new ArgumentNullException("bindingTypes");
             }
 
-            if(types.Length != bindingTypes.Length)
+            if (types.Length != bindingTypes.Length)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }
@@ -456,13 +452,7 @@ namespace uMVVMCS.DIContainer
         virtual public void Storing(IBinding binding)
         {
             // 如果参数为空,就抛出异常 (原此处的接口和虚类检查移至工厂的创建方法中)
-            if (binding == null)
-            {
-                throw new BindingSystemException (
-                    string.Format(BindingSystemException.NULL_PARAMETER,
-                    "[IBinding binding]",
-                    "[Storing]"));
-            }
+            if (binding == null) { throw new ArgumentNullException("binding"); }
 
             // 如果 AOT 前置委托不为空就执行它
             if (beforeAddBinding != null) { beforeAddBinding(this, ref binding); }

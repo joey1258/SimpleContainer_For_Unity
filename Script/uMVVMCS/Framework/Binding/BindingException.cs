@@ -21,7 +21,6 @@ namespace uMVVMCS.DIContainer
     public class BindingSystemException : Exception
     {
         public const string SAME_BINDING = "The binding with the same key and id already exists.";
-        public const string NULL_PARAMETER = "The parameter {0} of method {1} cannot be null.";
         public const string PARAMETERS_LENGTH_ERROR = "Parameter length is not correct";
         public const string TYPE_NOT_ASSIGNABLE = "The type or instance is not assignable to binding";
         public const string BINDINGTYPE_NOT_ASSIGNABLE = "ParameterlessMethod {0} does not allow for {1} type of binding.";

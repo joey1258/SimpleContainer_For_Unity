@@ -46,7 +46,8 @@ namespace uMVVMCS.DIContainer
         #region functions
 
         /// <summary>
-        /// Setups bindings in the container.
+        /// 为指定的实现了 IBindingsSetup 接口的类型在容器中实例化并注入，再按优先级排序，最后按
+        /// 顺序执行它们自身所实现的 SetupBindings 方法
         /// </summary>
         public static IInjectionContainer SetupBindings<T>(this IInjectionContainer container) where T : IBindingsSetup, new()
         {
@@ -56,7 +57,8 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// Setups bindings in the container.
+        /// 为指定的实现了 IBindingsSetup 接口的类型在容器中实例化并注入，再按优先级排序，最后按
+        /// 顺序执行它们自身所实现的 SetupBindings 方法
         /// </summary>
         public static IInjectionContainer SetupBindings(this IInjectionContainer container, Type type)
         {
@@ -67,7 +69,8 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// Setups bindings in the container.
+        /// 为指定的实现了 IBindingsSetup 接口的类型在容器中实例化并注入，再按优先级排序，最后按
+        /// 顺序执行它们自身所实现的 SetupBindings 方法
         /// </summary>
         public static IInjectionContainer SetupBindings(this IInjectionContainer container, IBindingsSetup setup)
         {
@@ -76,9 +79,9 @@ namespace uMVVMCS.DIContainer
             return container;
         }
 
-
         /// <summary>
-        /// Setups bindings in the container from a given namespace and its children namespaces.
+        /// 为指定命名空间（包括子空间）中实现了 IBindingsSetup 接口的类型在容器中实例化并注入，再按优先
+        /// 级排序，最后按顺序执行它们自身所实现的 SetupBindings 方法
         /// </summary>
         public static IInjectionContainer SetupBindings(this IInjectionContainer container, string namespaceName)
         {
@@ -88,13 +91,14 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// Setups bindings in the container from a given <paramref name="namespace"/>.
+        /// 为指定命名空间中实现了 IBindingsSetup 接口的类型在容器中实例化并注入，再按优先级排序，最后按
+        /// 顺序执行它们自身所实现的 SetupBindings 方法
         /// </summary>
         public static IInjectionContainer SetupBindings(this IInjectionContainer container,
              string namespaceName,
              bool includeChildren)
         {
-            // 获取指定命名空间中的类型数组
+            // 获取指定命名空间中实现了 IBindingsSetup 接口的类型数组
             var setups = TypeUtils.GetAssignableTypes(
                 typeof(IBindingsSetup), namespaceName, includeChildren);
             // 新建一个和获取到的类型数组同等长度的内部类数组
@@ -129,7 +133,7 @@ namespace uMVVMCS.DIContainer
 
             // 对数组进行排序
             Array.Sort(prioritizedSetups);
-            // 逐一执行
+            // 逐一执行 setup 对象所实现的 SetupBindings 方法
             for (var setupIndex = 0; setupIndex < prioritizedSetups.Length; setupIndex++)
             {
                 prioritizedSetups[setupIndex].setup.SetupBindings(container);

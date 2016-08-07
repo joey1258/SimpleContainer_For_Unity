@@ -262,17 +262,13 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
-            bool notNull = (types != null &&
-                bindingTypes != null &&
-                types.Length != 0 &&
-                bindingTypes.Length != 0);
-
-            if (!notNull)
+            if (types == null || types.Length == 0)
             {
-                throw new BindingSystemException(
-                    string.Format(BindingSystemException.NULL_PARAMETER,
-                    "[IBinding MultipleBind]",
-                    "[types] || [bindingTypes]"));
+                throw new ArgumentNullException("types");
+            }
+            if (bindingTypes == null || bindingTypes.Length == 0)
+            {
+                throw new ArgumentNullException("bindingTypes");
             }
 
             if (types.Length != bindingTypes.Length)

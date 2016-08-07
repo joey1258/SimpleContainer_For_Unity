@@ -47,13 +47,7 @@ namespace uMVVMCS
         /// </summary>
         protected void Add(Type type)
         {
-            if (type == null)
-            {
-                throw new UtilsSystemException(
-                    string.Format(UtilsSystemException.NULL_PARAMETER, 
-                    "[Type type]",
-                    "[Add]"));
-            }
+            if (type == null) { throw new ArgumentNullException("type"); }
 
             if (!Contains(type))
             {
@@ -66,13 +60,7 @@ namespace uMVVMCS
         /// </summary>
         public void Remove(Type type)
         {
-            if (type == null)
-            {
-                throw new UtilsSystemException(
-                    string.Format(UtilsSystemException.NULL_PARAMETER,
-                    "[Type type]",
-                    "[Add]"));
-            }
+            if (type == null) { throw new ArgumentNullException("type"); }
 
             if (Contains(type))
             {
@@ -95,13 +83,7 @@ namespace uMVVMCS
         /// </summary>
         public Items<T> Get(Type type)
         {
-            if (type == null)
-            {
-                throw new UtilsSystemException(
-                    string.Format(UtilsSystemException.NULL_PARAMETER,
-                    "[Type type]",
-                    "[Add]"));
-            }
+            if (type == null) { throw new ArgumentNullException("type"); }
 
             if (!Contains(type)) { Add(type); }
 
@@ -137,13 +119,7 @@ namespace uMVVMCS
         /// </summary>
         protected void Add(object id)
         {
-            if (id == null)
-            {
-                throw new UtilsSystemException(
-                    string.Format(UtilsSystemException.NULL_PARAMETER,
-                    "[Type type]",
-                    "[Add]"));
-            }
+            if (id == null) { throw new ArgumentNullException("id"); }
 
             if (!Contains(id)) { items.Add(id, default(T)); }
         }
@@ -153,13 +129,7 @@ namespace uMVVMCS
         /// </summary>
         public void Remove(object id)
         {
-            if (id == null)
-            {
-                throw new UtilsSystemException(
-                    string.Format(UtilsSystemException.NULL_PARAMETER,
-                    "[Type type]",
-                    "[Add]"));
-            }
+            if (id == null) { throw new ArgumentNullException("id"); }
 
             if (Contains(id)) { items.Remove(id); }
         }
@@ -179,13 +149,7 @@ namespace uMVVMCS
         /// </summary>
         public T Get(object id)
         {
-            if (id == null)
-            {
-                throw new UtilsSystemException(
-                    string.Format(UtilsSystemException.NULL_PARAMETER,
-                    "[Type type]",
-                    "[Add]"));
-            }
+            if (id == null) { throw new ArgumentNullException("id"); }
 
             if (!Contains(id)) { return default(T); }
 
@@ -197,13 +161,7 @@ namespace uMVVMCS
         /// </summary>
         public void Set(object id, T value)
         {
-            if(id == null || value == null)
-            {
-                throw new UtilsSystemException(
-                    string.Format(UtilsSystemException.NULL_PARAMETER,
-                    "[Type type]",
-                    "[Add]"));
-            }
+            if(id == null || value == null) { throw new ArgumentNullException("id"); }
 
             if (!Contains(id)) { Add(id); }
 
