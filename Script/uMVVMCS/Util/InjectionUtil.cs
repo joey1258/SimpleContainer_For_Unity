@@ -45,7 +45,7 @@ namespace uMVVMCS
                     // 如需根据容器的 id 进行匹配，将 InjectFromContainer 的 id 作为要对照的 id 传入
                     if (attribute is InjectFromContainer)
                     {
-						Inject(obj, (attribute as InjectFromContainer).id);
+                        Inject(obj, (attribute as InjectFromContainer).id);
 						containInjectFromContainer = true;
 					}
 				}
@@ -81,11 +81,11 @@ namespace uMVVMCS
 		}
 		
 		/// <summary>
-		/// 返回指定容器中的 object 是否是单例
+		/// 返回指定容器中的 object 是否已经存在
 		/// </summary>
 		public static bool IsExistOnContainer(object obj, IInjectionContainer container)
         {
-			var isSingleton = false;
+			var isExist = false;
 			var bindings = container.GetBindingsByType(obj.GetType());
 
             if (bindings == null) { return false; }
@@ -97,21 +97,21 @@ namespace uMVVMCS
                 {
                     if (bindings[i].valueList[n] == obj)
                     {
-                        isSingleton = true;
-                        return isSingleton;
+                        isExist = true;
+                        return isExist;
                     }
                 }
 			}
 			
-			return isSingleton;
+			return isExist;
         }
 
         /// <summary>
-        /// 返回指定 binder 中的 object 是否是单例
+        /// 返回指定 binder 中的 object 是否已经存在
         /// </summary>
         public static bool IsExistOnBinder(object obj, IBinder binder)
         {
-            var isSingleton = false;
+            var isExist = false;
             var bindings = binder.GetBindingsByType(obj.GetType());
 
             if (bindings == null) { return false; }
@@ -123,13 +123,13 @@ namespace uMVVMCS
                 {
                     if (bindings[i].valueList[n] == obj)
                     {
-                        isSingleton = true;
-                        return isSingleton;
+                        isExist = true;
+                        return isExist;
                     }
                 }
             }
 
-            return isSingleton;
+            return isExist;
         }
     }
 }

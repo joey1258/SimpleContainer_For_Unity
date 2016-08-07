@@ -218,7 +218,8 @@ namespace uMVVMCS.DIContainer
                 else { inwardType = type; }
 
                 if (id != null) { bindings.Add(binder.GetBinding(inwardType, id)); }
-                else { bindings = binder.GetBindingsByType(inwardType); }
+                else { bindings = binder.GetBindingsByType(inwardType);
+                }
             }
 
             IList<object> instances = new List<object>();
@@ -255,10 +256,13 @@ namespace uMVVMCS.DIContainer
 
                         for (int n = 0; n < length; n++)
                         {
-                            instances.Add(os[n]);
+                            if (os[n] != null) { instances.Add(os[n]); }
                         }
                     }
-                    else { instances.Add(instance); }
+                    else
+                    {
+                        if (instance != null) { instances.Add(instance); }
+                    }
                 }
             }
 
