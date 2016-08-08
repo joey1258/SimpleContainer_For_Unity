@@ -21,15 +21,17 @@ using System.Collections.Generic;
 
 namespace uMVVMCS.DIContainer
 {
-    public abstract class Command : ICommand, IDisposable 
+    public abstract class Command : ICommand, IDisposable
     {
+        #region property
+
         /// <summary>
-        /// The command dispatcher that dispatched this command.
+        /// commandDispatcher
         /// </summary>
         public ICommandDispatcher dispatcher { get; set; }
 
         /// <summary>
-        /// Indicates whether the command is running.
+        /// command 是否在运行中
         /// </summary>
         public bool running { get; set; }
 
@@ -57,6 +59,10 @@ namespace uMVVMCS.DIContainer
         /// 协程 list
         /// </summary>
         private List<Coroutine> coroutines = new List<Coroutine>(1);
+
+        #endregion
+
+        #region functions
 
         /// <summary>
         /// command 的执行方法
@@ -86,6 +92,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public virtual void Dispose()
         {
+            // 循环停止协程并从 Coroutine list 中移除，直到 Coroutine list 为空
             while (coroutines.Count > 0)
             {
                 StopCoroutine(coroutines[0]);
@@ -93,36 +100,38 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 等待指定秒数后执行 Action method,并使用其结果开始协程
+        /// 等待指定秒数后执行 Action method,并使用 EventContainer.eventBehaviour 进行协程
         /// </summary>
         protected void Invoke(Action method, float time)
         {
-            var routine = this.MethodInvoke(method, time);
+            var routine = MethodInvoke(method, time);
             StartCoroutine(routine);
         }
 
         /// <summary>
-        /// Starts a coroutine.
+        /// 使用 EventContainer.eventBehaviour 来调用协程并加入 Coroutine list，设 keepAlive 
+        /// 为真，最后返回结果
         /// </summary>
-        /// <param name="routine">Routine to be started.</param>
-        /// <returns>The coroutine.</returns>
         protected Coroutine StartCoroutine(IEnumerator routine)
         {
-            var coroutine = EventCallerContainerExtension.eventCaller.StartCoroutine(routine);
-            this.coroutines.Add(coroutine);
-            this.Retain();
+            // 使用 EventContainer.eventBehaviour 来调用协程并传人参数 routine
+            var coroutine = EventContainer.eventBehaviour.StartCoroutine(routine);
+            // 将结果添加到 Coroutine list
+            coroutines.Add(coroutine);
+            // keepAlive 设为真
+            Retain();
 
             return coroutine;
         }
 
         /// <summary>
-        /// Stops a coroutine.
+        /// 停止协程并从 Coroutine list 中移除
         /// </summary>
         /// <param name="coroutine">Coroutine to be stopped.</param>
         protected void StopCoroutine(Coroutine coroutine)
         {
-            EventCallerContainerExtension.eventCaller.StopCoroutine(coroutine);
-            this.coroutines.Remove(coroutine);
+            EventContainer.eventBehaviour.StopCoroutine(coroutine);
+            coroutines.Remove(coroutine);
         }
 
         /// <summary>
@@ -133,5 +142,7 @@ namespace uMVVMCS.DIContainer
             yield return new WaitForSeconds(time);
             method();
         }
+
+        #endregion
     }
 }

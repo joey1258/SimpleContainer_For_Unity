@@ -22,39 +22,48 @@ namespace uMVVMCS.DIContainer
 {
     public interface ICommand
     {
-        /// <summary>The command dispatcher that dispatched this command.</summary>
-        ICommandDispatcher dispatcher { get; set; }
-        /// <summary>Indicates whether the command is running.</summary>
-        bool running { get; set; }
-        /// <summary>Indicates whether the command must be kept alive even after its execution.</summary>
-        bool keepAlive { get; set; }
         /// <summary>
-        /// Indicates whether this command is a singleton (there's only one instance of it).
-        /// 
-        /// Singleton commands improve performance and are the recommended approach when, for every execution
-        /// of a command, there's no need to reinject dependencies and/or all parameters the command needs
-        /// are passed through the <code>Execute()</code> method.
+        /// commandDispatcher
+        /// </summary>
+        ICommandDispatcher dispatcher { get; set; }
+
+        /// <summary>
+        /// command 是否在运行中
+        /// </summary>
+        bool running { get; set; }
+
+        /// <summary>
+        /// Indicates whether the command must be kept alive even after its execution.
+        /// </summary>
+        bool keepAlive { get; set; }
+
+        /// <summary>
+        /// 是否是单例 单例能提高性能，避免重复注入
         /// </summary>
         bool singleton { get; }
-        /// <summary>The quantity of the command to preload on pool.</summary>
+
+        /// <summary>
+        /// command 对象池预加载数量，默认为1
+        /// </summary>
         int preloadPoolSize { get; }
-        /// <summary>The maximum size pool for this command.</summary>
+
+        /// <summary>
+        /// command 对象池大小，默认为10
+        /// </summary>
         int maxPoolSize { get; }
 
         /// <summary>
-        /// Executes the command.
-        /// <param name="parameters">Command parameters.</param>
+        /// command 的执行方法
+        /// </summary>
         void Execute(params object[] parameters);
 
         /// <summary>
-        /// Retains the command as in use, not disposing it after execution.
-        /// 
-        /// Always call Release() after the command has terminated.
+        /// 保留 command，执行后不释放,如要释放可在执行后调用 Release() 方法
         /// </summary>
         void Retain();
 
         /// <summary>
-        /// Release this command.
+        /// 释放 command.
         /// </summary>
         void Release();
     }

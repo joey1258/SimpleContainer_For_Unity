@@ -22,12 +22,12 @@ namespace uMVVMCS.DIContainer
     public class EventContainer : IContainerExtension
     {
         /// <summary>
-        /// 需要释放的对象 list
+        /// 可释放对象 list
         /// </summary>
         public static List<IDisposable> disposable = new List<IDisposable>();
 
         /// <summary>
-        /// 每帧更新的对象 list
+        /// 每帧更新对象 list
         /// </summary>
         public static List<IUpdatable> updateable = new List<IUpdatable>();
 
@@ -40,20 +40,26 @@ namespace uMVVMCS.DIContainer
 
         public EventContainer()
         {
-            //Creates a new game object for UpdateableBehaviour.
-            var gameObject = new GameObject("EventCaller");
+            //在游戏中创建一个游戏物体来挂载 EventBehaviour 组件
+            var gameObject = new GameObject("EventBehaviour");
             eventBehaviour = gameObject.AddComponent<EventBehaviour>();
         }
 
         #endregion
 
+        #region functions
+
+        /// <summary>
+        /// 注册容器
+        /// </summary>
         public void OnRegister(IInjectionContainer container)
         {
-            //Adds the container to the disposable list.
+            // 将容器添加到 IDisposable list.
             disposable.Add(container);
 
-            //Checks whether a binding for the ICommandDispatcher exists.
-            if (container.ContainsBindingFor<ICommandDispatcher>())
+            // 如果容器中含有 ICommandDispatcher 类型的 binding，且它实现了 IDisposable 接口，就将其也添加到 IDisposable list
+            if (container.GetBindingsByType<ICommandDispatcher>() != null &&
+                container.GetBindingsByType<ICommandDispatcher>().Count != 0)
             {
                 var dispatcher = container.Resolve<ICommandDispatcher>();
                 if (dispatcher is IDisposable)
@@ -62,58 +68,71 @@ namespace uMVVMCS.DIContainer
                 }
             }
 
+            // 添加 AOT 委托
             container.afterAddBinding += this.OnAfterAddBinding;
             container.bindingResolution += this.OnBindingResolution;
         }
 
+        /// <summary>
+        /// 注销容器
+        /// </summary>
         public void OnUnregister(IInjectionContainer container)
         {
+            // 取消 AOT 委托
             container.afterAddBinding -= this.OnAfterAddBinding;
             container.bindingResolution -= this.OnBindingResolution;
 
+            // 释放 list 并销毁组件
             disposable.Clear();
             updateable.Clear();
             MonoBehaviour.Destroy(eventBehaviour);
         }
 
         /// <summary>
-        /// handles the after add binding event.
-        /// 
-        /// Used to check whether singleton instances should be added to the updater.
+        /// 处理 binding 添加之后的工作，用于对 SINGLETON 和 MULTITON 类型的 binding 的值
+        /// 分别感觉其自身类型添加到对应的 list 中去(IDisposable list 或 IUpdatable list)
         /// </summary>
-        /// <param name="source">Source.</param>
-        /// <param name="binding">Binding.</param>
-        protected void OnAfterAddBinding(IBinder source, ref BindingInfo binding)
+        protected void OnAfterAddBinding(IBinder source, ref IBinding binding)
         {
-            if (binding.instanceType == BindingInstance.Singleton)
+            if (binding.bindingType == BindingType.SINGLETON ||
+                binding.bindingType == BindingType.MULTITON)
             {
-                //Do not add commands.
-                if (binding.value is ICommand) return;
+                int length = binding.valueList.Count;
+                for (int i = 0; i < length; i++)
+                {
+                    // 如果是 ICommand 对象就直接退出
+                    if (binding.valueList[i] is ICommand) { return; }
 
-                if (binding.value is IDisposable && !disposable.Contains((IDisposable)binding.value))
-                {
-                    disposable.Add((IDisposable)binding.value);
-                }
-                if (binding.value is IUpdatable && !updateable.Contains((IUpdatable)binding.value))
-                {
-                    updateable.Add((IUpdatable)binding.value);
+                    // 如果是 IDisposable 对象且 disposable list 中没有该对象，就进行添加
+                    if (binding.valueList[i] is IDisposable && 
+                        !disposable.Contains((IDisposable)binding.valueList[i]))
+                    {
+                        disposable.Add((IDisposable)binding.valueList[i]);
+                    }
+
+                    // 如果是 IUpdatable 对象且 updateable list 中没有该对象，就进行添加
+                    if (binding.valueList[i] is IUpdatable && 
+                        !updateable.Contains((IUpdatable)binding.valueList[i]))
+                    {
+                        updateable.Add((IUpdatable)binding.valueList[i]);
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Handles the binding resolution event.
-        /// 
-        /// Used to check whether the resolved instance should be added to the updater.
+        /// 在 ResolveBinding 方法的最后，获取到实例之后、返回实例之前根据 BindingType 以及实例的类型
+        /// 对实例进行分类，分别添加到相应的 list 中(IDisposable list 或 IUpdatable list)
         /// </summary>
-        /// <param name="source">Source.</param>
-        /// <param name="binding">Binding.</param>
-        /// <param name="instance">Instance.</param>
-        protected void OnBindingResolution(IInjector source, ref BindingInfo binding, ref object instance)
+        protected void OnBindingResolution(IInjector source, ref IBinding binding, ref object instance)
         {
-            //Do not add commands.
-            if (binding.instanceType == BindingInstance.Singleton || instance is ICommand) return;
+            // 如果是 SINGLETON 或 MULTITON 类型 binding，或是 ICommand 对象就直接退出
+            if (binding.bindingType == BindingType.SINGLETON ||
+                binding.bindingType == BindingType.MULTITON ||
+                instance is ICommand)
+            { return; }
 
+            // 根据各自的类型添加到相应的 list
             if (instance is IDisposable && !disposable.Contains((IDisposable)instance))
             {
                 disposable.Add((IDisposable)instance);
@@ -123,5 +142,7 @@ namespace uMVVMCS.DIContainer
                 updateable.Add((IUpdatable)instance);
             }
         }
+
+        #endregion
     }
 }

@@ -27,24 +27,25 @@ namespace uMVVMCS.DIContainer
             // 如果游戏暂停则不执行（Mathf.Approximately 方法用于比较浮点值，由于浮点值不精确所以运算时可能产生误差，所以必须使用特殊的方法来比较）
             if (Mathf.Approximately(Time.deltaTime, 0)) { return; }
 
-            for (var objIndex = 0; objIndex < EventCallerContainerExtension.updateable.Count; objIndex++)
+            for (var objIndex = 0; objIndex < EventContainer.updateable.Count; objIndex++)
             {
-                EventCallerContainerExtension.updateable[objIndex].Update();
+                EventContainer.updateable[objIndex].Update();
             }
         }
 
         /// <summary>
-        /// Called when the component is destroyed.
+        /// 当组件被销毁时调用，销毁 disposable list 中的所有元素
         /// </summary>
         protected void OnDestroy()
         {
-            foreach (var obj in EventCallerContainerExtension.disposable)
+            int length = EventContainer.disposable.Count;
+            for (int i = 0; i < length; i++)
             {
-                obj.Dispose();
+                EventContainer.disposable[i].Dispose();
             }
 
-            EventCallerContainerExtension.disposable.Clear();
-            EventCallerContainerExtension.updateable.Clear();
+            EventContainer.disposable.Clear();
+            EventContainer.updateable.Clear();
         }
     }
 }
