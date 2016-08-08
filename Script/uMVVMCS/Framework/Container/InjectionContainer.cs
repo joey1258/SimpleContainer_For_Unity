@@ -34,7 +34,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 容器 AOT 接口 list
         /// </summary>
-        private List<IContainerAOT> AOT;
+        private List<IContainerExtension> AOT;
 
         #region constructor
 
@@ -120,7 +120,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 注册容器到 AOT list 
         /// </summary>
-        virtual public IInjectionContainer RegisterAOT<T>() where T : IContainerAOT
+        virtual public IInjectionContainer RegisterAOT<T>() where T : IContainerExtension
         {
             RegisterAOT(Resolve<T>());
 
@@ -130,10 +130,10 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 注册容器到 AOT list，并执行容器的 OnRegister 方法
         /// </summary>
-        virtual public IInjectionContainer RegisterAOT(IContainerAOT aot)
+        virtual public IInjectionContainer RegisterAOT(IContainerExtension aot)
         {
-            // 如果 List<IContainerAOT> AOT 为空,将其初始化
-            if (AOT == null) AOT = new List<IContainerAOT>();
+            // 如果 List<IContainerExtension> AOT 为空,将其初始化
+            if (AOT == null) AOT = new List<IContainerExtension>();
             // 添加参数到 list
             AOT.Add(aot);
             // 执行 OnRegister 方法
@@ -145,10 +145,10 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 将所有指定类型的容器从 AOT list 中移除 
         /// </summary>
-        virtual public IInjectionContainer UnregisterAOT<T>() where T : IContainerAOT
+        virtual public IInjectionContainer UnregisterAOT<T>() where T : IContainerExtension
         {
             // 获取list 中所有指定类型的容器 AOT 接口对象
-            var AOTToUnregister = AOT.OfTheType<T, IContainerAOT>();
+            var AOTToUnregister = AOT.OfTheType<T, IContainerExtension>();
 
             // 注销所有获取到的容器 AOT 接口对象
             int length = AOTToUnregister.Count;
@@ -163,7 +163,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 将一个容器从 AOT list 中移除 
         /// </summary>
-        virtual public IInjectionContainer UnregisterAOT(IContainerAOT aot)
+        virtual public IInjectionContainer UnregisterAOT(IContainerExtension aot)
         {
             if (!AOT.Contains(aot)) { return this; }
 

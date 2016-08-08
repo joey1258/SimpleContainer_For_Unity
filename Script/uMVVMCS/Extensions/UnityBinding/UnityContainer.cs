@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace uMVVMCS.DIContainer
 {
-    public class UnityContainer : IContainerAOT
+    public class UnityContainer : IContainerExtension
     {
         #region IContainerAOT implementation 
 
