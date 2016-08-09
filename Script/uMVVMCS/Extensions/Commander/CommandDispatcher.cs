@@ -42,6 +42,8 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
+        #region Dispatch
+
         /// <summary>
         /// 发送一个 command
         /// </summary>
@@ -73,23 +75,27 @@ namespace uMVVMCS.DIContainer
                     container.Inject(command);
                 }
 
+                // 设置 command.dispatcher 为当前，将 command.running 设为真，再将参数 parameters 传人并执行
                 command.dispatcher = this;
                 command.running = true;
                 command.Execute(parameters);
 
+                // 如果 command.keepAlive 为真
                 if (command.keepAlive)
                 {
-                    //If the command has IUpdatable interface, adds it to the EventCaller extension.
-                    if (command is IUpdatable && !EventCallerContainerExtension.updateable.Contains((IUpdatable)command))
+                    //如果命令实现了 IUpdatable 接口，并且 EventContainer 的 IUpdatable list 中还没有添加该 command 就进行添加
+                    if (command is IUpdatable && !EventContainer.updateable.Contains((IUpdatable)command))
                     {
-                        EventCallerContainerExtension.updateable.Add((IUpdatable)command);
+                        EventContainer.updateable.Add((IUpdatable)command);
                     }
                 }
                 else
                 {
-                    this.Release(command);
+                    // 不为真则释放 command
+                    Release(command);
                 }
             }
+            // 如果不含有该 command 就抛出异常
             else
             {
                 throw new CommandException(
@@ -97,170 +103,178 @@ namespace uMVVMCS.DIContainer
             }
         }
 
+        #endregion
+
+        #region InvokeDispatch
+
         /// <summary>
-        /// Dispatches a command by type after a given time in seconds.
+        /// 通过 EventContainer.eventBehaviour 在等待指定秒后发送一个 command 
         /// </summary>
-        /// <typeparam name="T">The type of the command to be dispatched.</typeparam>
-        /// <param name="time">Time to dispatch the command (seconds).</param>
-        /// <param name="parameters">Command parameters.</param>
         public void InvokeDispatch<T>(float time, params object[] parameters) where T : ICommand
         {
-            EventCallerContainerExtension.eventCaller.StartCoroutine(this.DispatchInvoke(typeof(T), time, parameters));
+            EventContainer.eventBehaviour.StartCoroutine(this.DispatchInvoke(typeof(T), time, parameters));
         }
 
         /// <summary>
-        /// Dispatches a command by type after a given time in seconds.
+        /// 通过 EventContainer.eventBehaviour 在等待指定秒后发送一个 command 
         /// </summary>
-        /// <param name="type">The type of the command to be dispatched.</typeparam>
-        /// <param name="time">Time to dispatch the command (seconds).</param>
-        /// <param name="parameters">Command parameters.</param>
         public void InvokeDispatch(Type type, float time, params object[] parameters)
         {
-            EventCallerContainerExtension.eventCaller.StartCoroutine(this.DispatchInvoke(type, time, parameters));
+            EventContainer.eventBehaviour.StartCoroutine(DispatchInvoke(type, time, parameters));
         }
 
         /// <summary>
-        /// Dispatches a command by type after a given time in seconds.
+        /// 等待指定秒后发送一个 command 
         /// </summary>
-        /// <typeparam name="T">The type of the command to be dispatched.</typeparam>
-        /// <param name="time">Time to dispatch the command (seconds).</param>
-        /// <param name="parameters">Command parameters.</param>
         protected IEnumerator DispatchInvoke(Type type, float time, params object[] parameters)
         {
             yield return new UnityEngine.WaitForSeconds(time);
-            this.Dispatch(type, parameters);
+            Dispatch(type, parameters);
         }
 
+        #endregion
+
+        #region Release
+
         /// <summary>
-        /// Releases a command.
+        /// 释放 command.
         /// </summary>
-        /// <param name="command">Command to be released.</param>
         public void Release(ICommand command)
         {
-            if (!command.running) return;
+            // 如果 command.running 不为真直接返回
+            if (!command.running) { return; }
 
-            //If the command has IUpdatable interface, and is on the EventCaller extension, removes it.
-            if (command is IUpdatable && EventCallerContainerExtension.updateable.Contains((IUpdatable)command))
+            // 如果 command 实现了 IUpdatable 接口，且添加到了 EventContainer 的 IUpdatable list 就进行移除
+            if (command is IUpdatable && EventContainer.updateable.Contains((IUpdatable)command))
             {
-                EventCallerContainerExtension.updateable.Remove((IUpdatable)command);
+                EventContainer.updateable.Remove((IUpdatable)command);
             }
-            //If the command has IDisposable interface, calls the Dispose() method. 
+            // 如果 command 实现了 IDisposable 接口, 就调用 Dispose 方法
             if (command is IDisposable)
             {
                 ((IDisposable)command).Dispose();
             }
-
+            // 设 running 和 keepAlive 为假
             command.running = false;
             command.keepAlive = false;
         }
 
         /// <summary>
-        /// Releases all commands that are running.
+        /// 释放所有 command
         /// </summary>
         public void ReleaseAll()
         {
-            foreach (var entry in this.commands)
+            List<object> values = new List<object>(commands.Values);
+            int length = values.Count;
+            for (int i = 0; i < length; i++)
             {
-                if (entry.Value is ICommand)
+                // 如果当前元素是 ICommand 对象表示为单例模式
+                if (values[i] is ICommand)
                 {
-                    this.Release((ICommand)entry.Value);
+                    Release((ICommand)values[i]);
                 }
+                // 否则为对象池模式，循环释放对象池中的对象
                 else
                 {
-                    var pool = (List<ICommand>)entry.Value;
-                    for (int poolIndex = 0; poolIndex < pool.Count; poolIndex++)
+                    var pool = (List<ICommand>)values[i];
+                    for (int n = 0; n < pool.Count; n++)
                     {
-                        this.Release((ICommand)pool[poolIndex]);
+                        Release((ICommand)pool[n]);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Releases all commands that are running.
+        /// 释放指定类型的所有 command
         /// </summary>
-        /// <typeparam name="T">The type of the commands to be released.</typeparam>
         public void ReleaseAll<T>() where T : ICommand
         {
-            this.ReleaseAll(typeof(T));
+            ReleaseAll(typeof(T));
         }
 
         /// <summary>
-        /// Releases all commands that are running.
+        /// 释放指定类型的所有 command
         /// </summary>
-        /// <param name="type">The type of the commands to be released.</param>
         public void ReleaseAll(Type type)
         {
-            foreach (var entry in this.commands)
+            List<object> values = new List<object>(commands.Values);
+            int length = values.Count;
+            for (int i = 0; i < length; i++)
             {
-                if (entry.Value is ICommand && entry.Value.GetType().Equals(type))
+                if (values[i] is ICommand && values[i].GetType().Equals(type))
                 {
-                    this.Release((ICommand)entry.Value);
+                    Release((ICommand)values[i]);
                 }
                 else
                 {
-                    var pool = (List<ICommand>)entry.Value;
-                    for (int poolIndex = 0; poolIndex < pool.Count; poolIndex++)
+                    var pool = (List<ICommand>)values[i];
+                    for (int n = 0; n < pool.Count; n++)
                     {
-                        var command = (ICommand)pool[poolIndex];
+                        var command = (ICommand)pool[n];
 
                         if (command.GetType().Equals(type))
                         {
-                            this.Release(command);
+                            Release(command);
                         }
                     }
                 }
             }
         }
 
+        #endregion
+
         /// <summary>
-        /// Pools all commands.
+        /// 将容器中所有 ICommand 对象实例化并缓存到字典
         /// </summary>
         public void Pool()
         {
+            // 获取所有执行过注入后的 ICommand 对象实例
             var resolvedCommands = container.ResolveAll<ICommand>();
 
-            for (var cmdIndex = 0; cmdIndex < resolvedCommands.Length; cmdIndex++)
+            for (var i = 0; i < resolvedCommands.Length; i++)
             {
-                var command = resolvedCommands[cmdIndex];
+                // 获取类型和实例
+                var command = resolvedCommands[i];
                 var commandType = command.GetType();
 
-                //If the type already exists in the pool, goes to the next type.
-                if (this.commands.ContainsKey(commandType)) continue;
-
+                // 如果字典中已经有了就直接进行下次循环
+                if (commands.ContainsKey(commandType)) { continue; }
+                // 如果是单例类型就直接进行添加
                 if (command.singleton)
                 {
-                    this.commands.Add(commandType, command);
+                    commands.Add(commandType, command);
                 }
                 else
                 {
+                    // 否则用 list 来作为对象池
                     var commandPool = new List<ICommand>(command.preloadPoolSize);
 
-                    //Adds the currently resolved command.
+                    // 将当前元素添加到 list 中
                     commandPool.Add(command);
 
-                    //Adds other commands until matches preloadPoolSize.
+                    // 如果对象池初始化数量大于1就继续进行实例化并添加到 list
                     if (command.preloadPoolSize > 1)
                     {
-                        for (int itemIndex = 1; itemIndex < command.preloadPoolSize; itemIndex++)
+                        for (int n = 1; n < command.preloadPoolSize; n++)
                         {
                             commandPool.Add((ICommand)container.Resolve(commandType));
                         }
                     }
-
-                    this.commands.Add(commandType, commandPool);
+                    // 将 list 添加到字典
+                    commands.Add(commandType, commandPool);
                 }
             }
         }
 
+        #region ContainsCommands
+
         /// <summary>
-        /// Checks whether a given command of <typeparamref name="T"/> is registered.
+        /// 返回 commands 字典中是否含有指定类型的 command
         /// </summary>
-        /// <typeparam name="T">Command type.</typeparam>
-        /// <returns><c>true</c>, if registration exists, <c>false</c> otherwise.</returns>
         public bool ContainsCommands<T>() where T : ICommand
         {
-            return this.commands.ContainsKey(typeof(T));
+            return commands.ContainsKey(typeof(T));
         }
 
         /// <summary>
@@ -268,44 +282,43 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public bool ContainsCommands(Type type)
         {
-            return this.commands.ContainsKey(type);
+            return commands.ContainsKey(type);
         }
 
+        #endregion
+
         /// <summary>
-        /// Gets all commands registered in the command dispatcher.
+        /// 返回字典中的所有 key（类型）
         /// </summary>
-        /// <returns>All available registrations.</returns>
         public Type[] GetAllRegistrations()
         {
-            return this.commands.Keys.ToArray();
+            Type[] types = new Type[commands.Count];
+            List<Type> keys = new List<Type>(commands.Keys);
+            return keys.ToArray();
         }
 
+        #region GetCommandFromPool
+
         /// <summary>
-        /// Gets a command from the pool.
+        /// 从字典中获取一个 command
         /// </summary>
-        /// <param name="commandType">Command type.</param>
-        /// <param name="pool">Pool from which the command will be taken.</param>
-        /// <returns>Command or NULL.</returns>
         public ICommand GetCommandFromPool(Type commandType)
         {
             ICommand command = null;
 
-            if (this.commands.ContainsKey(commandType))
+            if (commands.ContainsKey(commandType))
             {
-                var item = this.commands[commandType];
-                command = this.GetCommandFromPool(commandType, (List<ICommand>)item);
+                var item = commands[commandType];
+                command = GetCommandFromPool(commandType, (List<ICommand>)item);
             }
 
             return command;
         }
 
         /// <summary>
-        /// Gets a command from the pool.
+        /// 从对象池获取一个 command
         /// </summary>
-        /// <param name="commandType">Command type.</param>
-        /// <param name="pool">Pool from which the command will be taken.</param>
-        /// <returns>Command or NULL.</returns>
-        public ICommand GetCommandFromPool(Type commandType, List<ICommand> pool)
+        public ICommand GetCommandFromPool(Type type, List<ICommand> pool)
         {
             ICommand command = null;
 
@@ -329,24 +342,24 @@ namespace uMVVMCS.DIContainer
                         string.Format(CommandException.MAX_POOL_SIZE, pool[0].ToString()));
                 }
 
-                command = (ICommand)this.container.Resolve(commandType);
+                // 获取实例化结果并添加到对象池
+                command = (ICommand)container.Resolve(type);
                 pool.Add(command);
             }
 
             return command;
         }
 
+        #endregion
+
         /// <summary>
-        /// Releases all resource used by the <see cref="Adic.CommandDispatcher"/> object.
-        /// </summary>
-        /// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="Adic.CommandDispatcher"/>. The
-        /// <see cref="Dispose"/> method leaves the <see cref="Adic.CommandDispatcher"/> in an unusable state. After calling
-        /// <see cref="Dispose"/>, you must release all references to the <see cref="Adic.CommandDispatcher"/> so the garbage
-        /// collector can reclaim the memory that the <see cref="Adic.CommandDispatcher"/> was occupying.</remarks>
+        /// 释放 CommandDispatcher 中的所有资源，当 CommandDispatcher 用完后调用。Dispose 方法
+        /// 调用后必须释放所有 CommandDispatcher 的引用以便 GC 回收eclaim the memory that the CommandDispatcher was occupying.
+        /// </remarks>
         public void Dispose()
         {
-            this.ReleaseAll();
-            this.commands.Clear();
+            ReleaseAll();
+            commands.Clear();
         }
     }
 }

@@ -26,12 +26,6 @@ namespace uMVVMCS.DIContainer
     public interface IPool
     {
         /// <summary>
-        /// 当类需要实现对象池功能时，可以通过 InjectionBinder 实现，也可以通过实现IInstanceProvider接口实现该属性，
-        /// 来存放InjectionBinder实例（因为IInjectionBinder接口继承了IInstanceProvider接口）或者IInstanceProvider实例
-        /// </summary>
-        //IInstanceProvider instanceProvider { get; set; }
-
-        /// <summary>
         /// 属性，储存对象池的类型（由第一个放入对象池的对象类型决定）
         /// </summary>
         Type poolType { get; set; }

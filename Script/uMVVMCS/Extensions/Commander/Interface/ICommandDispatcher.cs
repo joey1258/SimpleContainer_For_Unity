@@ -65,12 +65,12 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// Checks whether a given command of <typeparamref name="T"/> is registered.
         /// </summary>
-        bool ContainsRegistration<T>() where T : ICommand;
+        bool ContainsCommands<T>() where T : ICommand;
 
         /// <summary>
         /// Checks whether a given command of <paramref name="type"/> is registered.
         /// </summary>
-        bool ContainsRegistration(Type type);
+        bool ContainsCommands(Type type);
 
         /// <summary>
         /// Gets all commands registered in the command dispatcher.
