@@ -28,7 +28,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 属性，储存对象池的类型（由第一个放入对象池的对象类型决定）
         /// </summary>
-        Type poolType { get; set; }
+        Type type { get; set; }
 
         /// <summary>
         /// 如果对象池中有可用的实例就按顺序返回
@@ -68,6 +68,11 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 获取或者设置无限大小的对象池的扩展行为类型：添加单倍，或者双倍对象
         /// </summary>
-        //PoolInflationType inflationType { get; set; }
+        bool isInflation { get; set; }
+
+        /// <summary>
+        /// 重置
+        /// </summary>
+        void Restore();
     }
 }
