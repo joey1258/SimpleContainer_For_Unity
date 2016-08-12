@@ -24,7 +24,7 @@ namespace uMVVMCS.DIContainer
     /// 泛型对象池类
     /// </summary>
     /// <typeparam name="T"></typeparam>
-	public class Pool<T> : Pool, IPool<T>
+	public class Pool<T> : Pool//, IPool<T>
     {
         /// <summary>
         /// 构造函数 设置对象池的类型
@@ -202,7 +202,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public object GetInstance(int instancesToCreate = 1)
         {
-            // 如果 instancesAvailable 栈中存有实例
+            /*// 如果 instancesAvailable 栈中存有实例
             if (instancesUnUse.Count > 0)
             {
                 // 将其从栈中推出，并存入 instancesInUse 中
@@ -241,7 +241,7 @@ namespace uMVVMCS.DIContainer
                 }
                 // 最后返回一个实例，将其从instancesAvailable栈中推出，并存入instancesInUse HashSet中
                 return GetInstance();
-            }
+            }*/
 
             //If not, return null
             return null;

@@ -292,7 +292,6 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public Type[] GetAllRegistrations()
         {
-            Type[] types = new Type[commands.Count];
             List<Type> keys = new List<Type>(commands.Keys);
             return keys.ToArray();
         }

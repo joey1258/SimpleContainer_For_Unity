@@ -33,7 +33,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 如果对象池中有可用的实例就按顺序返回
         /// </summary>
-        object GetInstance();
+        //object GetInstance();
 
         /// <summary>
         /// 将一个实例返回到对象池 (如果被释放的实例实现了IPoolable接口，那么应该调用Release()方法)

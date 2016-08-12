@@ -58,8 +58,8 @@ namespace uMVVMCS.DIContainer
             disposable.Add(container);
 
             // 如果容器中含有 ICommandDispatcher 类型的 binding，且它实现了 IDisposable 接口，就将其也添加到 IDisposable list
-            if (container.GetBindingsByType<ICommandDispatcher>() != null &&
-                container.GetBindingsByType<ICommandDispatcher>().Count != 0)
+            var commandDispatches = container.GetBindingsByType<ICommandDispatcher>();
+            if (commandDispatches != null && commandDispatches.Count != 0)
             {
                 var dispatcher = container.Resolve<ICommandDispatcher>();
                 if (dispatcher is IDisposable)
