@@ -14,7 +14,7 @@
  *		limitations under the License.
  */
 
-namespace uMVVMCS.DIContainer
+namespace uMVVMCS
 {
     public interface ICommandPool
     {

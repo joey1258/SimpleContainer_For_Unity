@@ -14,10 +14,7 @@
  *		limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
-
-namespace uMVVMCS.DIContainer
+namespace uMVVMCS
 {
     /// <summary>
     /// 允许一个 object 接受 updates 更新

@@ -18,8 +18,9 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using uMVVMCS.DIContainer;
 
-namespace uMVVMCS.DIContainer
+namespace uMVVMCS
 {
     public abstract class Command : ICommand, IDisposable
     {

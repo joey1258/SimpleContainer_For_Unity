@@ -14,7 +14,9 @@
  *      limitations under the License.
  */
 
-namespace uMVVMCS.DIContainer
+using uMVVMCS.DIContainer;
+
+namespace uMVVMCS
 {
     public class CommanderContainer : IContainerExtension
     {

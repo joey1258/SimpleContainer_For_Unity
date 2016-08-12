@@ -15,8 +15,9 @@
  */
 
 using System;
+using uMVVMCS.DIContainer;
 
-namespace uMVVMCS.DIContainer
+namespace uMVVMCS
 {
     public static class CommanderContainerExtension
     {

@@ -15,10 +15,9 @@
  */
 
 using UnityEngine;
-using System;
-using System.Collections.Generic;
+using uMVVMCS.DIContainer;
 
-namespace uMVVMCS.DIContainer
+namespace uMVVMCS
 {
     public class EventBehaviour : MonoBehaviour
     {
