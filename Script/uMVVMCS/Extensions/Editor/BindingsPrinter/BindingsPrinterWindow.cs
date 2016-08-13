@@ -18,7 +18,7 @@ using UnityEngine;
 using UnityEditor;
 using uMVVMCS.DIContainer;
 
-namespace uMVVMCS.DIContainer.Extensions
+namespace uMVVMCS.Editor
 {
     public class BindingsPrinterWindow : EditorWindow
     {

@@ -16,7 +16,7 @@
 
 using UnityEngine;
 
-namespace uMVVMCS.DIContainer.Extensions
+namespace uMVVMCS.Editor
 {
     public static class EditorStyles
     {
