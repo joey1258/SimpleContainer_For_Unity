@@ -13,16 +13,11 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  */
-
-using UnityEngine;
-using System;
+ 
 using uMVVMCS.DIContainer;
 
 namespace uMVVMCS
 {
-	/// <summary>
-	/// 注入工具类
-	/// </summary>
 	public static class InjectionUtil {
         /// <summary>
         /// Injects into a specified object using container details.
