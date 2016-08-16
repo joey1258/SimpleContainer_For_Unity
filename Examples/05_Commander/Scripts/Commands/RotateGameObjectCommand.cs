@@ -1,33 +1,22 @@
 using UnityEngine;
-using System.Collections;
-using Adic;
+using uMVVMCS.DIContainer;
 
-namespace Adic.Examples.Commander.Commands {
-	/// <summary>
-	/// Game object rotator.
-	/// 
-	/// Receives the Transform component of the game object to be rotated as
-	/// a parameter during execution.
-	/// </summary>
-	public class RotateGameObjectCommand : Command, IUpdatable {
-		/// <summary>Object to rotate.</summary>
+namespace uMVVMCS.Examples.Commander
+{
+	public class RotateGameObjectCommand : Command, IUpdatable
+    {
 		protected Transform objectToRotate;
 		
 		public override void Execute(params object[] parameters) {
-			this.objectToRotate = (Transform)parameters[0];
+			objectToRotate = (Transform)parameters[0];
 
-			//Call "Retain()" to keep the command running
-			//after the "Execute()" method is called.
-			//This way the command can receive update events.
-			//In this example the command will not be released
-			//manually. However, depending on the action being
-			//executed (e.g. some network call) you'll have to
-			//release the command manually by calling "Release()".
-			this.Retain();
+            // 调用 Retain() 方法来保持 command 在 Execute() 方法执行后继续运行
+            // 这使其可以接收 Update 事件。command 将不会释放，如需释放可调用 Release() 方法
+            Retain();
 		}
 
 		public void Update () {
-			this.objectToRotate.Rotate(1.0f, 1.0f, 1.0f);
+			objectToRotate.Rotate(1.0f, 1.0f, 1.0f);
 		}
 	}
 }

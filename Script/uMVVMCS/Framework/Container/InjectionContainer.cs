@@ -120,9 +120,9 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 注册容器到 AOT list 
         /// </summary>
-        virtual public IInjectionContainer RegisterAOT<T>() where T : IContainerExtension
+        virtual public IInjectionContainer RegisterExtension<T>() where T : IContainerExtension
         {
-            RegisterAOT(Resolve<T>());
+            RegisterExtension(Resolve<T>());
 
             return this;
         }
@@ -130,7 +130,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 注册容器到 AOT list，并执行容器的 OnRegister 方法
         /// </summary>
-        virtual public IInjectionContainer RegisterAOT(IContainerExtension aot)
+        virtual public IInjectionContainer RegisterExtension(IContainerExtension aot)
         {
             // 如果 List<IContainerExtension> AOT 为空,将其初始化
             if (AOT == null) AOT = new List<IContainerExtension>();

@@ -33,12 +33,12 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 注册容器到 AOT list
         /// </summary>
-        IInjectionContainer RegisterAOT<T>() where T : IContainerExtension;
+        IInjectionContainer RegisterExtension<T>() where T : IContainerExtension;
 
         /// <summary>
         /// 注册容器到 AOT list 
         /// </summary>
-        IInjectionContainer RegisterAOT(IContainerExtension extension);
+        IInjectionContainer RegisterExtension(IContainerExtension extension);
 
         /// <summary>
         /// 将一个容器从 AOT list 中移除 

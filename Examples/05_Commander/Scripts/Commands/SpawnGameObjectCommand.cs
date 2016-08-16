@@ -1,18 +1,17 @@
 ﻿using UnityEngine;
-using Adic.Container;
+using uMVVMCS.DIContainer;
 
-namespace Adic.Examples.Commander.Commands {
-	/// <summary>
-	/// Spawns a cube and makes it rotate.
-	/// </summary>
-	public class SpawnGameObjectCommand : Command {
-		/// <summary>Container that dispatched the command.</summary>
+namespace uMVVMCS.Examples.Commander
+{
+	public class SpawnGameObjectCommand : Command
+    {
 		[Inject]
 		public IInjectionContainer container;
 
-		public override void Execute(params object[] parameters) {
+		public override void Execute(params object[] parameters)
+        {
 			var prefab = container.Resolve<Transform>();
-			this.dispatcher.Dispatch<RotateGameObjectCommand>(prefab);
+			dispatcher.Dispatch<RotateGameObjectCommand>(prefab);
 		}
 	}
 }

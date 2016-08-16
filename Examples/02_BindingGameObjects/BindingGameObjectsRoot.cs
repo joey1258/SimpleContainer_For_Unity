@@ -26,7 +26,7 @@ namespace uMVVMCS.Examples
             //Create the container.
             AddContainer<InjectionContainer>()
                 //Register any extensions the container may use.
-                .RegisterAOT<UnityContainer>()
+                .RegisterExtension<UnityContainer>()
                 //Bind a Transform component to the "Cube" game object in the scene.
                 .Bind<Transform>().ToGameObject("Cube")
                 //Bind the "GameObjectRotator" component to a new ame object of the same name.

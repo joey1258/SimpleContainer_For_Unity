@@ -1,36 +1,34 @@
 using UnityEngine;
 using uMVVMCS.DIContainer;
 
-namespace uMVVMCS.Examples.Commander {
-	/// <summary>
-	/// Game context root.
-	/// </summary>
-	public class GameRoot : ContextRoot {
-		/// <summary>The command dispatcher.</summary>
+namespace uMVVMCS.Examples.Commander
+{
+	public class GameRoot : ContextRoot
+    {
 		protected ICommandDispatcher dispatcher;
 
-		public override void SetupContainers() {
-			//Create the container.
-			var container = this.AddContainer<InjectionContainer>();
+		public override void SetupContainers()
+        {
+			// 添加容器
+			var container = AddContainer<InjectionContainer>();
 
 			container
-				//Register any extensions the container may use.
-				.RegisterExtension<CommanderContainerExtension>()
-				.RegisterExtension<EventCallerContainerExtension>()
-				.RegisterExtension<UnityBindingContainerExtension>()
-				//Register all commands under the namespace "Adic.Examples.Commander.Commands".
-				.RegisterCommands("Adic.Examples.Commander.Commands")
-				//Bind the "Prism" prefab.
+				// 注册所需的容器扩展
+				.RegisterExtension<CommanderContainer>()
+				.RegisterExtension<EventContainer>()
+				.RegisterExtension<UnityContainer>()
+                // 注册 "uMVVMCS.Examples.Commander" 命名空间下的所有 Command
+                .RegisterCommands("uMVVMCS.Examples.Commander")
+				// 绑定 prefab
 				.Bind<Transform>().ToPrefab("05_Commander/Prism");
 		
-			//Get a reference to the command dispatcher so it can be used to dispatch
-			//commands in the Init() method.
-			this.dispatcher = container.GetCommandDispatcher();
+			// 获取 commandDispatcher 以便在 Init() 方法中调用
+			dispatcher = container.GetCommandDispatcher();
 		}
 		
-		public override void Init() {
-			//Init the game.
-			this.dispatcher.Dispatch<SpawnGameObjectCommand>();
+		public override void Init()
+        {
+			dispatcher.Dispatch<SpawnGameObjectCommand>();
 		}
 	}
 }
