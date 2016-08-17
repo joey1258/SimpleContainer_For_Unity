@@ -140,7 +140,7 @@ namespace uMVVMCS.DIContainer
         virtual protected void Start()
         {
             // SceneInjector 应该比其它任何 Start 方法都早执行
-            //this.gameObject.AddComponent<SceneInjector>();
+            gameObject.AddComponent<SceneInjector>();
 
             Init();
         }

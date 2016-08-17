@@ -14,7 +14,9 @@
  *      limitations under the License.
  */
 
-namespace uMVVMCS.DIContainer
+using UnityEngine;
+
+namespace uMVVMCS
 {
     /// <summary>
     /// 为 UnityEngine.StateMachineBehaviour 提供注入方法，以有可用 ContextRoot Extension 为前提
