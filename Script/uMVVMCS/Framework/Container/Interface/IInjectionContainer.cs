@@ -31,23 +31,23 @@ namespace uMVVMCS.DIContainer
         IReflectionCache cache { get; }
 
         /// <summary>
-        /// 注册容器到 extension list
+        /// 注册容器到 aots list
         /// </summary>
-        IInjectionContainer RegisterExtension<T>() where T : IContainerExtension;
+        IInjectionContainer RegisterAOT<T>() where T : IContainerAOT;
 
         /// <summary>
-        /// 注册容器到 extension list 
+        /// 注册容器到 aots list 
         /// </summary>
-        IInjectionContainer RegisterExtension(IContainerExtension extension);
+        IInjectionContainer RegisterAOT(IContainerAOT extension);
 
         /// <summary>
-        /// 将一个容器从 extension list 中移除 
+        /// 将一个容器从 aots list 中移除 
         /// </summary>
-        IInjectionContainer UnregisterExtension<T>() where T : IContainerExtension;
+        IInjectionContainer UnregisterAOT<T>() where T : IContainerAOT;
 
         /// <summary>
-        /// 将一个容器从 extension list 中移除
+        /// 将一个容器从 aots list 中移除
         /// </summary>
-        IInjectionContainer UnregisterExtension(IContainerExtension extension);
+        IInjectionContainer UnregisterAOT(IContainerAOT extension);
     }
 }

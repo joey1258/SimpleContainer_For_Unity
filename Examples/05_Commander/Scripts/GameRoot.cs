@@ -14,9 +14,9 @@ namespace uMVVMCS.Examples.Commander
 
 			container
 				// 注册所需的容器扩展
-				.RegisterExtension<CommanderContainer>()
-				.RegisterExtension<EventContainer>()
-				.RegisterExtension<UnityContainer>()
+				.RegisterAOT<CommanderContainer>()
+				.RegisterAOT<EventContainer>()
+				.RegisterAOT<UnityContainer>()
                 // 注册 "uMVVMCS.Examples.Commander" 命名空间下的所有 Command
                 .RegisterCommands("uMVVMCS.Examples.Commander")
 				// 绑定 prefab

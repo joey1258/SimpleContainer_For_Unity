@@ -18,7 +18,7 @@ using uMVVMCS.DIContainer;
 
 namespace uMVVMCS
 {
-    public class CommanderContainer : IContainerExtension
+    public class CommanderContainer : IContainerAOT
     {
         public void OnRegister(IInjectionContainer container)
         {

@@ -186,7 +186,7 @@ namespace uMVVMCS.DIContainer
         {
             object resolution = null;
 
-            // 如果 extension Resolve 前置委托不为空就执行
+            // 如果 aots Resolve 前置委托不为空就执行
             if (beforeResolve != null)
             {
                 var delegates = beforeResolve.GetInvocationList();
@@ -207,7 +207,7 @@ namespace uMVVMCS.DIContainer
             Type inwardType = typeof(object);
             IList<IBinding> bindings = new List<IBinding>();
 
-            // 不能根据 id 是否为空来过滤，因为 unityBinding 是通过 extension 来获取实例的，因此即使没有 
+            // 不能根据 id 是否为空来过滤，因为 unityBinding 是通过 aots 来获取实例的，因此即使没有 
             // id 也必须进入 ResolveBinding 方法,所以必须先获取其 binding 自身
             // 如果类型为空 id 不为空，根据 id 来获取 binding
             if (type == null) { bindings = binder.GetBindingsById(id); }
@@ -282,7 +282,7 @@ namespace uMVVMCS.DIContainer
                 resolution = array;
             }
 
-            // 如果 extension Resolve 后置委托不为空就执行
+            // 如果 aots Resolve 后置委托不为空就执行
             if (afterResolve != null)
             {
                 var delegates = this.afterResolve.GetInvocationList();
@@ -333,7 +333,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         protected object Inject(object instance, ReflectionInfo reflectedInfo)
         {
-            // 如果 extension Inject 前置委托不为空就执行
+            // 如果 aots Inject 前置委托不为空就执行
             if (beforeInject != null)
             {
                 beforeInject(this, ref instance, reflectedInfo);
@@ -357,7 +357,7 @@ namespace uMVVMCS.DIContainer
                 InjectMethods(instance, reflectedInfo.methods);
             }
 
-            // 如果 extension Inject 后置委托不为空就执行
+            // 如果 aots Inject 后置委托不为空就执行
             if (afterInject != null)
             {
                 afterInject(this, ref instance, reflectedInfo);
@@ -413,7 +413,7 @@ namespace uMVVMCS.DIContainer
             // 过滤实例
             object instance = null;
 
-            // 如果 extension 委托 BindingEvaluationHandler 不为空就执行
+            // 如果 aots 委托 BindingEvaluationHandler 不为空就执行
             if (bindingEvaluation != null)
             {
                 var delegates = bindingEvaluation.GetInvocationList();
@@ -479,7 +479,7 @@ namespace uMVVMCS.DIContainer
                 }
             }
 
-            // 如果 extension 委托 bindingResolution 不为空执行委托
+            // 如果 aots 委托 bindingResolution 不为空执行委托
             if (bindingResolution != null)
             {
                 bindingResolution(this, ref binding, ref instance);
@@ -615,11 +615,11 @@ namespace uMVVMCS.DIContainer
         #endregion
 
         /// <summary>
-        /// AddBinding 之前执行的 extension 方法
+        /// AddBinding 之前执行的 aots 方法
         /// </summary>
         virtual protected void OnBeforeAddBinding(IBinder source, ref IBinding binding)
         {
-            // 由于 extension 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
+            // 由于 aots 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
             int length = binding.valueList.Count;
             for (int i = 0; i < length; i++)
             {

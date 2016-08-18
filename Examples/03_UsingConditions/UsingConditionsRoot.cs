@@ -26,7 +26,7 @@ namespace uMVVMCS.Examples
             //Create the container.
             AddContainer<InjectionContainer>()
                 //Register any extensions the container may use.
-                .RegisterExtension<UnityContainer>()
+                .RegisterAOT<UnityContainer>()
                 //Bind a Transform component to the two cubes on the scene, using a "As"
                 //condition to define their identifiers.
                 .Bind<Transform>().ToGameObject("LeftCube").As("LeftCube")

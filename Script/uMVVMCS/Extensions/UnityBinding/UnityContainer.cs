@@ -19,9 +19,9 @@ using UnityEngine;
 
 namespace uMVVMCS.DIContainer
 {
-    public class UnityContainer : IContainerExtension
+    public class UnityContainer : IContainerAOT
     {
-        #region IContainerAOT implementation 
+        #region IContainerExtension implementation 
 
         public void OnRegister(IInjectionContainer container)
         {

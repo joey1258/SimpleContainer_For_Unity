@@ -20,7 +20,7 @@ using uMVVMCS.DIContainer;
 
 namespace uMVVMCS
 {
-    public class EventContainer : IContainerExtension
+    public class EventContainer : IContainerAOT
     {
         /// <summary>
         /// 可释放对象 list
@@ -58,7 +58,8 @@ namespace uMVVMCS
             // 将容器添加到 IDisposable list.
             disposable.Add(container);
 
-            // 如果容器中含有 ICommandDispatcher 类型的 binding，且它实现了 IDisposable 接口，就将其也添加到 IDisposable list
+            // 如果容器中含有 ICommandDispatcher 类型的 binding，且它实现了 IDisposable 接口
+            // 就实例化 ICommandDispatcher 类型并将其也添加到 IDisposable list
             var commandDispatches = container.GetBindingsByType<ICommandDispatcher>();
             if (commandDispatches != null && commandDispatches.Count != 0)
             {
@@ -69,7 +70,7 @@ namespace uMVVMCS
                 }
             }
 
-            // 添加 extension 委托
+            // 添加 aots 委托
             container.afterAddBinding += this.OnAfterAddBinding;
             container.bindingResolution += this.OnBindingResolution;
         }
@@ -79,7 +80,7 @@ namespace uMVVMCS
         /// </summary>
         public void OnUnregister(IInjectionContainer container)
         {
-            // 取消 extension 委托
+            // 取消 aots 委托
             container.afterAddBinding -= this.OnAfterAddBinding;
             container.bindingResolution -= this.OnBindingResolution;
 
@@ -91,7 +92,7 @@ namespace uMVVMCS
 
         /// <summary>
         /// 处理 binding 添加之后的工作，用于对 SINGLETON 和 MULTITON 类型的 binding 的值
-        /// 分别感觉其自身类型添加到对应的 list 中去(IDisposable list 或 IUpdatable list)
+        /// 分别根据其自身类型添加到对应的 list 中去(IDisposable list 或 IUpdatable list)
         /// </summary>
         protected void OnAfterAddBinding(IBinder source, ref IBinding binding)
         {

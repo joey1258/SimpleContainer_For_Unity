@@ -32,61 +32,61 @@ namespace uMVVMCS.DIContainer
         public object id { get; private set; }
 
         /// <summary>
-        /// 容器 extension 接口 list
+        /// 容器 IContainerAOT 接口 list
         /// </summary>
-        private List<IContainerExtension> extension;
+        private List<IContainerAOT> aots;
 
         #region constructor
 
         public InjectionContainer() 
             : base(new ReflectionCache(), new Binder(), DEFAULT_RESOLUTION_MODE)
         {
-            RegisterItself();
+            RegisterSelf();
         }
 
         public InjectionContainer(object id) 
             : base(new ReflectionCache(), new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
-            RegisterItself();
+            RegisterSelf();
         }
 
         public InjectionContainer(IReflectionCache cache) 
             : base(cache, new Binder(),  DEFAULT_RESOLUTION_MODE)
         {
-            RegisterItself();
+            RegisterSelf();
         }
 
         public InjectionContainer(ResolutionMode resolutionMode)
             : base(new ReflectionCache(), new Binder(), resolutionMode)
         {
-            RegisterItself();
+            RegisterSelf();
         }
 
         public InjectionContainer(object id, IReflectionCache cache) 
             : base(cache, new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
-            RegisterItself();
+            RegisterSelf();
         }
 
         public InjectionContainer(IReflectionCache cache, ResolutionMode resolutionMode)
             : base(cache, new Binder(), resolutionMode)
         {
-            RegisterItself();
+            RegisterSelf();
         }
 
         public InjectionContainer(IReflectionCache cache, IBinder binder) 
             : base(cache, binder, DEFAULT_RESOLUTION_MODE)
         {
-            RegisterItself();
+            RegisterSelf();
         }
 
         public InjectionContainer(object id, IReflectionCache cache, IBinder binder) 
             : base(cache, binder, DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
-            RegisterItself();
+            RegisterSelf();
         }
 
         public InjectionContainer(
@@ -97,7 +97,7 @@ namespace uMVVMCS.DIContainer
             : base(cache, binder, resolutionMode)
         {
             this.id = id;
-            RegisterItself();
+            RegisterSelf();
         }
 
         #endregion
@@ -118,24 +118,24 @@ namespace uMVVMCS.DIContainer
         #region IInjectionContainer implementation 
 
         /// <summary>
-        /// 注册容器到 extension list 
+        /// 实例化指定类型的容器扩展并注入到 AOT list 
         /// </summary>
-        virtual public IInjectionContainer RegisterExtension<T>() where T : IContainerExtension
+        virtual public IInjectionContainer RegisterAOT<T>() where T : IContainerAOT
         {
-            RegisterExtension(Resolve<T>());
+            RegisterAOT(Resolve<T>());
 
             return this;
         }
 
         /// <summary>
-        /// 注册容器到 extension list，并执行容器的 OnRegister 方法
+        /// 注册指定类型的容器扩展实例到 IContainerAOT list，并执行容器的 OnRegister 方法
         /// </summary>
-        virtual public IInjectionContainer RegisterExtension(IContainerExtension aot)
+        virtual public IInjectionContainer RegisterAOT(IContainerAOT aot)
         {
-            // 如果 List<IContainerExtension> extension 为空,将其初始化
-            if (extension == null) extension = new List<IContainerExtension>();
+            // 如果 List<IContainerAOT> aots 为空,将其初始化
+            if (this.aots == null) this.aots = new List<IContainerAOT>();
             // 添加参数到 list
-            extension.Add(aot);
+            this.aots.Add(aot);
             // 执行 OnRegister 方法
             aot.OnRegister(this);
 
@@ -143,31 +143,31 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 将所有指定类型的容器从 extension list 中移除 
+        /// 将所有指定类型的容器从 IContainerAOT list 中移除 
         /// </summary>
-        virtual public IInjectionContainer UnregisterExtension<T>() where T : IContainerExtension
+        virtual public IInjectionContainer UnregisterAOT<T>() where T : IContainerAOT
         {
-            // 获取list 中所有指定类型的容器 extension 接口对象
-            var AOTToUnregister = extension.OfTheType<T, IContainerExtension>();
+            // 获取list 中所有指定类型的容器 aots 接口对象
+            var AOTToUnregister = aots.OfTheType<T, IContainerAOT>();
 
-            // 注销所有获取到的容器 extension 接口对象
+            // 注销所有获取到的容器 aots 接口对象
             int length = AOTToUnregister.Count;
             for (int i = 0; i < length; i++)
             {
-                UnregisterExtension(AOTToUnregister[i]);
+                UnregisterAOT(AOTToUnregister[i]);
             }
 
             return this;
         }
 
         /// <summary>
-        /// 将一个容器从 extension list 中移除 
+        /// 将一个容器扩展从 IContainerAOT list 中移除 
         /// </summary>
-        virtual public IInjectionContainer UnregisterExtension(IContainerExtension aot)
+        virtual public IInjectionContainer UnregisterAOT(IContainerAOT aot)
         {
-            if (!extension.Contains(aot)) { return this; }
+            if (!this.aots.Contains(aot)) { return this; }
 
-            extension.Remove(aot);
+            this.aots.Remove(aot);
             aot.OnUnregister(this);
 
             return this;
@@ -175,7 +175,7 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
-        #region binder Extension event
+        #region binder AOT event
 
         virtual public event BindingAddedHandler beforeAddBinding
         {
@@ -422,7 +422,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 绑定一个单例 binding，其 type 为自身类型，自身作为实例保存到 value
         /// </summary>
-        virtual protected void RegisterItself()
+        virtual protected void RegisterSelf()
         {
             BindSingleton<IInjectionContainer>().To(this);
         }
