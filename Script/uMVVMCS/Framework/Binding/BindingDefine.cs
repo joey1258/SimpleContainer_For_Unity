@@ -25,12 +25,12 @@ namespace uMVVMCS.DIContainer
     public delegate bool Condition(InjectionContext context);
 
     /// <summary>
-    /// 添加 Binding 的 AOT 委托
+    /// 添加 Binding 的 extension 委托
     /// </summary>
     public delegate void BindingAddedHandler(IBinder source, ref IBinding binding);
 
     /// <summary>
-    /// 移除 Binding 的 AOT 委托
+    /// 移除 Binding 的 extension 委托
     /// </summary>
     public delegate void BindingRemovedHandler(IBinder source, IList<IBinding> bindings);
 

@@ -69,7 +69,7 @@ namespace uMVVMCS
                 }
             }
 
-            // 添加 AOT 委托
+            // 添加 extension 委托
             container.afterAddBinding += this.OnAfterAddBinding;
             container.bindingResolution += this.OnBindingResolution;
         }
@@ -79,7 +79,7 @@ namespace uMVVMCS
         /// </summary>
         public void OnUnregister(IInjectionContainer container)
         {
-            // 取消 AOT 委托
+            // 取消 extension 委托
             container.afterAddBinding -= this.OnAfterAddBinding;
             container.bindingResolution -= this.OnBindingResolution;
 

@@ -32,9 +32,9 @@ namespace uMVVMCS.DIContainer
         public object id { get; private set; }
 
         /// <summary>
-        /// 容器 AOT 接口 list
+        /// 容器 extension 接口 list
         /// </summary>
-        private List<IContainerExtension> AOT;
+        private List<IContainerExtension> extension;
 
         #region constructor
 
@@ -118,7 +118,7 @@ namespace uMVVMCS.DIContainer
         #region IInjectionContainer implementation 
 
         /// <summary>
-        /// 注册容器到 AOT list 
+        /// 注册容器到 extension list 
         /// </summary>
         virtual public IInjectionContainer RegisterExtension<T>() where T : IContainerExtension
         {
@@ -128,14 +128,14 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 注册容器到 AOT list，并执行容器的 OnRegister 方法
+        /// 注册容器到 extension list，并执行容器的 OnRegister 方法
         /// </summary>
         virtual public IInjectionContainer RegisterExtension(IContainerExtension aot)
         {
-            // 如果 List<IContainerExtension> AOT 为空,将其初始化
-            if (AOT == null) AOT = new List<IContainerExtension>();
+            // 如果 List<IContainerExtension> extension 为空,将其初始化
+            if (extension == null) extension = new List<IContainerExtension>();
             // 添加参数到 list
-            AOT.Add(aot);
+            extension.Add(aot);
             // 执行 OnRegister 方法
             aot.OnRegister(this);
 
@@ -143,31 +143,31 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 将所有指定类型的容器从 AOT list 中移除 
+        /// 将所有指定类型的容器从 extension list 中移除 
         /// </summary>
-        virtual public IInjectionContainer UnregisterAOT<T>() where T : IContainerExtension
+        virtual public IInjectionContainer UnregisterExtension<T>() where T : IContainerExtension
         {
-            // 获取list 中所有指定类型的容器 AOT 接口对象
-            var AOTToUnregister = AOT.OfTheType<T, IContainerExtension>();
+            // 获取list 中所有指定类型的容器 extension 接口对象
+            var AOTToUnregister = extension.OfTheType<T, IContainerExtension>();
 
-            // 注销所有获取到的容器 AOT 接口对象
+            // 注销所有获取到的容器 extension 接口对象
             int length = AOTToUnregister.Count;
             for (int i = 0; i < length; i++)
             {
-                UnregisterAOT(AOTToUnregister[i]);
+                UnregisterExtension(AOTToUnregister[i]);
             }
 
             return this;
         }
 
         /// <summary>
-        /// 将一个容器从 AOT list 中移除 
+        /// 将一个容器从 extension list 中移除 
         /// </summary>
-        virtual public IInjectionContainer UnregisterAOT(IContainerExtension aot)
+        virtual public IInjectionContainer UnregisterExtension(IContainerExtension aot)
         {
-            if (!AOT.Contains(aot)) { return this; }
+            if (!extension.Contains(aot)) { return this; }
 
-            AOT.Remove(aot);
+            extension.Remove(aot);
             aot.OnUnregister(this);
 
             return this;
@@ -175,7 +175,7 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
-        #region binder AOT event
+        #region binder Extension event
 
         virtual public event BindingAddedHandler beforeAddBinding
         {

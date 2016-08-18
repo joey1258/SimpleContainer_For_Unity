@@ -98,7 +98,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 缓存 binder 中所有 binding 中 value 属性所储存的类型
+        /// 缓存 binder 中所有 binding 的 value 的类型
         /// </summary>
         public void CacheFromBinder(IBinder binder)
         {

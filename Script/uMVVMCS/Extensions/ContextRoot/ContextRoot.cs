@@ -133,7 +133,7 @@ namespace uMVVMCS.DIContainer
 
             SetupContainers();
 
-            // 缓存所有容器中的 bindings 的类型信息
+            // 缓存所有容器中所有 binding 的 value 属性所储存的类型信息
             CacheBindings();
         }
 

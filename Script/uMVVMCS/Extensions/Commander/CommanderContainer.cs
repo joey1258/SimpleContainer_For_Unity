@@ -22,16 +22,18 @@ namespace uMVVMCS
     {
         public void OnRegister(IInjectionContainer container)
         {
-            // 绑定一个单例的 ICommandDispatcher 对象，所有命令都通过该对象传播
+            // 绑定一个单例的 ICommandDispatcher binding
             container.BindSingleton<ICommandDispatcher>().To<CommandDispatcher>();
-            // 绑定命令对象池
+            // 实例化 binding value，所有命令都通过该实例化后的 value 传播
             var dispatcher = (CommandDispatcher)container.Resolve<ICommandDispatcher>();
+            // 将实例化后的 binding value 作为值绑定一条 ICommandPool 类型的 binding
+            // 此时 container 中将有两条 binding，都为单例类型，且值都为 dispatcher，只有类型不同
             container.Bind<ICommandPool>().To(dispatcher);
         }
 
         public void OnUnregister(IInjectionContainer container)
         {
-            // 清除命令对象池和 ICommandDispatcher 对象
+            // Unbind ICommandDispatcher 类型和 ICommandPool 类型 binding（清除 dispatcher)
             container.UnbindByType<ICommandDispatcher>();
             container.UnbindByType<ICommandPool>();
 

@@ -19,13 +19,13 @@ using System;
 namespace uMVVMCS.DIContainer
 {
     /// <summary>
-    /// Resolve 方法的 AOT 委托，在 Resolve 方法实际操作开始之前和完成之后根据类型参数进行前置/后置操作
+    /// Resolve 方法的 extension 委托，在 Resolve 方法实际操作开始之前和完成之后根据类型参数进行前置/后置操作
     /// （修改传入的委托参数 resolutionInstance ）（Resolution : 正式决定，决议）
     /// </summary>
     public delegate bool TypeResolutionHandler(IInjector source, Type type, InjectionInto member, object parentInstance, object id, ref object resolutionInstance);
 
     /// <summary>
-    /// ResolveBinding 方法 AOT 委托，在方法内部对 id 进行完过滤之后，根据 binding 的 bindingType
+    /// ResolveBinding 方法 extension 委托，在方法内部对 id 进行完过滤之后，根据 binding 的 bindingType
     /// 对其进行相应的实例化与注入操作的之前进行的前置操作（修改传入的委托参数 binding）
     /// </summary>
     public delegate object BindingEvaluationHandler(IInjector source, ref IBinding binding);
