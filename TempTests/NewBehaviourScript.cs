@@ -36,7 +36,7 @@ public static class renKZ
 public class someClass : IInjectionFactory, IComparable<someClass>
 {
     public int id;
-    public object Create(InjectionContext context) { return this; }
+    public object Create(InjectionInfo context) { return this; }
 
     #region IComparable implementation 
 

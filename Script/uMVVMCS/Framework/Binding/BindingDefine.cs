@@ -22,7 +22,7 @@ namespace uMVVMCS.DIContainer
     /// <summary>
     /// 条件判断委托
     /// </summary>
-    public delegate bool Condition(InjectionContext context);
+    public delegate bool Condition(InjectionInfo context);
 
     /// <summary>
     /// 添加 Binding 的 aots 委托

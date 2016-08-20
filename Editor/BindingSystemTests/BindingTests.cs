@@ -470,7 +470,7 @@ namespace uMVVMCS_NUitTests
         {
             //Arrange 
             IBinder binder = new Binder();
-            InjectionContext Context = new InjectionContext();
+            InjectionInfo Context = new InjectionInfo();
             object o = new object();
             Context.id = o;
             //Act
@@ -493,7 +493,7 @@ namespace uMVVMCS_NUitTests
         {
             //Arrange 
             IBinder binder = new Binder();
-            InjectionContext Context = new InjectionContext();
+            InjectionInfo Context = new InjectionInfo();
             Context.parentType = typeof(object);
             //Act
             binder.Bind<object>().As(1).Into(typeof(object));

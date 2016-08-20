@@ -73,8 +73,10 @@ namespace uMVVMCS
             string namespaceName,
             bool includeChildren)
         {
+            // 获取指定命名空间下实现了 ICommand 的类型
             var commands = TypeUtils.GetAssignableTypes(typeof(ICommand), namespaceName, includeChildren);
 
+            // 如果不为空，就讲其类型作为值逐一绑定一条 ICommand 类型的 TEMP binding
             if (commands.Length > 0)
             {
                 for (var i = 0; i < commands.Length; i++)
@@ -85,7 +87,9 @@ namespace uMVVMCS
                         container.Bind<ICommand>().To(commandType);
                     }
                 }
-
+                // 为容器实例化一个 ICommandPool（CommandDispatcher）实例，并将容器内的所有 commands
+                // 实例化、注入并存入对象池（储存为 List<ICommand> 并根据类型添加到 CommandDispatcher 
+                // 的字典中）
                 PoolCommands(container);
             }
 
@@ -93,7 +97,8 @@ namespace uMVVMCS
         }
 
         /// <summary>
-        /// 将容器内的所有 commands 实例化、注入并存入对象池
+        /// 为容器实例化一个 ICommandPool（CommandDispatcher）实例，并将容器内的所有 commands 实例化、
+        /// 注入并存入对象池（储存为 List<ICommand> 并根据类型添加到 CommandDispatcher 的字典中）
         /// </summary>
         public static IInjectionContainer PoolCommands(this IInjectionContainer container)
         {

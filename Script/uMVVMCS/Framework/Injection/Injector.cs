@@ -382,7 +382,7 @@ namespace uMVVMCS.DIContainer
             object parentInstance,
             object id)
         {
-            var context = new InjectionContext()
+            var context = new InjectionInfo()
             {
                 member = member,
                 memberType = type,
@@ -527,7 +527,7 @@ namespace uMVVMCS.DIContainer
 
         /// <summary>
         /// 根据缓存的构造函数参数属性 constructorParameters 实例化并返回所有所需参数 
-        /// instance 参数最终会传递到 ResolveBinding 方法的 parentInstance 参数，用于传递 InjectionContext 同名属性的值
+        /// instance 参数最终会传递到 ResolveBinding 方法的 parentInstance 参数，用于传递 InjectionInfo 同名属性的值
         /// </summary>
         virtual protected object[] GetParametersFromInfo(object instance, ParameterInfo[] parametersInfo)
         {

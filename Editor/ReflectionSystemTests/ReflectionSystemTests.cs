@@ -164,7 +164,7 @@ namespace uMVVMCS_NUitTests
     {
         public int id;
         public string name;
-        public object Create(InjectionContext context) { return this; }
+        public object Create(InjectionInfo context) { return this; }
         //[Construct]
         public someClass_d(int id) { this.id = id; }
     }
@@ -173,7 +173,7 @@ namespace uMVVMCS_NUitTests
     {
         public int id;
         public string name;
-        public object Create(InjectionContext context) { return this; }
+        public object Create(InjectionInfo context) { return this; }
         public someClass_e(int id) { this.id = id; }
         [Inject]
         public someClass_e(int id, string name) { this.id = id; this.name = name; }
@@ -187,7 +187,7 @@ namespace uMVVMCS_NUitTests
     {
         public int id;
         public string name;
-        public object Create(InjectionContext context) { return this; }
+        public object Create(InjectionInfo context) { return this; }
         [Inject]
         public string name1 { get; set; }
         [Inject]

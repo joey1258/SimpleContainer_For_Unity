@@ -18,7 +18,7 @@ using System;
 
 namespace uMVVMCS.DIContainer
 {
-    public class InjectionContext
+    public class InjectionInfo
     {
         /// <summary>
         /// 需要注入的成员枚举 （None | Constructor | Field | Property）
