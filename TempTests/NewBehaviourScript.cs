@@ -9,9 +9,23 @@ public class NewBehaviourScript : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        print(typeof(a.aa).Namespace == typeof(a.b.ab).Namespace);
-        print(typeof(a.aa).Namespace);
-        print(typeof(a.b.ab).Namespace);
+        //Arrange 
+        var container = new InjectionContainer();
+        ICommandDispatcher dispatcher;
+        someClass sc = new someClass();
+        //Act
+        container
+            .RegisterAOT<UnityContainer>()
+            .RegisterAOT<EventContainer>()
+            .RegisterAOT<CommanderContainer>()
+            .RegisterCommand<TestCommand1>()
+            .Bind<Transform>().ToPrefab("05_Commander/Prism");
+
+        container.PoolCommands();
+        dispatcher = container.GetCommandDispatcher();
+        dispatcher.Dispatch<TestCommand1>(sc);
+
+        print(((PrefabInfo)container.GetBindingsByType<Transform>()[0].value).path);
 
     }
 
@@ -56,6 +70,19 @@ public class someClass_c : someClass { }
 namespace a { public class aa { } }
 
 namespace a.b { public class ab { } }
+
+public class TestCommand1 : Command
+{
+    [Inject]
+    public IInjectionContainer container;
+    public int num = 0;
+
+    public override void Execute(params object[] parameters)
+    {
+        num++;
+        ((someClass)parameters[0]).id = num;
+    }
+}
 
 
 

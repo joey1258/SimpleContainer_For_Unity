@@ -46,7 +46,7 @@ namespace uMVVMCS
         #region Dispatch
 
         /// <summary>
-        /// 发送一个 command
+        /// 发送一个指定类型的 command
         /// </summary>
         public void Dispatch<T>(params object[] parameters) where T : ICommand
         {
@@ -54,7 +54,7 @@ namespace uMVVMCS
         }
 
         /// <summary>
-        /// 发送一个 command
+        /// 发送一个指定类型的 command
         /// </summary>
         public void Dispatch(Type type, params object[] parameters)
         {
@@ -300,7 +300,7 @@ namespace uMVVMCS
         #region GetCommandFromPool
 
         /// <summary>
-        /// 从字典中获取一个 command
+        /// 从对象池的字典中获取一个 command
         /// </summary>
         public ICommand GetCommandFromPool(Type commandType)
         {
@@ -316,7 +316,7 @@ namespace uMVVMCS
         }
 
         /// <summary>
-        /// 从对象池获取一个 command
+        /// 从对象池的字典中获取一个 command
         /// </summary>
         public ICommand GetCommandFromPool(Type type, List<ICommand> pool)
         {

@@ -47,7 +47,7 @@ namespace uMVVMCS_NUitTests
         public override void Execute(params object[] parameters)
         {
             num ++;
-            parameters[0] = num;
+            ((someClass)parameters[0]).id = num;
         }
     }
 }

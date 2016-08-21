@@ -38,23 +38,25 @@ namespace uMVVMCS_NUitTests
             //Arrange 
             var container = new InjectionContainer();
             ICommandDispatcher dispatcher;
-            int num = 0;
+            someClass sc = new someClass();
             //Act
             container
                 .RegisterAOT<UnityContainer>()
                 .RegisterAOT<EventContainer>()
                 .RegisterAOT<CommanderContainer>()
-                .RegisterCommand<TestCommand1>();
+                .RegisterCommand<TestCommand1>()
+                .Bind<Transform>().ToPrefab("05_Commander/Prism");
+            container.PoolCommands();
 
             dispatcher = container.GetCommandDispatcher();
-            dispatcher.Dispatch<TestCommand1>(num);
+            dispatcher.Dispatch<TestCommand1>(sc);
             //Assert
             Assert.AreEqual(
                 true,
                 dispatcher != null &&
-                container.GetAllBindings().Count == 1 &&
-                binding.type == typeof(IInjectionContainer) &&
-                binding.value == container);
+                sc.id == 1 &&
+                container.GetBindingsByType<Transform>().Count == 1 &&
+                ((PrefabInfo)container.GetBindingsByType<Transform>()[0].value).path == "05_Commander/Prism");
         }
 
         /// <summary>
