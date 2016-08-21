@@ -133,9 +133,9 @@ namespace uMVVMCS.DIContainer
         virtual public IInjectionContainer RegisterAOT(IContainerAOT aot)
         {
             // 如果 List<IContainerAOT> aots 为空,将其初始化
-            if (this.aots == null) this.aots = new List<IContainerAOT>();
+            if (aots == null) { aots = new List<IContainerAOT>(); }
             // 添加参数到 list
-            this.aots.Add(aot);
+            aots.Add(aot);
             // 执行 OnRegister 方法
             aot.OnRegister(this);
 
@@ -165,9 +165,9 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IInjectionContainer UnregisterAOT(IContainerAOT aot)
         {
-            if (!this.aots.Contains(aot)) { return this; }
+            if (!aots.Contains(aot)) { return this; }
 
-            this.aots.Remove(aot);
+            aots.Remove(aot);
             aot.OnUnregister(this);
 
             return this;

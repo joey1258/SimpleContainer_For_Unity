@@ -40,4 +40,14 @@ namespace uMVVMCS_NUitTests
         override public object Create(InjectionInfo context) { return 2; }
     }
 
+    public class TestCommand1 : Command
+    {
+        public int num = 0;
+
+        public override void Execute(params object[] parameters)
+        {
+            num ++;
+            parameters[0] = num;
+        }
+    }
 }
