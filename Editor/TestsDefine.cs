@@ -27,17 +27,30 @@ namespace uMVVMCS_NUitTests
     public class someClass : IInjectionFactory
     {
         public int id;
-        virtual public object Create(InjectionContext context) { return this; }
+        virtual public object Create(InjectionInfo context) { return this; }
     }
 
     public class someClass_b : someClass
     {
-        override public object Create(InjectionContext context) { return 1; }
+        override public object Create(InjectionInfo context) { return 1; }
     }
 
     public class someClass_c : someClass
     {
-        override public object Create(InjectionContext context) { return 2; }
+        [Inject]
+        public someClass_b b;
+
+        override public object Create(InjectionInfo context) { return 2; }
     }
 
+    public class TestCommand1 : Command
+    {
+        public int num = 0;
+
+        public override void Execute(params object[] parameters)
+        {
+            num ++;
+            ((someClass)parameters[0]).id = num;
+        }
+    }
 }

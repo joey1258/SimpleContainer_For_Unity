@@ -84,7 +84,7 @@ namespace uMVVMCS.DIContainer
         IBindingFactory Into(Type[] ts);
 
         /// <summary>
-        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
+        /// 返回一个新的Binding实例，并设置指定类型给 type, BindingType 为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         IBinding Bind<T>();
 

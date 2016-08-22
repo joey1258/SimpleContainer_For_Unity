@@ -26,20 +26,14 @@ namespace uMVVMCS.DIContainer
     public interface IPool
     {
         /// <summary>
-        /// 当类需要实现对象池功能时，可以通过 InjectionBinder 实现，也可以通过实现IInstanceProvider接口实现该属性，
-        /// 来存放InjectionBinder实例（因为IInjectionBinder接口继承了IInstanceProvider接口）或者IInstanceProvider实例
-        /// </summary>
-        //IInstanceProvider instanceProvider { get; set; }
-
-        /// <summary>
         /// 属性，储存对象池的类型（由第一个放入对象池的对象类型决定）
         /// </summary>
-        Type poolType { get; set; }
+        Type type { get; set; }
 
         /// <summary>
         /// 如果对象池中有可用的实例就按顺序返回
         /// </summary>
-        object GetInstance();
+        //object GetInstance();
 
         /// <summary>
         /// 将一个实例返回到对象池 (如果被释放的实例实现了IPoolable接口，那么应该调用Release()方法)
@@ -74,6 +68,11 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 获取或者设置无限大小的对象池的扩展行为类型：添加单倍，或者双倍对象
         /// </summary>
-        //PoolInflationType inflationType { get; set; }
+        bool isInflation { get; set; }
+
+        /// <summary>
+        /// 重置
+        /// </summary>
+        void Restore();
     }
 }

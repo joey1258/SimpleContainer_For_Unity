@@ -10,12 +10,23 @@ public class NewBehaviourScript : MonoBehaviour {
     void Start()
     {
         //Arrange 
-        IBinder binder = new Binder();
-        IBinding binding = binder.BindMultiton<int>().To(new object[] { 1, 2, 3, 4, 5, 6 });
+        var container = new InjectionContainer();
+        ICommandDispatcher dispatcher;
+        someClass sc = new someClass();
         //Act
-        binding.RemoveValue(new object[] { 1, 2 });
+        container
+            .RegisterAOT<UnityContainer>()
+            .RegisterAOT<EventContainer>()
+            .RegisterAOT<CommanderContainer>()
+            .RegisterCommand<TestCommand1>()
+            .Bind<Transform>().ToPrefab("05_Commander/Prism");
 
-        print(binding.valueList.Count);
+        container.PoolCommands();
+        dispatcher = container.GetCommandDispatcher();
+        dispatcher.Dispatch<TestCommand1>(sc);
+
+        print(((PrefabInfo)container.GetBindingsByType<Transform>()[0].value).path);
+
     }
 
     // Update is called once per frame
@@ -36,16 +47,42 @@ public static class renKZ
     public static void printAge(this ren r) { UnityEngine.Debug.Log(r.age); }
 }
 
-public class someClass : IInjectionFactory
+public class someClass : IInjectionFactory, IComparable<someClass>
 {
     public int id;
-    public object Create(InjectionContext context) { return this; }
+    public object Create(InjectionInfo context) { return this; }
+
+    #region IComparable implementation 
+
+    public int CompareTo(someClass other)
+    {
+        if (other == null) { return 1; }
+        else { return -id.CompareTo(other.id); }
+    }
+
+    #endregion
 }
 
 public class someClass_b : someClass { }
 
 public class someClass_c : someClass { }
 
+namespace a { public class aa { } }
+
+namespace a.b { public class ab { } }
+
+public class TestCommand1 : Command
+{
+    [Inject]
+    public IInjectionContainer container;
+    public int num = 0;
+
+    public override void Execute(params object[] parameters)
+    {
+        num++;
+        ((someClass)parameters[0]).id = num;
+    }
+}
 
 
 

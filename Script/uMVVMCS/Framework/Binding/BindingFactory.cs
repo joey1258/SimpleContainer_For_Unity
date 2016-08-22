@@ -97,7 +97,7 @@ namespace uMVVMCS.DIContainer
             for (int i = 0; i < length; i++)
             {
                 ConstraintType cti = ConstraintType.MULTIPLE;
-                if (bindingType[i] != BindingType.TEMP && 
+                if (bindingType[i] != BindingType.ADDRESS && 
                     bindingType[i] != BindingType.MULTITON)
                 {
                     cti = ConstraintType.SINGLE;
@@ -234,7 +234,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个新的Binding实例,并设置指定类型给 type, BindingType 为 TEMP，值约束为 MULTIPLE
+        /// 返回一个新的Binding实例,并设置指定类型给 type, BindingType 为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {
@@ -262,17 +262,13 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
-            bool notNull = (types != null &&
-                bindingTypes != null &&
-                types.Length != 0 &&
-                bindingTypes.Length != 0);
-
-            if (!notNull)
+            if (types == null || types.Length == 0)
             {
-                throw new BindingSystemException(
-                    string.Format(BindingSystemException.NULL_PARAMETER,
-                    "[IBinding MultipleBind]",
-                    "[types] || [bindingTypes]"));
+                throw new ArgumentNullException("types");
+            }
+            if (bindingTypes == null || bindingTypes.Length == 0)
+            {
+                throw new ArgumentNullException("bindingTypes");
             }
 
             if (types.Length != bindingTypes.Length)

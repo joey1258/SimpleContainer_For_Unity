@@ -15,8 +15,8 @@
  */
 
 /*
- * 当 binding 为 TEMP 类型时其值只能为 Type，其会对相同的值进行过滤（对 typeBindings 进行遍历）
- * 因此 TEMP 类型的 binding 早于其它类型的 binding 添加的效率将有别于相反的顺序
+ * 当 binding 为 ADDRESS 类型时其值只能为 Type，其会对相同的值进行过滤（对 typeBindings 进行遍历）
+ * 因此 ADDRESS 类型的 binding 早于其它类型的 binding 添加的效率将有别于相反的顺序
  */
 
 using System;
@@ -58,19 +58,19 @@ namespace uMVVMCS.DIContainer
         #region Bind
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {
-            return Bind(typeof(T), BindingType.TEMP);
+            return Bind(typeof(T), BindingType.ADDRESS);
         }
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind(Type type)
         {
-            return Bind(type, BindingType.TEMP);
+            return Bind(type, BindingType.ADDRESS);
         }
 
         /// <summary>
@@ -134,20 +134,16 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
         {
-            bool notNull = (types != null && 
-                bindingTypes != null &&
-                types.Length != 0 && 
-                bindingTypes.Length != 0);
-
-            if (!notNull)
+            if (types == null || types.Length == 0)
             {
-                throw new BindingSystemException(
-                    string.Format(BindingSystemException.NULL_PARAMETER,
-                    "[IBinding MultipleBind]",
-                    "[types] || [bindingTypes]"));
+                throw new ArgumentNullException("types");
+            }
+            if (bindingTypes == null || bindingTypes.Length == 0)
+            {
+                throw new ArgumentNullException("bindingTypes");
             }
 
-            if(types.Length != bindingTypes.Length)
+            if (types.Length != bindingTypes.Length)
             {
                 throw new BindingSystemException(BindingSystemException.PARAMETERS_LENGTH_ERROR);
             }
@@ -280,7 +276,7 @@ namespace uMVVMCS.DIContainer
 
             if (bindings != null && bindings.Count != 0)
             {
-                // 如果 AOT 前置委托不为空就执行它
+                // 如果 aots 前置委托不为空就执行它
                 if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
 
                 int length = bindings.Count;
@@ -294,7 +290,7 @@ namespace uMVVMCS.DIContainer
                     RemoveBinding(bindings[0]);
                 }*/
 
-                // 如果 AOT 后置委托不为空就执行它
+                // 如果 aots 后置委托不为空就执行它
                 if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
             }
         }
@@ -308,7 +304,7 @@ namespace uMVVMCS.DIContainer
 
             if (bindings != null && bindings.Count != 0)
             {
-                // 如果 AOT 前置委托不为空就执行它
+                // 如果 aots 前置委托不为空就执行它
                 if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
 
                 int length = bindings.Count;
@@ -321,7 +317,7 @@ namespace uMVVMCS.DIContainer
                     RemoveBinding(bindings[0]);
                 }
 
-                // 如果 AOT 后置委托不为空就执行它
+                // 如果 aots 后置委托不为空就执行它
                 if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
             }
         }
@@ -349,7 +345,7 @@ namespace uMVVMCS.DIContainer
 
             if (nullIds.Count != 0)
             {
-                // 如果 AOT 前置委托不为空就执行它
+                // 如果 aots 前置委托不为空就执行它
                 if (beforeRemoveBinding != null) { beforeRemoveBinding(this, nullIds); }
 
                 length = nullIds.Count;
@@ -363,7 +359,7 @@ namespace uMVVMCS.DIContainer
                     RemoveBinding(nullIds[i]);
                 }
 
-                // 如果 AOT 后置委托不为空就执行它
+                // 如果 aots 后置委托不为空就执行它
                 if (afterRemoveBinding != null) { afterRemoveBinding(this, nullIds); }
             }
 
@@ -386,10 +382,10 @@ namespace uMVVMCS.DIContainer
             // 如果参数 type 或 id 为空，就直接退出
             if (type == null || id == null) { return; }
 
-            // 为了可以放入 AOT 委托执行而采用 List 形式储存
+            // 为了可以放入 aots 委托执行而采用 List 形式储存
             var bindings = new List<IBinding>() { bindingStorage[type][id] };
 
-            // 如果 AOT 前置委托不为空就执行它
+            // 如果 aots 前置委托不为空就执行它
             if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
 
             // 如果获取到了 binding 就进行删除
@@ -401,7 +397,7 @@ namespace uMVVMCS.DIContainer
             }
             bindings = null;
 
-            // 如果 AOT 后置委托不为空就执行它
+            // 如果 aots 后置委托不为空就执行它
             if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
         }
 
@@ -412,15 +408,15 @@ namespace uMVVMCS.DIContainer
         {
             if (binding == null) { return; }
 
-            // 为了可以放入 AOT 委托执行而采用 List 形式储存
+            // 为了可以放入 aots 委托执行而采用 List 形式储存
             var bindings = new List<IBinding>() { binding };
 
-            // 如果 AOT 前置委托不为空就执行它
+            // 如果 aots 前置委托不为空就执行它
             if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
 
             RemoveBinding(binding);
 
-            // 如果 AOT 后置委托不为空就执行它
+            // 如果 aots 后置委托不为空就执行它
             if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
         }
 
@@ -456,22 +452,16 @@ namespace uMVVMCS.DIContainer
         virtual public void Storing(IBinding binding)
         {
             // 如果参数为空,就抛出异常 (原此处的接口和虚类检查移至工厂的创建方法中)
-            if (binding == null)
-            {
-                throw new BindingSystemException (
-                    string.Format(BindingSystemException.NULL_PARAMETER,
-                    "[IBinding binding]",
-                    "[Storing]"));
-            }
+            if (binding == null) { throw new ArgumentNullException("binding"); }
 
-            // 如果 AOT 前置委托不为空就执行它
+            // 如果 aots 前置委托不为空就执行它
             if (beforeAddBinding != null) { beforeAddBinding(this, ref binding); }
 
             // 储存或整理 binding 到对应的容器
             AddBinding(binding);
 
-            // 如果 AOT 后置委托不为空就执行它
-            if (this.afterAddBinding != null) { this.afterAddBinding(this, ref binding); }
+            // 如果 aots 后置委托不为空就执行它
+            if (afterAddBinding != null) { afterAddBinding(this, ref binding); }
         }
 
         /// <summary>
@@ -486,14 +476,10 @@ namespace uMVVMCS.DIContainer
 
             bool exist = typeBindings[binding.type].Contains(binding);
 
-            // 如果 id 为空且未添加过相同的binding，就储存到 typeBindings
             if (binding.id == null)
             {
-                // 如果尚未被添加过，且不是 TEMP 类型才添加到 typeBindings 中
-                if (binding.bindingType != BindingType.TEMP && !exist)
-                {
-                    typeBindings[binding.type].Add(binding);
-                }
+                // 如果尚未被添加过才添加到 typeBindings 中
+                if (!exist) { typeBindings[binding.type].Add(binding); }
             }
             // 不为空时将引用储存到 bindingStorage 和 idBindings
             else

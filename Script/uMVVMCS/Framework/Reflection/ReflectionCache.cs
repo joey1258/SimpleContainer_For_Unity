@@ -59,9 +59,9 @@ namespace uMVVMCS.DIContainer
                 return;
             }
 
-            if (!this.Contains(type))
+            if (!Contains(type))
             {
-                this.infos.Add(type, reflectionFactory.Create(type));
+                infos.Add(type, reflectionFactory.Create(type));
             }
         }
 
@@ -70,9 +70,9 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public void Remove(Type type)
         {
-            if (this.Contains(type))
+            if (Contains(type))
             {
-                this.infos.Remove(type);
+                infos.Remove(type);
             }
         }
 
@@ -81,12 +81,12 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public ReflectionInfo GetInfo(Type type)
         {
-            if (!this.Contains(type))
+            if (!Contains(type))
             {
-                this.Add(type);
+                Add(type);
             }
 
-            return this.infos[type];
+            return infos[type];
         }
 
         /// <summary>
@@ -94,29 +94,34 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public bool Contains(Type type)
         {
-            return this.infos.ContainsKey(type);
+            return infos.ContainsKey(type);
         }
 
         /// <summary>
-        /// 缓存 binder 中所有 binding 中 value 属性所储存的类型
+        /// 缓存 binder 中所有 binding 的 value 的类型
         /// </summary>
         public void CacheFromBinder(IBinder binder)
         {
             var bindings = binder.GetAllBindings();
 
-            // 遍历所有 binding，如果是 TEMP 类型则缓存其 Type 类型的值；
+            // 遍历所有 binding，如果是 ADDRESS 类型则缓存其 Type 类型的值；
             // 如果是 SINGLETON 类型，缓存 value 属性的值的类型
             for (int i = 0; i < bindings.Count; i++)
             {
                 var binding = bindings[i];
 
-                if (binding.bindingType == BindingType.TEMP && binding.value is Type)
+                int length = binding.valueList.Count;
+                for (int n = 0; n < length; n++)
                 {
-                    this.Add(binding.value as Type);
-                }
-                else if (binding.bindingType == BindingType.SINGLETON)
-                {
-                    this.Add(binding.value.GetType());
+                    if (binding.bindingType == BindingType.ADDRESS && binding.value is Type)
+                    {
+                        Add(binding.valueList[n] as Type);
+                    }
+                    else if (binding.bindingType == BindingType.SINGLETON ||
+                        binding.bindingType == BindingType.MULTITON)
+                    {
+                        Add(binding.valueList[n].GetType());
+                    }
                 }
             }
         }

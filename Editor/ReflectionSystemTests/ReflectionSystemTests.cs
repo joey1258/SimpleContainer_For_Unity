@@ -98,7 +98,7 @@ namespace uMVVMCS_NUitTests
             //Act
             ReflectionInfo reflectionInfo = reflectionFactory.Create(typeof(someClass_e));
             //Assert
-            Assert.AreEqual(2, reflectionInfo.postConstructors.Length);
+            Assert.AreEqual(2, reflectionInfo.methods.Length);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace uMVVMCS_NUitTests
     {
         public int id;
         public string name;
-        public object Create(InjectionContext context) { return this; }
+        public object Create(InjectionInfo context) { return this; }
         //[Construct]
         public someClass_d(int id) { this.id = id; }
     }
@@ -173,13 +173,13 @@ namespace uMVVMCS_NUitTests
     {
         public int id;
         public string name;
-        public object Create(InjectionContext context) { return this; }
+        public object Create(InjectionInfo context) { return this; }
         public someClass_e(int id) { this.id = id; }
-        [Construct]
+        [Inject]
         public someClass_e(int id, string name) { this.id = id; this.name = name; }
-        [PostConstruct]
+        [Inject]
         public void TestPostConstruct1(int id) { }
-        [PostConstruct]
+        [Inject]
         public void TestPostConstruct2(int id, string name) { }
     }
 
@@ -187,7 +187,7 @@ namespace uMVVMCS_NUitTests
     {
         public int id;
         public string name;
-        public object Create(InjectionContext context) { return this; }
+        public object Create(InjectionInfo context) { return this; }
         [Inject]
         public string name1 { get; set; }
         [Inject]

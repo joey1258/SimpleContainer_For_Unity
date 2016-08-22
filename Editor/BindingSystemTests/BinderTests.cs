@@ -30,7 +30,7 @@ namespace uMVVMCS_NUitTests
         #region Bind
 
         /// <summary>
-        /// 测试 Bind 方法是否生成了 TEMP 类型的 binding,值约束为 Multiple
+        /// 测试 Bind 方法是否生成了 ADDRESS 类型的 binding,值约束为 Multiple
         /// </summary>
         [Test]
         public void Bind_CreateTempBinding_True()
@@ -43,7 +43,7 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(
                 true, 
                 binding != null && 
-                binding.bindingType == BindingType.TEMP &&
+                binding.bindingType == BindingType.ADDRESS &&
                 binding.constraint == ConstraintType.MULTIPLE);
         }
 
@@ -448,6 +448,7 @@ namespace uMVVMCS_NUitTests
 
         /// <summary>
         /// 测试链式绑定（单数开始无 id）是否正确的绑定了相应的 binding
+        /// 初版不保存 TEMP 类型 binding；2016.8.1 改 TEMP 类型为 ADDRESS，并将其保存在 binder 中
         /// </summary>
         [Test]
         public void ChainBind_SingleBeginNullId_Correct()
@@ -461,23 +462,24 @@ namespace uMVVMCS_NUitTests
                 .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() });
             //Assert
-            Assert.AreEqual(5, binder.GetAllBindings().Count);
+            Assert.AreEqual(7, binder.GetAllBindings().Count);
         }
 
         /// <summary>
         /// 测试链式绑定（单数开始无 id）是否正确的绑定了相应的 binding
+        /// 初版不保存 TEMP 类型 binding；2016.8.1 改 TEMP 类型为 ADDRESS，并将其保存在 binder 中
         /// </summary>
         [Test]
         public void ChainBind_SingleBeginHasId_Correct()
@@ -492,7 +494,7 @@ namespace uMVVMCS_NUitTests
                 .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
@@ -500,14 +502,14 @@ namespace uMVVMCS_NUitTests
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
@@ -515,7 +517,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 7 &&
+                binder.GetAllBindings().Count == 10 &&
                 binder.GetBinding<int>(1) != null &&
                 binder.GetBinding<string>(0) != null &&
                 binder.GetBinding<someClass>(2) != null &&
@@ -525,6 +527,7 @@ namespace uMVVMCS_NUitTests
 
         /// <summary>
         /// 测试链式绑定（复数开始无 id）是否正确的绑定了相应的 binding
+        /// 初版不保存 TEMP 类型 binding；2016.8.1 改 TEMP 类型为 ADDRESS，并将其保存在 binder 中
         /// </summary>
         [Test]
         public void ChainBind_MultipleBeginNullId_Correct()
@@ -535,23 +538,24 @@ namespace uMVVMCS_NUitTests
             binder.MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() });
             //Assert
-            Assert.AreEqual(4, binder.GetAllBindings().Count);
+            Assert.AreEqual(6, binder.GetAllBindings().Count);
         }
 
         /// <summary>
         /// 测试链式绑定（复数开始有 id）是否正确的绑定了相应的 binding
+        /// 初版不保存 TEMP 类型 binding；2016.8.1 改 TEMP 类型为 ADDRESS，并将其保存在 binder 中
         /// </summary>
         [Test]
         public void ChainBind_MultipleBeginHasId_Correct()
@@ -562,7 +566,7 @@ namespace uMVVMCS_NUitTests
             binder.MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
@@ -570,14 +574,14 @@ namespace uMVVMCS_NUitTests
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
                     .MultipleBind(
                 new Type[] { typeof(someClass_b), typeof(int), typeof(someClass) },
                 new BindingType[] {
-                    BindingType.TEMP,
+                    BindingType.ADDRESS,
                     BindingType.SINGLETON,
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() })
@@ -585,7 +589,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true, 
-                binder.GetAllBindings().Count == 6 &&
+                binder.GetAllBindings().Count == 9 &&
                 binder.GetBinding<int>(1) != null &&
                 binder.GetBinding<someClass>(2) != null &&
                 binder.GetBinding<int>(3) != null &&

@@ -22,48 +22,82 @@ namespace uMVVMCS.DIContainer
     public class InjectionContainer : Injector, IInjectionContainer
     {
         /// <summary>
+        /// 默认实例化模式
+        /// </summary>
+        protected const ResolutionMode DEFAULT_RESOLUTION_MODE = ResolutionMode.ALWAYS_RESOLVE;
+
+        /// <summary>
         /// 容器 id
         /// </summary>
         public object id { get; private set; }
 
         /// <summary>
-        /// 容器 AOT 接口 list
+        /// 容器 IContainerAOT 接口 list
         /// </summary>
-        private List<IContainerAOT> AOT;
+        private List<IContainerAOT> aots;
 
         #region constructor
 
-        public InjectionContainer() : base(new ReflectionCache(), new Binder())
+        public InjectionContainer() 
+            : base(new ReflectionCache(), new Binder(), DEFAULT_RESOLUTION_MODE)
         {
-            RegisterItself();
+            RegisterSelf();
         }
 
-        public InjectionContainer(object id) : base(new ReflectionCache(), new Binder())
+        public InjectionContainer(object id) 
+            : base(new ReflectionCache(), new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
-            RegisterItself();
+            RegisterSelf();
         }
 
-        public InjectionContainer(IReflectionCache cache) : base(cache, new Binder())
+        public InjectionContainer(IReflectionCache cache) 
+            : base(cache, new Binder(),  DEFAULT_RESOLUTION_MODE)
         {
-            RegisterItself();
+            RegisterSelf();
         }
 
-        public InjectionContainer(object id, IReflectionCache cache) : base(cache, new Binder())
+        public InjectionContainer(ResolutionMode resolutionMode)
+            : base(new ReflectionCache(), new Binder(), resolutionMode)
         {
-            this.id = id;
-            RegisterItself();
+            RegisterSelf();
         }
 
-        public InjectionContainer(IReflectionCache cache, IBinder binder) : base(cache, binder)
-        {
-            RegisterItself();
-        }
-
-        public InjectionContainer(object id, IReflectionCache cache, IBinder binder) : base(cache, binder)
+        public InjectionContainer(object id, IReflectionCache cache) 
+            : base(cache, new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
-            RegisterItself();
+            RegisterSelf();
+        }
+
+        public InjectionContainer(IReflectionCache cache, ResolutionMode resolutionMode)
+            : base(cache, new Binder(), resolutionMode)
+        {
+            RegisterSelf();
+        }
+
+        public InjectionContainer(IReflectionCache cache, IBinder binder) 
+            : base(cache, binder, DEFAULT_RESOLUTION_MODE)
+        {
+            RegisterSelf();
+        }
+
+        public InjectionContainer(object id, IReflectionCache cache, IBinder binder) 
+            : base(cache, binder, DEFAULT_RESOLUTION_MODE)
+        {
+            this.id = id;
+            RegisterSelf();
+        }
+
+        public InjectionContainer(
+            object id, 
+            IReflectionCache cache, 
+            IBinder binder,
+            ResolutionMode resolutionMode) 
+            : base(cache, binder, resolutionMode)
+        {
+            this.id = id;
+            RegisterSelf();
         }
 
         #endregion
@@ -84,7 +118,7 @@ namespace uMVVMCS.DIContainer
         #region IInjectionContainer implementation 
 
         /// <summary>
-        /// 注册容器到 AOT list 
+        /// 实例化指定类型的容器扩展并注入到 AOT list 
         /// </summary>
         virtual public IInjectionContainer RegisterAOT<T>() where T : IContainerAOT
         {
@@ -94,29 +128,29 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 注册容器到 AOT list 
+        /// 注册指定类型的容器扩展实例到 IContainerAOT list，并执行容器的 OnRegister 方法
         /// </summary>
-        virtual public IInjectionContainer RegisterAOT(IContainerAOT extension)
+        virtual public IInjectionContainer RegisterAOT(IContainerAOT aot)
         {
-            // 如果 List<IContainerAOT> AOT 为空,将其初始化
-            if (AOT == null) AOT = new List<IContainerAOT>();
+            // 如果 List<IContainerAOT> aots 为空,将其初始化
+            if (aots == null) { aots = new List<IContainerAOT>(); }
             // 添加参数到 list
-            AOT.Add(extension);
+            aots.Add(aot);
             // 执行 OnRegister 方法
-            extension.OnRegister(this);
+            aot.OnRegister(this);
 
             return this;
         }
 
         /// <summary>
-        /// 将所有指定类型的容器从 AOT list 中移除 
+        /// 将所有指定类型的容器从 IContainerAOT list 中移除 
         /// </summary>
         virtual public IInjectionContainer UnregisterAOT<T>() where T : IContainerAOT
         {
-            // 获取list 中所有指定类型的容器 AOT 接口对象
-            var AOTToUnregister = AOT.OfTheType<T, IContainerAOT>();
+            // 获取list 中所有指定类型的容器 aots 接口对象
+            var AOTToUnregister = aots.OfTheType<T, IContainerAOT>();
 
-            // 注销所有获取到的容器 AOT 接口对象
+            // 注销所有获取到的容器 aots 接口对象
             int length = AOTToUnregister.Count;
             for (int i = 0; i < length; i++)
             {
@@ -127,13 +161,13 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 将一个容器从 AOT list 中移除 
+        /// 将一个容器扩展从 IContainerAOT list 中移除 
         /// </summary>
         virtual public IInjectionContainer UnregisterAOT(IContainerAOT aot)
         {
-            if (!AOT.Contains(aot)) { return this; }
+            if (!aots.Contains(aot)) { return this; }
 
-            AOT.Remove(aot);
+            aots.Remove(aot);
             aot.OnUnregister(this);
 
             return this;
@@ -174,7 +208,7 @@ namespace uMVVMCS.DIContainer
         #region Bind
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {
@@ -182,7 +216,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind(Type type)
         {
@@ -388,7 +422,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 绑定一个单例 binding，其 type 为自身类型，自身作为实例保存到 value
         /// </summary>
-        virtual protected void RegisterItself()
+        virtual protected void RegisterSelf()
         {
             BindSingleton<IInjectionContainer>().To(this);
         }

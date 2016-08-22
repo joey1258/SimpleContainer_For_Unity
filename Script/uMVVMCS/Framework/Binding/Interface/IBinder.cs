@@ -33,7 +33,7 @@ namespace uMVVMCS.DIContainer
         #region Bind
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         IBinding Bind<T>();
         IBinding Bind(Type type);

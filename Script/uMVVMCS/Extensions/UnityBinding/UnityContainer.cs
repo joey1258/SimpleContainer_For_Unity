@@ -17,11 +17,11 @@
 using System;
 using UnityEngine;
 
-namespace uMVVMCS.DIContainer.Extensions
+namespace uMVVMCS.DIContainer
 {
     public class UnityContainer : IContainerAOT
     {
-        #region IContainerAOT implementation 
+        #region IContainerExtension implementation 
 
         public void OnRegister(IInjectionContainer container)
         {
@@ -50,35 +50,37 @@ namespace uMVVMCS.DIContainer.Extensions
         }
 
         /// <summary>
-        /// 为 TEMP 类型 binding 返回实例化并加载好组件的 gameObject(在 Injector 类的 
+        /// 为 ADDRESS 类型 binding 返回实例化并加载好组件的 gameObject(在 Injector 类的 
         /// ResolveBinding 方法中触发)
         /// </summary>
-        protected object OnBindingEvaluation(IInjector source, ref IBinding binding)
+        protected object OnBindingEvaluation(
+            IInjector source, 
+            ref IBinding binding)
         {
-            //Checks whether a prefab should be instantiated.
-            if (binding.value is PrefabBinding &&
-                binding.bindingType == BindingType.TEMP)
+            if (binding.value is PrefabInfo &&
+                binding.bindingType == BindingType.ADDRESS)
             {
-                var prefabBinding = (PrefabBinding)binding.value;
-                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabBinding.prefab);
+                var prefabInfo = (PrefabInfo)binding.value;
+                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
 
-                if (prefabBinding.type.Equals(typeof(GameObject)))
+                if (prefabInfo.type.Equals(typeof(GameObject)))
                 {
                     return gameObject;
                 }
                 else
                 {
-                    var component = gameObject.GetComponent(prefabBinding.type);
+                    var component = gameObject.GetComponent(prefabInfo.type);
 
                     if (component == null)
                     {
-                        component = gameObject.AddComponent(prefabBinding.type);
+                        component = gameObject.AddComponent(prefabInfo.type);
                     }
 
                     return component;
                 }
             }
-            else {
+            else
+            {
                 return null;
             }
         }

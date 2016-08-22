@@ -17,8 +17,7 @@
 /*
  * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类
  * id 用于快速获取 binding，如果需要同1个类型的多个实例，可以将其以数组的形式保存在同一个 binding
- * TEMP 类型的 Binding 只能储存类型值，同时不会被储存到 binder
- * 去除值约束只保留单列与复数两个类型，去除同样必须保存为单例的 POOL 类型
+ * ADDRESS 类型的 Binding 只能储存类型值，或者 prefab 信息类等可供复用的类型
  */
 
 using System;
@@ -35,6 +34,8 @@ namespace uMVVMCS.DIContainer
             _binder = b;
 
             _type = t;
+
+            _value = new List<object>();
         }
 
         public Binding(IBinder b, Type t, BindingType bt)
@@ -44,6 +45,8 @@ namespace uMVVMCS.DIContainer
             _type = t;
 
             _bindingType = bt;
+
+            _value = new List<object>();
         }
 
         public Binding(IBinder b, Type t, BindingType bt, ConstraintType c)
@@ -62,6 +65,7 @@ namespace uMVVMCS.DIContainer
         #endregion
 
         #region IBinding implementation 
+
 
         #region property
 
@@ -91,7 +95,8 @@ namespace uMVVMCS.DIContainer
         {
             get
             {
-                if(_value == null) { _value = new List<object>(); }
+                if (_value == null) { _value = new List<object>(); }
+                if (_value.Count == 0) { return null; }
                 return _value[0];
             }
         }
@@ -171,7 +176,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding To(object o)
         {
-            if (_bindingType == BindingType.TEMP && !(o is Type))
+            if (_bindingType == BindingType.ADDRESS && !(o is Type))
             {
                 _bindingType = BindingType.SINGLETON;
                 _constraint = ConstraintType.SINGLE;
@@ -208,7 +213,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         virtual public IBinding To(object[] os)
         {
-            if (_bindingType == BindingType.TEMP)
+            if (_bindingType == BindingType.ADDRESS)
             {
                 _bindingType = BindingType.MULTITON;
                 _constraint = ConstraintType.MULTIPLE;
@@ -312,7 +317,7 @@ namespace uMVVMCS.DIContainer
         #region ReBind
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind<T>()
         {
@@ -320,7 +325,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 TEMP，值约束为 MULTIPLE
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 ADDRESS，值约束为 MULTIPLE
         /// </summary>
         virtual public IBinding Bind(Type type)
         {
@@ -465,7 +470,7 @@ namespace uMVVMCS.DIContainer
                 return TypeUtils.IsAssignable(typeof(IInjectionFactory), v.GetType());
             }
 
-            // 如果 binding 是 TEMP 类型，返回自身 type 与参数 v 是否是同类或继承关系
+            // 如果 binding 是 ADDRESS 类型，返回自身 type 与参数 v 是否是同类或继承关系
             if (v is Type) { return TypeUtils.IsAssignable(_type, (v as Type)); }
 
             return TypeUtils.IsAssignable(_type, v.GetType());
@@ -483,8 +488,6 @@ namespace uMVVMCS.DIContainer
                 _value = new List<object>() { o };
             }
             else { _value.Add(o); }
-
-            binder.Storing(this);
 
             return this;
         }
@@ -521,13 +524,13 @@ namespace uMVVMCS.DIContainer
             "BindingType: {4}\n" +
             "constraint: {5}\n" +
             "Conditions: {6}\n",
-            this.type.FullName,
-            (this.value == null ? "null" : this.value.ToString()),
-            (this.value is Type ? "type" : "instance"),
-            (this.id == null ? "null" : this.id.ToString()),
-            this.bindingType.ToString(),
-            this.constraint.ToString(),
-            (this.condition == null ? "no" : "yes")
+            type.FullName,
+            (value == null ? "null" : this.value.ToString()),
+            (value is Type ? "type" : "instance"),
+            (id == null ? "null" : this.id.ToString()),
+            bindingType.ToString(),
+            constraint.ToString(),
+            (condition == null ? "no" : "yes")
             );
         }
     }
