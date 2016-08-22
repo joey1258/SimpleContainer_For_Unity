@@ -37,6 +37,9 @@ namespace uMVVMCS_NUitTests
 
     public class someClass_c : someClass
     {
+        [Inject]
+        public someClass_b b;
+
         override public object Create(InjectionInfo context) { return 2; }
     }
 

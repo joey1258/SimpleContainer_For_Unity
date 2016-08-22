@@ -315,7 +315,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public T Inject<T>(T instance) where T : class
         {
-            var reflectedInfo = this.cache.GetInfo(instance.GetType());
+            var reflectedInfo = cache.GetInfo(instance.GetType());
             return (T)Inject(instance, reflectedInfo);
         }
 
@@ -324,7 +324,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public object Inject(object instance)
         {
-            var reflectedInfo = this.cache.GetInfo(instance.GetType());
+            var reflectedInfo = cache.GetInfo(instance.GetType());
             return Inject(instance, reflectedInfo);
         }
 

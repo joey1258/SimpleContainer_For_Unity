@@ -86,13 +86,64 @@ namespace uMVVMCS_NUitTests
 
         #region Dispose
 
+        /// <summary>
+        /// 测试 RegisterSelf 方法创建 binding 结果是否正确
+        /// </summary>
+        [Test]
+        public void Dispose_Clearn_Correct()
+        {
+            //Arrange 
+            var container = new InjectionContainer();
+            //Act
+            container.Dispose();
+            //Assert
+            Assert.AreEqual(
+                true,
+                container.binder == null &&
+                container.cache == null);
+        }
+
         #endregion
 
         #region Resolve
 
+        /// <summary>
+        /// 测试 RegisterSelf 方法创建 binding 结果是否正确
+        /// </summary>
+        [Test]
+        public void Resolve_SomeClass_Correct()
+        {
+            //Arrange 
+            var container = new InjectionContainer();
+            //Act
+            var instance = container.Resolve<someClass_c>();
+            //Assert
+            Assert.AreEqual(
+                true,
+                instance != null &&
+                instance.b != null);
+        }
+
         #endregion
 
         #region Inject
+
+        /// <summary>
+        /// 测试 RegisterSelf 方法创建 binding 结果是否正确
+        /// </summary>
+        [Test]
+        public void Inject_SomeClass_Correct()
+        {
+            //Arrange 
+            var container = new InjectionContainer();
+            someClass_c c = new someClass_c();
+            //Act
+            container.Inject(c);
+            //Assert
+            Assert.AreEqual(
+                true,
+                c.b != null);
+        }
 
         #endregion
     }
