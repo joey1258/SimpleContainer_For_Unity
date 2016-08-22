@@ -27,7 +27,7 @@ namespace uMVVMCS.Examples.BindingsSetup
 			//Create the container.
 			AddContainer<InjectionContainer>()
 				//Register any extensions the container may use.
-				.RegisterAOT<UnityContainer>()
+				.RegisterAOT<UnityContainerAOT>()
 				//Setups bindings from a namespace.
 				.SetupBindings("uMVVMCS.Examples.BindingsSetup.Bindings");
         }

@@ -102,7 +102,7 @@ namespace uMVVMCS.DIContainer
             {
                 yield return null;
                 if (_prefab == null) { ResourcesLoad(); yield return null; }
-                if (handle != null) handle(_prefab);
+                if (handle != null) { handle(_prefab); }
                 yield break;
             }
         }
@@ -128,16 +128,14 @@ namespace uMVVMCS.DIContainer
             // 进度判断值不能为1，否则会卡住
             while (resRequest.progress < 0.9)
             {
-                if (progress != null)
-                    progress(resRequest.progress);
+                if (progress != null) { progress(resRequest.progress); }
                 yield return null;
             }
 
             // 在0.9~1之间如果未完成继续读取
             while (!resRequest.isDone)
             {
-                if (progress != null)
-                    progress(resRequest.progress);
+                if (progress != null) { progress(resRequest.progress); }
                 yield return null;
             }
 

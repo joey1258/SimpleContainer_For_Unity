@@ -81,7 +81,7 @@ namespace uMVVMCS
 		public static bool IsExistOnContainer(object obj, IInjectionContainer container)
         {
 			var isExist = false;
-			var bindings = container.GetBindingsByType(obj.GetType());
+			var bindings = container.GetTypes(obj.GetType());
 
             if (bindings == null) { return false; }
 			
@@ -107,7 +107,7 @@ namespace uMVVMCS
         public static bool IsExistOnBinder(object obj, IBinder binder)
         {
             var isExist = false;
-            var bindings = binder.GetBindingsByType(obj.GetType());
+            var bindings = binder.GetTypes(obj.GetType());
 
             if (bindings == null) { return false; }
 

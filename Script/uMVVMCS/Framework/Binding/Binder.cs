@@ -158,15 +158,15 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
-        virtual public IList<IBinding> GetBindingsByType<T>()
+        virtual public IList<IBinding> GetTypes<T>()
         {
-            return GetBindingsByType(typeof(T));
+            return GetTypes(typeof(T));
         }
 
         /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
-		virtual public IList<IBinding> GetBindingsByType(Type type)
+		virtual public IList<IBinding> GetTypes(Type type)
         {
             if (!typeBindings.ContainsKey(type)) { return null; }
             return typeBindings[type];
@@ -175,7 +175,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 获取储存容器中所有指定 id 的 binding
         /// </summary>
-        virtual public IList<IBinding> GetBindingsById(object id)
+        virtual public IList<IBinding> GetIds(object id)
         {
             if (!idBindings.ContainsKey(id)) { return null; }
             return idBindings[id];
@@ -184,7 +184,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 获取 binder 中所有的 Binding
         /// </summary>
-		virtual public IList<IBinding> GetAllBindings()
+		virtual public IList<IBinding> GetAll()
         {
             List<IBinding> bindingList = new List<IBinding>();
 
@@ -203,7 +203,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 返回储存容器中除自身以外所有 type 和值都相同的 binding
         /// </summary>
-        virtual public IList<IBinding> GetSameNullIdBinding(IBinding binding)
+        virtual public IList<IBinding> GetSameNullId(IBinding binding)
         {
             List<IBinding> bindingList = new List<IBinding>();
 
@@ -262,17 +262,17 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindByType<T>()
+        virtual public void UnbindType<T>()
         {
-            UnbindByType(typeof(T));
+            UnbindType(typeof(T));
         }
 
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindByType(Type type)
+        virtual public void UnbindType(Type type)
         {
-            var bindings = GetBindingsByType(type);
+            var bindings = GetTypes(type);
 
             if (bindings != null && bindings.Count != 0)
             {
@@ -298,9 +298,9 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 根据 id 从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindById(object id)
+        virtual public void UnbindId(object id)
         {
-            var bindings = GetBindingsById(id);
+            var bindings = GetIds(id);
 
             if (bindings != null && bindings.Count != 0)
             {
@@ -311,7 +311,7 @@ namespace uMVVMCS.DIContainer
                 for (int i = 0; i < length; i++)
                 {
                     // bindings 是直接获取的 typeBindings 中的引用，当 typeBindings 中的引用被
-                    // 移除后 bindings 的数量就会跟随着发生变化，GetBindingsByType 方法也是直接返
+                    // 移除后 bindings 的数量就会跟随着发生变化，GetTypes 方法也是直接返
                     // 回 typeBindings[type],所以一样会随着元素被删除而变化长度，所以每次移除第一个
                     // 元素就可以将所有的元素都移除干净
                     RemoveBinding(bindings[0]);
@@ -325,15 +325,15 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindNullIdBindingByType<T>()
+        virtual public void UnbindNullIdType<T>()
         {
-            UnbindNullIdBindingByType(typeof(T));
+            UnbindNullIdType(typeof(T));
         }
 
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindNullIdBindingByType(Type type)
+        virtual public void UnbindNullIdType(Type type)
         {
             var bindings = typeBindings[type];
             IList<IBinding> nullIds = new List<IBinding>();
@@ -352,7 +352,7 @@ namespace uMVVMCS.DIContainer
                 for (int i = 0; i < length; i++)
                 {
                     // bindings 是直接获取的 typeBindings 中的引用，当 typeBindings 中的引用被
-                    // 移除后 bindings 的数量就会跟随着发生变化，GetBindingsByType 方法也是直接返
+                    // 移除后 bindings 的数量就会跟随着发生变化，GetTypes 方法也是直接返
                     // 回 typeBindings[type],所以一样会随着元素被删除而变化长度；而当前的方法中使用
                     // 了一个新的 List 来储存 typeBindings 中的引用，所以删除元素后 nullIds 的长度
                     // 不会发生变化，所以 index 必须随着循环而变化才能正确的删除所有的元素

@@ -210,7 +210,7 @@ namespace uMVVMCS.DIContainer
             // 不能根据 id 是否为空来过滤，因为 unityBinding 是通过 aots 来获取实例的，因此即使没有 
             // id 也必须进入 ResolveBinding 方法,所以必须先获取其 binding 自身
             // 如果类型为空 id 不为空，根据 id 来获取 binding
-            if (type == null) { bindings = binder.GetBindingsById(id); }
+            if (type == null) { bindings = binder.GetIds(id); }
             else
             {
                 // 判断参数 type 是否为数组是因为实参可能会传入类似 typeof(Type[]) 这样的值
@@ -218,7 +218,7 @@ namespace uMVVMCS.DIContainer
                 else { inwardType = type; }
 
                 if (id != null) { bindings.Add(binder.GetBinding(inwardType, id)); }
-                else { bindings = binder.GetBindingsByType(inwardType);
+                else { bindings = binder.GetTypes(inwardType);
                 }
             }
 

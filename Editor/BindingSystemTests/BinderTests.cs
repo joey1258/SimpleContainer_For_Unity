@@ -114,7 +114,7 @@ namespace uMVVMCS_NUitTests
                 new Type[] { typeof(int) , typeof(float), typeof(someClass) },
                 new BindingType[] { BindingType.MULTITON, BindingType.SINGLETON, BindingType.FACTORY })
                 .As(new object[] { 1, 2, 3 });
-            IList<IBinding> bindings = binder.GetAllBindings();
+            IList<IBinding> bindings = binder.GetAll();
             //Assert
             Assert.AreEqual(
                 true,
@@ -132,7 +132,7 @@ namespace uMVVMCS_NUitTests
         #region GetBinding
 
         /// <summary>
-        /// 测试 GetBindingsByType 所获取的各种类型的 binding 数量是否正确
+        /// 测试 GetTypes 所获取的各种类型的 binding 数量是否正确
         /// </summary>
         [Test]
         public void GetBindingsByType_TypeBindingsNumber_Correct()
@@ -156,13 +156,13 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetBindingsByType<int>().Count == 3 &&
-                binder.GetBindingsByType<float>().Count == 2 &&
-                binder.GetBindingsByType<string>().Count == 4);
+                binder.GetTypes<int>().Count == 3 &&
+                binder.GetTypes<float>().Count == 2 &&
+                binder.GetTypes<string>().Count == 4);
         }
 
         /// <summary>
-        /// 测试 GetBindingsById 所获取的各种 id 的 binding 数量是否正确
+        /// 测试 GetIds 所获取的各种 id 的 binding 数量是否正确
         /// </summary>
         [Test]
         public void GetBindingsById_IdBindingsNumber_Correct()
@@ -186,14 +186,14 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetBindingsById(1).Count == 3 &&
-                binder.GetBindingsById(2).Count == 1 &&
-                binder.GetBindingsById(3).Count == 2 &&
-                binder.GetBindingsById(5).Count == 2);
+                binder.GetIds(1).Count == 3 &&
+                binder.GetIds(2).Count == 1 &&
+                binder.GetIds(3).Count == 2 &&
+                binder.GetIds(5).Count == 2);
         }
 
         /// <summary>
-        /// 测试 GetAllBindings 所获取的 binding 数量是否正确
+        /// 测试 GetAll 所获取的 binding 数量是否正确
         /// </summary>
         [Test]
         public void GetAllBindings_BindingsNumber_Correct()
@@ -215,11 +215,11 @@ namespace uMVVMCS_NUitTests
                 new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON, BindingType.SINGLETON })
                 .As(new object[] { 6, 7, 8, 9 });
             //Assert
-            Assert.AreEqual( 9, binder.GetAllBindings().Count);
+            Assert.AreEqual( 9, binder.GetAll().Count);
         }
 
         /// <summary>
-        /// 测试 GetSameNullIdBinding 获取的 binding 是否正确
+        /// 测试 GetSameNullId 获取的 binding 是否正确
         /// </summary>
         [Test]
         public void GetSameNullIdBinding_ReturnBinding_Correct()
@@ -244,11 +244,11 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(
                 true,
                 /*确认没有取到多余的值，且取到的不是自身*/
-                binder.GetSameNullIdBinding(binding1).Count == 1 &&
-                binder.GetSameNullIdBinding(binding1)[0].GetHashCode() !=
+                binder.GetSameNullId(binding1).Count == 1 &&
+                binder.GetSameNullId(binding1)[0].GetHashCode() !=
                 binding1.GetHashCode() &&
-                binder.GetSameNullIdBinding(binding2).Count == 1 &&
-                binder.GetSameNullIdBinding(binding2)[0].GetHashCode() !=
+                binder.GetSameNullId(binding2).Count == 1 &&
+                binder.GetSameNullId(binding2)[0].GetHashCode() !=
                 binding2.GetHashCode());
         }
 
@@ -283,7 +283,7 @@ namespace uMVVMCS_NUitTests
         #region Unbind
 
         /// <summary>
-        /// 测试 UnbindByType 方法是否正确的移除了相应的 binding
+        /// 测试 UnbindType 方法是否正确的移除了相应的 binding
         /// </summary>
         [Test]
         public void UnbindByType_UnbindBinding_Correct()
@@ -304,16 +304,16 @@ namespace uMVVMCS_NUitTests
                 .Bind<float>()
                 .To(2f);
             //Act
-            binder.UnbindByType<int>();
+            binder.UnbindType<int>();
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 4 &&
-                binder.GetBindingsByType<int>().Count == 0);
+                binder.GetAll().Count == 4 &&
+                binder.GetTypes<int>().Count == 0);
         }
 
         /// <summary>
-        /// 测试 UnbindById 方法是否正确的移除了相应的 binding
+        /// 测试 UnbindId 方法是否正确的移除了相应的 binding
         /// </summary>
         [Test]
         public void UnbindById_UnbindBinding_Correct()
@@ -340,15 +340,15 @@ namespace uMVVMCS_NUitTests
                 .To(2f)
                 .As(2);
             //Act
-            binder.UnbindById(1);
+            binder.UnbindId(1);
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 3);
+                binder.GetAll().Count == 3);
         }
 
         /// <summary>
-        /// 测试 UnbindNullIdBindingByType 方法是否正确的移除了相应的 binding
+        /// 测试 UnbindNullIdType 方法是否正确的移除了相应的 binding
         /// </summary>
         [Test]
         public void UnbindNullIdBindingByType_UnbindBinding_Correct()
@@ -371,16 +371,16 @@ namespace uMVVMCS_NUitTests
                 .Bind<float>()
                 .To(2f);
             //Act
-            binder.UnbindNullIdBindingByType<object>();
-            binder.UnbindNullIdBindingByType<int>();
-            binder.UnbindNullIdBindingByType<float>();
+            binder.UnbindNullIdType<object>();
+            binder.UnbindNullIdType<int>();
+            binder.UnbindNullIdType<float>();
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 2 &&
-                binder.GetBindingsByType<object>().Count == 1 &&
-                binder.GetBindingsByType<int>().Count == 0 &&
-                binder.GetBindingsByType<float>().Count == 1);
+                binder.GetAll().Count == 2 &&
+                binder.GetTypes<object>().Count == 1 &&
+                binder.GetTypes<int>().Count == 0 &&
+                binder.GetTypes<float>().Count == 1);
         }
 
         /// <summary>
@@ -474,7 +474,7 @@ namespace uMVVMCS_NUitTests
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() });
             //Assert
-            Assert.AreEqual(7, binder.GetAllBindings().Count);
+            Assert.AreEqual(7, binder.GetAll().Count);
         }
 
         /// <summary>
@@ -517,7 +517,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 10 &&
+                binder.GetAll().Count == 10 &&
                 binder.GetBinding<int>(1) != null &&
                 binder.GetBinding<string>(0) != null &&
                 binder.GetBinding<someClass>(2) != null &&
@@ -550,7 +550,7 @@ namespace uMVVMCS_NUitTests
                     BindingType.FACTORY })
                     .To(new object[] { typeof(someClass_b), 1, new someClass() });
             //Assert
-            Assert.AreEqual(6, binder.GetAllBindings().Count);
+            Assert.AreEqual(6, binder.GetAll().Count);
         }
 
         /// <summary>
@@ -589,7 +589,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true, 
-                binder.GetAllBindings().Count == 9 &&
+                binder.GetAll().Count == 9 &&
                 binder.GetBinding<int>(1) != null &&
                 binder.GetBinding<someClass>(2) != null &&
                 binder.GetBinding<int>(3) != null &&

@@ -18,7 +18,7 @@ using uMVVMCS.DIContainer;
 
 namespace uMVVMCS
 {
-    public class CommanderContainer : IContainerAOT
+    public class CommanderContainerAOT : IContainerAOT
     {
         public void OnRegister(IInjectionContainer container)
         {
@@ -34,11 +34,11 @@ namespace uMVVMCS
         public void OnUnregister(IInjectionContainer container)
         {
             // Unbind ICommandDispatcher 类型和 ICommandPool 类型 binding（清除 dispatcher)
-            container.UnbindByType<ICommandDispatcher>();
-            container.UnbindByType<ICommandPool>();
+            container.UnbindType<ICommandDispatcher>();
+            container.UnbindType<ICommandPool>();
 
             // 清除所有 commands
-            container.UnbindByType<ICommand>();
+            container.UnbindType<ICommand>();
         }
     }
 }

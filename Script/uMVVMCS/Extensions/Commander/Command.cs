@@ -100,7 +100,7 @@ namespace uMVVMCS
         }
 
         /// <summary>
-        /// 等待指定秒数后执行 Action method,并使用 EventContainer.eventBehaviour 进行协程
+        /// 等待指定秒数后执行 Action method,并使用 EventContainerAOT.eventBehaviour 进行协程
         /// </summary>
         protected void Invoke(Action method, float time)
         {
@@ -109,13 +109,13 @@ namespace uMVVMCS
         }
 
         /// <summary>
-        /// 使用 EventContainer.eventBehaviour 来调用协程并加入 Coroutine list，设 keepAlive 
+        /// 使用 EventContainerAOT.eventBehaviour 来调用协程并加入 Coroutine list，设 keepAlive 
         /// 为真，最后返回结果
         /// </summary>
         protected Coroutine StartCoroutine(IEnumerator routine)
         {
-            // 使用 EventContainer.eventBehaviour 来调用协程并传人参数 routine
-            var coroutine = EventContainer.eventBehaviour.StartCoroutine(routine);
+            // 使用 EventContainerAOT.eventBehaviour 来调用协程并传人参数 routine
+            var coroutine = EventContainerAOT.eventBehaviour.StartCoroutine(routine);
             // 将结果添加到 Coroutine list
             coroutines.Add(coroutine);
             // keepAlive 设为真
@@ -130,7 +130,7 @@ namespace uMVVMCS
         /// <param name="coroutine">Coroutine to be stopped.</param>
         protected void StopCoroutine(Coroutine coroutine)
         {
-            EventContainer.eventBehaviour.StopCoroutine(coroutine);
+            EventContainerAOT.eventBehaviour.StopCoroutine(coroutine);
             coroutines.Remove(coroutine);
         }
 

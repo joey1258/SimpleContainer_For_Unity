@@ -87,7 +87,7 @@ namespace uMVVMCS.Editors
             for (int i = 0; i < ContextRoot.containersData.Count; i++)
             {
                 var data = ContextRoot.containersData[i];
-                var bindings = data.container.GetAllBindings();
+                var bindings = data.container.GetAll();
 
                 GUILayout.Space(20f);
                 GUILayout.Label("CONTAINER", EditorStyles.containerInfo);
