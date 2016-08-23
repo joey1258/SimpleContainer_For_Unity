@@ -26,7 +26,7 @@ namespace uMVVMCS.DIContainer
         public event TypeResolutionHandler beforeResolve;
         public event TypeResolutionHandler afterResolve;
         public event BindingEvaluationHandler bindingEvaluation;
-        public event BindingResolutionHandler bindingResolution;
+        public event BindingResolutionHandler beforeInstantiate;
         public event InstanceInjectionHandler beforeInject;
         public event InstanceInjectionHandler afterInject;
 
@@ -479,10 +479,10 @@ namespace uMVVMCS.DIContainer
                 }
             }
 
-            // 如果 aots 委托 bindingResolution 不为空执行委托
-            if (bindingResolution != null)
+            // 如果 aots 委托 beforeInstantiate 不为空执行委托
+            if (beforeInstantiate != null)
             {
-                bindingResolution(this, ref binding, ref instance);
+                beforeInstantiate(this, ref binding, ref instance);
             }
 
             // 返回实例

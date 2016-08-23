@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace uMVVMCS.DIContainer
 {
-    public static class UnityBinding
+    public static class UnityBindingExtension
     {
         #region exception text
 
@@ -94,6 +94,81 @@ namespace uMVVMCS.DIContainer
             // 否则用参数 name 查找 GameObject
             else { gameObject = GameObject.Find(name); }
             
+            // 将 gameObject 设为 binding 的值
+            SetValueAddComponent(binding, gameObject, type, isGameObject);
+            binding.binder.Storing(binding);
+
+            return binding;
+        }
+
+        #endregion
+
+        #region ToGameObjectDDOL
+
+        public static IBinding ToGameObjectDDOL(this IBinding binding)
+        {
+            return binding.ToGameObjectDDOL(binding.type, null);
+        }
+
+        public static IBinding ToGameObjectDDOL<T>(this IBinding binding) where T : Component
+        {
+            return binding.ToGameObjectDDOL(typeof(T), null);
+        }
+
+        public static IBinding ToGameObjectDDOL(this IBinding binding, Type type)
+        {
+            return binding.ToGameObjectDDOL(type, null);
+        }
+
+        /// <summary>
+        /// 在场景中建立或获取一个指定名称的空物体并将指定类型的组件加载到空物体上，如果指定名称为空就以组件
+        /// 的名称来命名空物体，如果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 
+        /// binding 的值，为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
+        /// </summary>
+        public static IBinding ToGameObjectDDOL(this IBinding binding, string name)
+        {
+            return binding.ToGameObjectDDOL(binding.type, name);
+        }
+
+        /// <summary>
+        /// 在场景中建立或获取一个指定名称的空物体并将指定类型的组件加载到空物体上，如果指定名称为空就以组件
+        /// 的名称来命名空物体，如果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 
+        /// binding 的值，为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
+        /// </summary>
+        public static IBinding ToGameObjectDDOL<T>(this IBinding binding, string name) where T : Component
+        {
+            return binding.ToGameObjectDDOL(typeof(T), name);
+        }
+
+        /// <summary>
+        /// 在场景中建立或获取一个指定名称的空物体并将指定类型的组件加载到空物体上，如果指定名称为空就以组件
+        /// 的名称来命名空物体，如果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 
+        /// binding 的值，为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
+        /// </summary>
+        public static IBinding ToGameObjectDDOL(this IBinding binding, Type type, string name)
+        {
+            if (binding.bindingType == BindingType.ADDRESS)
+            {
+                binding.SetBindingType(BindingType.SINGLETON);
+                binding.SetConstraint(ConstraintType.SINGLE);
+            }
+
+            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
+            TypeFilter(binding, type, isGameObject);
+
+            // 如果参数 name 为空，使用参数 type 的字符串名称来命名新创建的 GameObject
+            GameObject gameObject = null;
+            if (string.IsNullOrEmpty(name))
+            {
+                gameObject = new GameObject(type.Name);
+                MonoBehaviour.DontDestroyOnLoad(gameObject);
+            }
+            // 否则用参数 name 查找 GameObject
+            else {
+                gameObject = GameObject.Find(name);
+                MonoBehaviour.DontDestroyOnLoad(gameObject);
+            }
+
             // 将 gameObject 设为 binding 的值
             SetValueAddComponent(binding, gameObject, type, isGameObject);
             binding.binder.Storing(binding);
@@ -525,6 +600,8 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
+        #region private functions
+
         private static void SetValueAddComponent(IBinding binding,
             GameObject gameObject,
             Type type,
@@ -564,5 +641,7 @@ namespace uMVVMCS.DIContainer
 
             if (!isGameObject && !isComponent) { throw new Exception(TYPE_NOT_COMPONENT); }
         }
+
+        #endregion
     }
 }
