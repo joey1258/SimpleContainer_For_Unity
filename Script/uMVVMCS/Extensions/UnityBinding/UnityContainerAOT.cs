@@ -26,13 +26,13 @@ namespace uMVVMCS.DIContainer
         public void OnRegister(IInjectionContainer container)
         {
             container.beforeAddBinding += OnBeforeAddBinding;
-            container.bindingEvaluation += this.OnBindingEvaluation;
+            container.beforeDefaultInstantiate += this.OnBindingEvaluation;
         }
 
         public void OnUnregister(IInjectionContainer container)
         {
             container.beforeAddBinding -= this.OnBeforeAddBinding;
-            container.bindingEvaluation -= this.OnBindingEvaluation;
+            container.beforeDefaultInstantiate -= this.OnBindingEvaluation;
         }
 
         #endregion

@@ -73,7 +73,7 @@ namespace uMVVMCS
 
             // 添加 AOT 委托
             container.afterAddBinding += this.OnAfterAddBinding;
-            container.beforeInstantiate += this.OnBindingResolution;
+            container.afterInstantiate += this.OnBindingResolution;
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace uMVVMCS
         {
             // 取消 AOT 委托
             container.afterAddBinding -= this.OnAfterAddBinding;
-            container.beforeInstantiate -= this.OnBindingResolution;
+            container.afterInstantiate -= this.OnBindingResolution;
 
             // 释放 list 并销毁组件
             disposable.Clear();
