@@ -210,6 +210,8 @@ namespace uMVVMCS.DIContainer
 
             #region 获取实际类型，并根据实际类型的获取结果从 binder 中获取 binding
 
+            // 存放获取到的 binding 的变量，如果没有指定 id，将获取指定类型的所有 binding；
+            // 如果没有指定类型但指定了 id，则获取指定 id 的所有 binding 
             IList<IBinding> bindings = new List<IBinding>();
             Type inwardType = typeof(object);
 
