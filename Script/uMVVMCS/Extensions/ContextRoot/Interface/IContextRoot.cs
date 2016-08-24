@@ -21,24 +21,24 @@ namespace uMVVMCS.DIContainer
     public interface IContextRoot
     {
         /// <summary>
-        /// 容器数组 (返回 containersData List 中每个元素的 container 属性)(包括所有容器)
-        /// </summary>
-        IInjectionContainer[] containers { get; }
-
-        /// <summary>
-        /// 用新创建的容器和 true 创建一个 InjectionContainerData，并添加到 containersData List
+        /// 将 container添加到 containers List，并默认 destroyOnLoad 为真
         /// </summary>
         IInjectionContainer AddContainer<T>() where T : IInjectionContainer, new();
 
         /// <summary>
-        /// 用 container 和 true 创建一个 InjectionContainerData，并添加到 containersData List
+        /// 将 container添加到 containers List，并默认 destroyOnLoad 为真
         /// </summary>
         IInjectionContainer AddContainer(IInjectionContainer container);
 
         /// <summary>
-        /// 用 container 和 destroyOnLoad 创建一个 InjectionContainerData，并添加到 containersData List
+        /// 将 container添加到 containers List，并设置其 destroyOnLoad 属性
         /// </summary>
         IInjectionContainer AddContainer(IInjectionContainer container, bool destroyOnLoad);
+
+        /// <summary>
+        /// Dispose 指定 id 的容器
+        /// </summary>
+        void Dispose(object id);
 
         /// <summary>
         /// 设置容器

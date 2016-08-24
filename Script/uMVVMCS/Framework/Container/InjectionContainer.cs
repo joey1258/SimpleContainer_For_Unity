@@ -27,6 +27,11 @@ namespace uMVVMCS.DIContainer
         protected const ResolutionMode DEFAULT_RESOLUTION_MODE = ResolutionMode.ALWAYS_RESOLVE;
 
         /// <summary>
+        /// load 时是否摧毁容器
+        /// </summary>
+        public bool destroyOnLoad { get; set; }
+
+        /// <summary>
         /// 容器 id
         /// </summary>
         public object id { get; private set; }
