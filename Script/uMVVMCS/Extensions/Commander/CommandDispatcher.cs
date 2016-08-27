@@ -84,10 +84,10 @@ namespace uMVVMCS
                 // 如果 command.keepAlive 为真
                 if (command.keepAlive)
                 {
-                    //如果命令实现了 IUpdatable 接口，并且 EventContainer 的 IUpdatable list 中还没有添加该 command 就进行添加
-                    if (command is IUpdatable && !EventContainer.updateable.Contains((IUpdatable)command))
+                    //如果命令实现了 IUpdatable 接口，并且 EventContainerAOT 的 IUpdatable list 中还没有添加该 command 就进行添加
+                    if (command is IUpdatable && !EventContainerAOT.updateable.Contains((IUpdatable)command))
                     {
-                        EventContainer.updateable.Add((IUpdatable)command);
+                        EventContainerAOT.updateable.Add((IUpdatable)command);
                     }
                 }
                 else
@@ -109,19 +109,19 @@ namespace uMVVMCS
         #region InvokeDispatch
 
         /// <summary>
-        /// 通过 EventContainer.eventBehaviour 在等待指定秒后发送一个 command 
+        /// 通过 EventContainerAOT.eventBehaviour 在等待指定秒后发送一个 command 
         /// </summary>
         public void InvokeDispatch<T>(float time, params object[] parameters) where T : ICommand
         {
-            EventContainer.eventBehaviour.StartCoroutine(this.DispatchInvoke(typeof(T), time, parameters));
+            EventContainerAOT.eventBehaviour.StartCoroutine(this.DispatchInvoke(typeof(T), time, parameters));
         }
 
         /// <summary>
-        /// 通过 EventContainer.eventBehaviour 在等待指定秒后发送一个 command 
+        /// 通过 EventContainerAOT.eventBehaviour 在等待指定秒后发送一个 command 
         /// </summary>
         public void InvokeDispatch(Type type, float time, params object[] parameters)
         {
-            EventContainer.eventBehaviour.StartCoroutine(DispatchInvoke(type, time, parameters));
+            EventContainerAOT.eventBehaviour.StartCoroutine(DispatchInvoke(type, time, parameters));
         }
 
         /// <summary>
@@ -145,10 +145,10 @@ namespace uMVVMCS
             // 如果 command.running 不为真直接返回
             if (!command.running) { return; }
 
-            // 如果 command 实现了 IUpdatable 接口，且添加到了 EventContainer 的 IUpdatable list 就进行移除
-            if (command is IUpdatable && EventContainer.updateable.Contains((IUpdatable)command))
+            // 如果 command 实现了 IUpdatable 接口，且添加到了 EventContainerAOT 的 IUpdatable list 就进行移除
+            if (command is IUpdatable && EventContainerAOT.updateable.Contains((IUpdatable)command))
             {
-                EventContainer.updateable.Remove((IUpdatable)command);
+                EventContainerAOT.updateable.Remove((IUpdatable)command);
             }
             // 如果 command 实现了 IDisposable 接口, 就调用 Dispose 方法
             if (command is IDisposable)

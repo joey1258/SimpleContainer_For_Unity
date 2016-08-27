@@ -21,6 +21,11 @@ namespace uMVVMCS.DIContainer
     public interface IInjectionContainer : IBinder, IInjector, IDisposable
     {
         /// <summary>
+        /// load 时是否摧毁容器
+        /// </summary>
+        bool destroyOnLoad { get; set; }
+
+        /// <summary>
         /// 容器 id
         /// </summary>
 		object id { get; }

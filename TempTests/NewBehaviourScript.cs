@@ -15,9 +15,9 @@ public class NewBehaviourScript : MonoBehaviour {
         someClass sc = new someClass();
         //Act
         container
-            .RegisterAOT<UnityContainer>()
-            .RegisterAOT<EventContainer>()
-            .RegisterAOT<CommanderContainer>()
+            .RegisterAOT<UnityContainerAOT>()
+            .RegisterAOT<EventContainerAOT>()
+            .RegisterAOT<CommanderContainerAOT>()
             .RegisterCommand<TestCommand1>()
             .Bind<Transform>().ToPrefab("05_Commander/Prism");
 
@@ -25,7 +25,7 @@ public class NewBehaviourScript : MonoBehaviour {
         dispatcher = container.GetCommandDispatcher();
         dispatcher.Dispatch<TestCommand1>(sc);
 
-        print(((PrefabInfo)container.GetBindingsByType<Transform>()[0].value).path);
+        print(((PrefabInfo)container.GetTypes<Transform>()[0].value).path);
 
     }
 

@@ -21,7 +21,7 @@ using uMVVMCS.DIContainer;
 
 namespace uMVVMCS
 {
-    public class EventContainer : IContainerAOT
+    public class EventContainerAOT : IContainerAOT
     {
         /// <summary>
         /// 可释放对象 list
@@ -40,7 +40,7 @@ namespace uMVVMCS
 
         #region constructor
 
-        public EventContainer()
+        public EventContainerAOT()
         {
             //在游戏中创建一个游戏物体来挂载 EventBehaviour 组件
             var gameObject = new GameObject("EventBehaviour");
@@ -61,7 +61,7 @@ namespace uMVVMCS
 
             // 如果容器中含有 ICommandDispatcher 类型的 binding，且它实现了 IDisposable 接口
             // 就实例化 ICommandDispatcher 类型并将其也添加到 IDisposable list
-            var commandDispatches = container.GetBindingsByType<ICommandDispatcher>();
+            var commandDispatches = container.GetTypes<ICommandDispatcher>();
             if (commandDispatches != null && commandDispatches.Count != 0)
             {
                 var dispatcher = container.Resolve<ICommandDispatcher>();
@@ -73,7 +73,7 @@ namespace uMVVMCS
 
             // 添加 AOT 委托
             container.afterAddBinding += this.OnAfterAddBinding;
-            container.bindingResolution += this.OnBindingResolution;
+            container.afterInstantiate += this.OnBindingResolution;
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace uMVVMCS
         {
             // 取消 AOT 委托
             container.afterAddBinding -= this.OnAfterAddBinding;
-            container.bindingResolution -= this.OnBindingResolution;
+            container.afterInstantiate -= this.OnBindingResolution;
 
             // 释放 list 并销毁组件
             disposable.Clear();

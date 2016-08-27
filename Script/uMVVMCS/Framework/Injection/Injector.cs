@@ -25,8 +25,8 @@ namespace uMVVMCS.DIContainer
 
         public event TypeResolutionHandler beforeResolve;
         public event TypeResolutionHandler afterResolve;
-        public event BindingEvaluationHandler bindingEvaluation;
-        public event BindingResolutionHandler bindingResolution;
+        public event BindingEvaluationHandler beforeDefaultInstantiate;
+        public event BindingResolutionHandler afterInstantiate;
         public event InstanceInjectionHandler beforeInject;
         public event InstanceInjectionHandler afterInject;
 
@@ -186,7 +186,9 @@ namespace uMVVMCS.DIContainer
         {
             object resolution = null;
 
-            // 如果 aots Resolve 前置委托不为空就执行
+            #region beforeResolve AOT
+
+            // 如果 AOT Resolve 前置委托不为空就执行
             if (beforeResolve != null)
             {
                 var delegates = beforeResolve.GetInvocationList();
@@ -204,13 +206,19 @@ namespace uMVVMCS.DIContainer
                 }
             }
 
-            Type inwardType = typeof(object);
-            IList<IBinding> bindings = new List<IBinding>();
+            #endregion
 
-            // 不能根据 id 是否为空来过滤，因为 unityBinding 是通过 aots 来获取实例的，因此即使没有 
+            #region 获取实际类型，并根据实际类型的获取结果从 binder 中获取 binding
+
+            // 存放获取到的 binding 的变量，如果没有指定 id，将获取指定类型的所有 binding；
+            // 如果没有指定类型但指定了 id，则获取指定 id 的所有 binding 
+            IList<IBinding> bindings = new List<IBinding>();
+            Type inwardType = typeof(object);
+
+            // 不能根据 id 是否为空来过滤，因为 unityBinding 是通过 AOT 来获取实例的，因此即使没有 
             // id 也必须进入 ResolveBinding 方法,所以必须先获取其 binding 自身
             // 如果类型为空 id 不为空，根据 id 来获取 binding
-            if (type == null) { bindings = binder.GetBindingsById(id); }
+            if (type == null) { bindings = binder.GetIds(id); }
             else
             {
                 // 判断参数 type 是否为数组是因为实参可能会传入类似 typeof(Type[]) 这样的值
@@ -218,9 +226,15 @@ namespace uMVVMCS.DIContainer
                 else { inwardType = type; }
 
                 if (id != null) { bindings.Add(binder.GetBinding(inwardType, id)); }
-                else { bindings = binder.GetBindingsByType(inwardType);
+                else
+                {
+                    bindings = binder.GetTypes(inwardType);
                 }
             }
+
+            #endregion
+
+            #region 根据从 binder 中获取的 binding 以及 ResolutionMode 的模式获取实例化结果
 
             IList<object> instances = new List<object>();
 
@@ -266,6 +280,10 @@ namespace uMVVMCS.DIContainer
                 }
             }
 
+            #endregion
+
+            #region 整理获取到的实例（组织为单个对象或数组对象）并赋值给 resolution
+
             // 如果 type 不为空且不是数组、instances的长度为1，将其第0个元素赋值给 resolution
             if (type != null && !type.IsArray && instances.Count == 1)
             {
@@ -282,7 +300,11 @@ namespace uMVVMCS.DIContainer
                 resolution = array;
             }
 
-            // 如果 aots Resolve 后置委托不为空就执行
+            #endregion
+
+            #region afterResolve AOT
+
+            // 如果 AOT Resolve 后置委托不为空就执行
             if (afterResolve != null)
             {
                 var delegates = this.afterResolve.GetInvocationList();
@@ -301,6 +323,8 @@ namespace uMVVMCS.DIContainer
                     }
                 }
             }
+
+            #endregion
 
             // 返回实例
             return resolution;
@@ -333,7 +357,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         protected object Inject(object instance, ReflectionInfo reflectedInfo)
         {
-            // 如果 aots Inject 前置委托不为空就执行
+            // 如果 AOT Inject 前置委托不为空就执行
             if (beforeInject != null)
             {
                 beforeInject(this, ref instance, reflectedInfo);
@@ -357,7 +381,7 @@ namespace uMVVMCS.DIContainer
                 InjectMethods(instance, reflectedInfo.methods);
             }
 
-            // 如果 aots Inject 后置委托不为空就执行
+            // 如果 AOT Inject 后置委托不为空就执行
             if (afterInject != null)
             {
                 afterInject(this, ref instance, reflectedInfo);
@@ -382,7 +406,9 @@ namespace uMVVMCS.DIContainer
             object parentInstance,
             object id)
         {
-            var context = new InjectionInfo()
+            #region 构造 InjectionInfo
+
+            var Info = new InjectionInfo()
             {
                 member = member,
                 memberType = type,
@@ -392,12 +418,20 @@ namespace uMVVMCS.DIContainer
                 injectType = binding.type
             };
 
-            // 如果参数binding的条件(BindingCondition委托，接受一个InjectionContext参数)不为空，新建一个InjectionContext实例并设置它的属性
+            #endregion
+
+            #region  过滤 binding 的 condition 条件
+
+            // 如果参数binding的条件不为空(BindingCondition 委托，接受一个 InjectionInfo 参数)
             if (binding.condition != null)
             {
-                // 如果参数binding的condition委托的结果是假则返回空
-                if (!binding.condition(context)) { return null; }
+                // 如果所构造的 InjectionInfo 不能通过 condition 委托（返回假）则返回空
+                if (!binding.condition(Info)) { return null; }
             }
+
+            #endregion
+
+            #region 过滤 id 条件
 
             // 过滤 id 条件（id 和 binding.id 都不能为空且必须相等，但不单独过滤 id 或 binding.id）
             // ，不符合返回空
@@ -410,18 +444,26 @@ namespace uMVVMCS.DIContainer
                 return null;
             }
 
-            // 过滤实例
+            #endregion
+
+            // 声明实例变量
             object instance = null;
 
-            // 如果 aots 委托 BindingEvaluationHandler 不为空就执行
-            if (bindingEvaluation != null)
+            #region beforeDefaultInstantiate AOT（UnityBinding 由此 AOT 委托方法获取实例）
+
+            // 如果 AOT 委托 BindingEvaluationHandler 不为空就执行
+            if (beforeDefaultInstantiate != null)
             {
-                var delegates = bindingEvaluation.GetInvocationList();
+                var delegates = beforeDefaultInstantiate.GetInvocationList();
                 for (int i = 0; i < delegates.Length; i++)
                 {
                     instance = ((BindingEvaluationHandler)delegates[i]).Invoke(this, ref binding);
                 }
             }
+
+            #endregion
+
+            #region 如果 beforeDefaultInstantiate AOT 没有获取到实例则根据默认方法获取实例
 
             if (instance == null)
             {
@@ -432,7 +474,7 @@ namespace uMVVMCS.DIContainer
                     // 如果实例类型为 ADDRESS，获取对应的完成注入后的实例
                     // 不保存实例化结果到 binding.value
                     case BindingType.ADDRESS:
-                        if(binding.constraint == ConstraintType.MULTIPLE)
+                        if (binding.constraint == ConstraintType.MULTIPLE)
                         {
                             object[] list = new object[length];
                             for (int i = 0; i < length; i++)
@@ -447,7 +489,7 @@ namespace uMVVMCS.DIContainer
                     // 如果是工厂类型，将 binding 的值作为工厂类并获取其create方法的结果
                     // 可以重写对应的接口类方法来实现所需的生成效果
                     case BindingType.FACTORY:
-                        instance = (binding.value as IInjectionFactory).Create(context);
+                        instance = (binding.value as IInjectionFactory).Create(Info);
                         break;
 
                     // 如果是单例类型，且 binding 的值是 Type，就实例化该类型并执行注入
@@ -479,11 +521,17 @@ namespace uMVVMCS.DIContainer
                 }
             }
 
-            // 如果 aots 委托 bindingResolution 不为空执行委托
-            if (bindingResolution != null)
+            #endregion
+
+            #region afterInstantiate AOT(EventContainerAOT 由此对获得的实例分类并添加到相应的 list)
+
+            // 如果 AOT 委托 afterInstantiate 不为空执行委托
+            if (afterInstantiate != null)
             {
-                bindingResolution(this, ref binding, ref instance);
+                afterInstantiate(this, ref binding, ref instance);
             }
+
+            #endregion
 
             // 返回实例
             return instance;
@@ -523,28 +571,6 @@ namespace uMVVMCS.DIContainer
             instance = Inject(instance, info);
 
             return instance;
-        }
-
-        /// <summary>
-        /// 根据缓存的构造函数参数属性 constructorParameters 实例化并返回所有所需参数 
-        /// instance 参数最终会传递到 ResolveBinding 方法的 parentInstance 参数，用于传递 InjectionInfo 同名属性的值
-        /// </summary>
-        virtual protected object[] GetParametersFromInfo(object instance, ParameterInfo[] parametersInfo)
-        {
-            object[] parameters = new object[parametersInfo.Length];
-
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                var parameterInfo = parametersInfo[i];
-
-                parameters[i] = Resolve(
-                    parameterInfo.type,
-                    InjectionInto.Constructor,
-                    instance,
-                    parameterInfo.id);
-            }
-
-            return parameters;
         }
 
         #endregion
@@ -612,14 +638,38 @@ namespace uMVVMCS.DIContainer
             }
         }
 
+        /// <summary>
+        /// 根据缓存的构造函数参数属性 constructorParameters 实例化并返回所有所需参数 
+        /// instance 参数最终会传递到 ResolveBinding 方法的 parentInstance 参数，用于传递 InjectionInfo 同名属性的值
+        /// </summary>
+        virtual protected object[] GetParametersFromInfo(object instance, ParameterInfo[] parametersInfo)
+        {
+            object[] parameters = new object[parametersInfo.Length];
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var parameterInfo = parametersInfo[i];
+
+                parameters[i] = Resolve(
+                    parameterInfo.type,
+                    InjectionInto.Constructor,
+                    instance,
+                    parameterInfo.id);
+            }
+
+            return parameters;
+        }
+
         #endregion
 
+        #region protected functions
+
         /// <summary>
-        /// AddBinding 之前执行的 aots 方法
+        /// AddBinding 之前执行的 AOT 方法
         /// </summary>
         virtual protected void OnBeforeAddBinding(IBinder source, ref IBinding binding)
         {
-            // 由于 aots 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
+            // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
             int length = binding.valueList.Count;
             for (int i = 0; i < length; i++)
             {
@@ -638,5 +688,7 @@ namespace uMVVMCS.DIContainer
                 }
             }
         }
+
+        #endregion
     }
 }

@@ -63,11 +63,11 @@ namespace uMVVMCS.Editors
                 return;
             }
 
-            // 如果 ContextRoot 的 containersData 不能为空
-            if (ContextRoot.containersData == null || ContextRoot.containersData.Count == 0)
+            // 如果 ContextRoot 的 containers 不能为空
+            if (ContextRoot.containers == null || ContextRoot.containers.Count == 0)
             {
                 GUILayout.FlexibleSpace();
-                GUILayout.Label("There are no containers in the current scene", EditorStyles.message);
+                GUILayout.Label("There are no containersArray in the current scene", EditorStyles.message);
                 GUILayout.FlexibleSpace();
                 return;
             }
@@ -81,13 +81,13 @@ namespace uMVVMCS.Editors
 
             GUILayout.Space(WINDOW_MARGIN);
             GUILayout.Label("uMVVMCS Bindings Printer", EditorStyles.title);
-            GUILayout.Label("Displays all bindings of all available containers", EditorStyles.containerInfo);
+            GUILayout.Label("Displays all bindings of all available containersArray", EditorStyles.containerInfo);
 
             // 显示容器及其中的 binding
-            for (int i = 0; i < ContextRoot.containersData.Count; i++)
+            for (int i = 0; i < ContextRoot.containers.Count; i++)
             {
-                var data = ContextRoot.containersData[i];
-                var bindings = data.container.GetAllBindings();
+                var container = ContextRoot.containers[i];
+                var bindings = container.GetAll();
 
                 GUILayout.Space(20f);
                 GUILayout.Label("CONTAINER", EditorStyles.containerInfo);
@@ -95,8 +95,8 @@ namespace uMVVMCS.Editors
                 GUILayout.Label(
                     string.Format(
                         "{0} (index: {1}, {2})",
-                        data.container.GetType().FullName, i,
-                        (data.destroyOnLoad ? "destroy on load" : "singleton")
+                        container.GetType().FullName, i,
+                        (container.destroyOnLoad ? "destroy on load" : "singleton")
                     ),
                     EditorStyles.title
                 );

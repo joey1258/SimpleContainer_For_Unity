@@ -27,6 +27,11 @@ namespace uMVVMCS.DIContainer
         protected const ResolutionMode DEFAULT_RESOLUTION_MODE = ResolutionMode.ALWAYS_RESOLVE;
 
         /// <summary>
+        /// load 时是否摧毁容器
+        /// </summary>
+        public bool destroyOnLoad { get; set; }
+
+        /// <summary>
         /// 容器 id
         /// </summary>
         public object id { get; private set; }
@@ -286,41 +291,41 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
-        virtual public IList<IBinding> GetBindingsByType<T>()
+        virtual public IList<IBinding> GetTypes<T>()
         {
-            return binder.GetBindingsByType(typeof(T));
+            return binder.GetTypes(typeof(T));
         }
 
         /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
-        virtual public IList<IBinding> GetBindingsByType(Type type)
+        virtual public IList<IBinding> GetTypes(Type type)
         {
-            return binder.GetBindingsByType(type);
+            return binder.GetTypes(type);
         }
 
         /// <summary>
         /// 获取储存容器中所有指定 id 的 binding
         /// </summary>
-        virtual public IList<IBinding> GetBindingsById(object id)
+        virtual public IList<IBinding> GetIds(object id)
         {
-            return binder.GetBindingsById(id);
+            return binder.GetIds(id);
         }
 
         /// <summary>
         /// 获取 binder 中所有的 Binding
         /// </summary>
-        virtual public IList<IBinding> GetAllBindings()
+        virtual public IList<IBinding> GetAll()
         {
-            return binder.GetAllBindings();
+            return binder.GetAll();
         }
 
         /// <summary>
         /// 返回储存容器中除自身以外所有 type 和值都相同的 binding
         /// </summary>
-        virtual public IList<IBinding> GetSameNullIdBinding(IBinding binding)
+        virtual public IList<IBinding> GetSameNullId(IBinding binding)
         {
-            return binder.GetSameNullIdBinding(binding);
+            return binder.GetSameNullId(binding);
         }
 
         /// <summary>
@@ -346,41 +351,41 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindByType<T>()
+        virtual public void UnbindType<T>()
         {
-            binder.UnbindByType<T>();
+            binder.UnbindType<T>();
         }
 
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindByType(Type type)
+        virtual public void UnbindType(Type type)
         {
-            binder.UnbindByType(type);
+            binder.UnbindType(type);
         }
 
         /// <summary>
         /// 根据 id 从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindById(object id)
+        virtual public void UnbindId(object id)
         {
-            binder.UnbindById(id);
+            binder.UnbindId(id);
         }
 
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindNullIdBindingByType<T>()
+        virtual public void UnbindNullIdType<T>()
         {
-            binder.UnbindNullIdBindingByType<T>();
+            binder.UnbindNullIdType<T>();
         }
 
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        virtual public void UnbindNullIdBindingByType(Type type)
+        virtual public void UnbindNullIdType(Type type)
         {
-            binder.UnbindNullIdBindingByType(type);
+            binder.UnbindNullIdType(type);
         }
 
         /// <summary>

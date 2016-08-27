@@ -70,18 +70,16 @@ namespace uMVVMCS.DIContainer
             var found = false;
 
             // 遍历 ContextRoot 下所有的容器
-            var containers = ContextRoot.containersData;
+            var containers = ContextRoot.containers;
             for (int i = 0; i < containers.Count; i++)
             {
-                var container = containers[i].container;
-
                 // 如果容器中含有 ICommandDispatcher binding，且含有指定类型的 binding，就发送 command 并返回真
-                var commandDispatches = container.GetBindingsByType<ICommandDispatcher>();
+                var commandDispatches = containers[i].GetTypes<ICommandDispatcher>();
                 if (commandDispatches != null && commandDispatches.Count != 0)
                 {
-                    var dispatcher = container.GetCommandDispatcher();
+                    var dispatcher = containers[i].GetCommandDispatcher();
 
-                    var bindings = container.GetBindingsByType(type);
+                    var bindings = containers[i].GetTypes(type);
                     if (bindings != null && bindings.Count != 0)
                     {
                         found = true;

@@ -29,8 +29,8 @@ namespace uMVVMCS.DIContainer
 
         event TypeResolutionHandler beforeResolve;
         event TypeResolutionHandler afterResolve;
-        event BindingEvaluationHandler bindingEvaluation;
-        event BindingResolutionHandler bindingResolution;
+        event BindingEvaluationHandler beforeDefaultInstantiate;
+        event BindingResolutionHandler afterInstantiate;
         event InstanceInjectionHandler beforeInject;
         event InstanceInjectionHandler afterInject;
 

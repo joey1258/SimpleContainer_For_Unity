@@ -51,26 +51,25 @@ namespace uMVVMCS
 		}
 
         /// <summary>
-        /// 如果参数 obj 不是单例 binding 的值，为 ContextRoot 的 containersData List 中每个
+        /// 如果参数 obj 不是单例 binding 的值，为 ContextRoot 的 containers List 中每个
         /// 元素的 container id 与参数 id 相等的容器注入 obj。
         /// 如参数 id 为空，只要 obj 不是单例就对每一个容器进行注入，否则只对容器 id 相等的容器注入
         /// </summary>
         public static void Inject(object obj, object id)
         {
-            // 获取 ContextRoot 中的 containersData List
-            var containers = ContextRoot.containersData;
+            // 获取 ContextRoot 中的 containers List
+            var containers = ContextRoot.containers;
 
             for (int i = 0; i < containers.Count; i++) {
-				var container = containers[i].container;
                 // 遍历 list，如果容器 id 不为空且和参数 id 相等，injectOnContainer 为真
-                var injectOnContainer = (container.id != null && container.id.Equals(id));
+                var injectOnContainer = (containers[i].id != null && containers[i].id.Equals(id));
 
                 // 如参数 id 为空或 id 与容器 id 相等，且参数 obj 不与容器中任何 binding 的值重复，
                 // 就为当前容器注入 obj(避免重复注入)
                 if ((id == null || injectOnContainer) && 
-                    !IsExistOnContainer(obj, container))
+                    !IsExistOnContainer(obj, containers[i]))
                 {
-					container.Inject(obj);
+                    containers[i].Inject(obj);
 				}
 			}
 		}
@@ -81,7 +80,7 @@ namespace uMVVMCS
 		public static bool IsExistOnContainer(object obj, IInjectionContainer container)
         {
 			var isExist = false;
-			var bindings = container.GetBindingsByType(obj.GetType());
+			var bindings = container.GetTypes(obj.GetType());
 
             if (bindings == null) { return false; }
 			
@@ -107,7 +106,7 @@ namespace uMVVMCS
         public static bool IsExistOnBinder(object obj, IBinder binder)
         {
             var isExist = false;
-            var bindings = binder.GetBindingsByType(obj.GetType());
+            var bindings = binder.GetTypes(obj.GetType());
 
             if (bindings == null) { return false; }
 

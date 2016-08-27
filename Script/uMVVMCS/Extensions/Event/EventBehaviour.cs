@@ -26,9 +26,9 @@ namespace uMVVMCS
             // 如果游戏暂停则不执行（Mathf.Approximately 方法用于比较浮点值，由于浮点值不精确所以运算时可能产生误差，所以必须使用特殊的方法来比较）
             if (Mathf.Approximately(Time.deltaTime, 0)) { return; }
 
-            for (var objIndex = 0; objIndex < EventContainer.updateable.Count; objIndex++)
+            for (var objIndex = 0; objIndex < EventContainerAOT.updateable.Count; objIndex++)
             {
-                EventContainer.updateable[objIndex].Update();
+                EventContainerAOT.updateable[objIndex].Update();
             }
         }
 
@@ -37,14 +37,14 @@ namespace uMVVMCS
         /// </summary>
         protected void OnDestroy()
         {
-            int length = EventContainer.disposable.Count;
+            int length = EventContainerAOT.disposable.Count;
             for (int i = 0; i < length; i++)
             {
-                EventContainer.disposable[i].Dispose();
+                EventContainerAOT.disposable[i].Dispose();
             }
 
-            EventContainer.disposable.Clear();
-            EventContainer.updateable.Clear();
+            EventContainerAOT.disposable.Clear();
+            EventContainerAOT.updateable.Clear();
         }
     }
 }

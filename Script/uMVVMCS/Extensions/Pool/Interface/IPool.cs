@@ -20,7 +20,9 @@ namespace uMVVMCS.DIContainer
 {
     public interface IPool<T> : IPool
     {
-		new T GetInstance();
+        new T GetInstance();
+        new T GetInstance(bool doublue);
+        new T GetInstance(bool doublue, bool throwException);
     }
 
     public interface IPool
@@ -33,7 +35,9 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 如果对象池中有可用的实例就按顺序返回
         /// </summary>
-        //object GetInstance();
+        object GetInstance();
+        object GetInstance(bool doublue);
+        object GetInstance(bool doublue, bool throwException);
 
         /// <summary>
         /// 将一个实例返回到对象池 (如果被释放的实例实现了IPoolable接口，那么应该调用Release()方法)
@@ -48,7 +52,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 返回non-committed实例的数量
         /// </summary>
-        int available { get; }
+        int availableCount { get; }
 
         /// <summary>
         /// 属性，获取或设置对象池可以储存多少个对象 (设置为0表示无限大小，可以无限制的扩展)
@@ -59,16 +63,6 @@ namespace uMVVMCS.DIContainer
         /// 属性，返回当前由对象池管理的实例总数
         /// </summary>
         int instanceCount { get; }
-
-        /// <summary>
-        /// 属性，获取或设置当请求超过对象池大小时该如何处理：抛出错误、抛出警告，或者忽略
-        /// </summary>
-        //PoolOverflowBehavior overflowBehavior { get; set; }
-
-        /// <summary>
-        /// 获取或者设置无限大小的对象池的扩展行为类型：添加单倍，或者双倍对象
-        /// </summary>
-        bool isInflation { get; set; }
 
         /// <summary>
         /// 重置

@@ -41,9 +41,9 @@ namespace uMVVMCS_NUitTests
             someClass sc = new someClass();
             //Act
             container
-                .RegisterAOT<UnityContainer>()
-                .RegisterAOT<EventContainer>()
-                .RegisterAOT<CommanderContainer>()
+                .RegisterAOT<UnityContainerAOT>()
+                .RegisterAOT<EventContainerAOT>()
+                .RegisterAOT<CommanderContainerAOT>()
                 .RegisterCommand<TestCommand1>()
                 .Bind<Transform>().ToPrefab("05_Commander/Prism");
             container.PoolCommands();
@@ -55,8 +55,8 @@ namespace uMVVMCS_NUitTests
                 true,
                 dispatcher != null &&
                 sc.id == 1 &&
-                container.GetBindingsByType<Transform>().Count == 1 &&
-                ((PrefabInfo)container.GetBindingsByType<Transform>()[0].value).path == "05_Commander/Prism");
+                container.GetTypes<Transform>().Count == 1 &&
+                ((PrefabInfo)container.GetTypes<Transform>()[0].value).path == "05_Commander/Prism");
         }
 
         /// <summary>
@@ -69,11 +69,11 @@ namespace uMVVMCS_NUitTests
             var container = new InjectionContainer();
             //Act
             //由于 RegisterSelf 方法于构造函数内部使用，所有不用也无法以 container.RegisterSelf() 形式调用;
-            var binding = container.GetAllBindings()[0];
+            var binding = container.GetAll()[0];
             //Assert
             Assert.AreEqual(
                 true,
-                container.GetAllBindings().Count == 1 &&
+                container.GetAll().Count == 1 &&
                 binding.type == typeof(IInjectionContainer) &&
                 binding.value == container);
         }

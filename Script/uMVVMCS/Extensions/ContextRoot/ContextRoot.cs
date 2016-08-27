@@ -25,33 +25,7 @@ namespace uMVVMCS.DIContainer
         #region Inner Class
 
         /// <summary>
-        /// 注入容器数据内部类
-        /// </summary>
-        public class InjectionContainerData
-        {
-            /// <summary>
-            /// 注入容器
-            /// </summary>
-            public IInjectionContainer container;
-
-            /// <summary>
-            /// load 时是否摧毁容器
-            /// </summary>
-            public bool destroyOnLoad;
-
-            #region constructor
-
-            public InjectionContainerData(IInjectionContainer container, bool destroyOnLoad)
-            {
-                this.container = container;
-                this.destroyOnLoad = destroyOnLoad;
-            }
-
-            #endregion
-        }
-
-        /// <summary>
-        /// MonoBehaviour injection type.
+        /// MonoBehaviour 注入类型
         /// </summary>
         [Serializable]
         public enum MonoBehaviourInjectionType
@@ -63,6 +37,11 @@ namespace uMVVMCS.DIContainer
             // 基类
             BaseType
         }
+
+        /// <summary>
+        /// Container 空 ID
+        /// </summary>
+        public enum ContainerNullId { Null }
 
         #endregion
 
@@ -84,51 +63,26 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 内部容器数据类 list
         /// </summary>
-        public static List<InjectionContainerData> containersData { get; set; }
+        public static List<IInjectionContainer> containers { get; set; }
 
         /// <summary>
-        /// 容器数组 (返回 containersData List 中每个元素的 container 属性)(包括所有容器)
+        /// 容器仓库 (储存 containers List 中 id 不为空的binding，并用 type 和 id 索引)
         /// </summary>
-        public IInjectionContainer[] containers
-        {
-            get
-            {
-                int length = containersData.Count;
-
-                if (_containers == null ||
-                    _containers.Length == 0 ||
-                    _containers.Length != length)
-                {
-                    _containers = new IInjectionContainer[length];
-                    for (var i = 0; i < containersData.Count; i++)
-                    {
-                        _containers[i] = containersData[i].container;
-                    }
-
-                    ContainersStoring();
-                }
-
-                return _containers;
-            }
-        }
-        protected IInjectionContainer[] _containers;
-
-        /// <summary>
-        /// 容器仓库 (储存 containersData List 中 id 不为空的binding，并用 type 和 id 索引)
-        /// </summary>
-        public static Storage<IInjectionContainer> containersStorage { get; protected set; }
+        public static Dictionary<object, List<IInjectionContainer>> containersDic { get; protected set; }
 
         #endregion
 
         #region functions
 
+        #region Mono functions
+
         virtual protected void Awake()
         {
-            containersStorage = new Storage<IInjectionContainer>();
+            containersDic = new Dictionary<object, List<IInjectionContainer>>();
             // 如果容器数据list为空，设置它的长度为1
-            if (containersData == null)
+            if (containers == null)
             {
-                containersData = new List<InjectionContainerData>(1);
+                containers = new List<IInjectionContainer>(1);
             }
 
             SetupContainers();
@@ -147,20 +101,24 @@ namespace uMVVMCS.DIContainer
 
         virtual protected void OnDestroy()
         {
-            // 释放 containersData List 中所有 destroyOnLoad 属性为真的容器中的 binder 和缓存
-            // 并将其从 containersData List 中移除
-            for (var i = 0; i < containersData.Count; i++)
+            // 释放 containers List 中所有 destroyOnLoad 属性为真的容器中的 binder 和缓存
+            // 并将其从 containers List 中移除
+            for (var i = 0; i < containers.Count; i++)
             {
-                if (!containersData[i].destroyOnLoad) continue;
+                if (!containers[i].destroyOnLoad) continue;
 
-                containersData[i].container.Dispose();
-                containersData.Remove(containersData[i]);
+                containers[i].Dispose();
+                containers.Remove(containers[i]);
                 i--;
             }
         }
 
+        #endregion
+
+        #region AddContainer
+
         /// <summary>
-        /// 用新创建的容器和 true 创建一个 InjectionContainerData，并添加到 containersData List
+        /// 将 container添加到 containers List，并默认 destroyOnLoad 为真
         /// </summary>
         virtual public IInjectionContainer AddContainer<T>() where T : IInjectionContainer, new()
         {
@@ -169,7 +127,7 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 用 container 和 true 创建一个 InjectionContainerData，并添加到 containersData List
+        /// 将 container添加到 containers List，并默认 destroyOnLoad 为真
         /// </summary>
         virtual public IInjectionContainer AddContainer(IInjectionContainer container)
         {
@@ -177,14 +135,35 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 用 container 和 destroyOnLoad 创建一个 InjectionContainerData，并添加到 containersData List
+        /// 将 container添加到 containers List，并设置其 destroyOnLoad 属性
         /// </summary>
         virtual public IInjectionContainer AddContainer(IInjectionContainer container, bool destroyOnLoad)
         {
-            containersData.Add(new InjectionContainerData(container, destroyOnLoad));
+            container.destroyOnLoad = destroyOnLoad;
+            containers.Add(container);
+            ContainersStoring(container);
 
             return container;
         }
+
+        #endregion
+
+        #region DisposeContainer
+
+        /// <summary>
+        /// Dispose 指定 id 的容器
+        /// </summary>
+        virtual public void Dispose(object id)
+        {
+            containers.Remove(containersDic[id][0]);
+            containersDic[id][0].Dispose();
+            containersDic[id][0] = null;
+            containersDic.Remove(containersDic[id]);
+        }
+
+        #endregion
+
+        #region Setup & Init
 
         /// <summary>
         /// 设置容器
@@ -196,14 +175,18 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public abstract void Init();
 
+        #endregion
+
+        #region private functions
+
         /// <summary>
         /// 缓存所有容器中所有 binding 的 value 属性所储存的类型信息
         /// </summary>
         private void CacheBindings()
         {
-            for (var i = 0; i < containersData.Count; i++)
+            for (var i = 0; i < containers.Count; i++)
             {
-                var container = containersData[i].container;
+                var container = containers[i];
                 container.cache.CacheFromBinder(container);
             }
         }
@@ -211,25 +194,24 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 整理储存所有容器
         /// </summary>
-        virtual protected void ContainersStoring()
+        virtual protected void ContainersStoring(IInjectionContainer container)
         {
-            for (var i = 0; i < containersData.Count; i++)
+            if (container.id != null)
             {
-                _containers[i] = containersData[i].container;
-
-                if (_containers[i].id != null)
+                if (!containersDic.ContainsKey(container.id))
                 {
-                    if (!containersStorage[this.GetType()].Contains(_containers[i].id))
-                    {
-                        containersStorage[this.GetType()][_containers[i].id] = _containers[i];
-                    }
-                    else
-                    {
-                        throw new InjectionSystemException(InjectionSystemException.SAME_OBJECT);
-                    }
+                    containersDic[container.id] = new List<IInjectionContainer>(1);
+                    containersDic[container.id].Add(container);
+                }
+                else
+                {
+                    throw new InjectionSystemException(InjectionSystemException.SAME_OBJECT);
                 }
             }
+            else { containersDic[ContainerNullId.Null].Add(container); }
         }
+
+        #endregion
 
         #endregion
     }

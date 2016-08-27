@@ -56,7 +56,7 @@ namespace uMVVMCS_NUitTests
             //Act
             binder.Bind<object>().ToSelf();
             //Assert
-            Assert.AreEqual(1, binder.GetAllBindings().Count);
+            Assert.AreEqual(1, binder.GetAll().Count);
         }
 
         /// <summary>
@@ -87,8 +87,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].value == typeof(object));
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].value == typeof(object));
         }
 
         #endregion
@@ -107,7 +107,7 @@ namespace uMVVMCS_NUitTests
             //Act
             binder.Bind<object>().To<object>();
             //Assert
-            Assert.AreEqual(1, binder.GetAllBindings().Count);
+            Assert.AreEqual(1, binder.GetAll().Count);
         }
 
         /// <summary>
@@ -123,8 +123,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].valueList[0] == typeof(object));
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].valueList[0] == typeof(object));
         }
 
         /// <summary>
@@ -140,8 +140,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].value == typeof(object));
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].value == typeof(object));
         }
 
         /// <summary>
@@ -157,8 +157,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].value == typeof(someClass));
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].value == typeof(someClass));
         }
 
         /// <summary>
@@ -174,8 +174,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].valueList[0] == typeof(object));
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].valueList[0] == typeof(object));
         }
 
         #endregion
@@ -196,8 +196,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].valueList[0] == o);
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].valueList[0] == o);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace uMVVMCS_NUitTests
             object o = new object();
             //Act
             binder.Bind<object>().To(o);
-            IBinding binding = binder.GetAllBindings()[0];
+            IBinding binding = binder.GetAll()[0];
             //Assert
             Assert.AreEqual(
                 true,
@@ -231,7 +231,7 @@ namespace uMVVMCS_NUitTests
             object o = new object();
             //Act
             binder.Bind<object>().To(o);
-            IBinding binding = binder.GetAllBindings()[0];
+            IBinding binding = binder.GetAll()[0];
             //Assert
             Assert.AreEqual(
                 true,
@@ -254,8 +254,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].value == o);
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].value == o);
         }
 
         /// <summary>
@@ -272,8 +272,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].value == o);
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].value == o);
         }
 
         /// <summary>
@@ -290,8 +290,8 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].valueList[0] == o);
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].valueList[0] == o);
         }
 
         #endregion
@@ -313,10 +313,10 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].valueList.Count == 2 &&
-                binder.GetAllBindings()[0].valueList[0] == o1 &&
-                binder.GetAllBindings()[0].valueList[1] == o2);
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].valueList.Count == 2 &&
+                binder.GetAll()[0].valueList[0] == o1 &&
+                binder.GetAll()[0].valueList[1] == o2);
         }
 
         /// <summary>
@@ -334,11 +334,11 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].valueList.Count == 2 &&
-                binder.GetAllBindings()[0].valueList[0] == o1 &&
-                binder.GetAllBindings()[0].valueList[1] == o2 &&
-                binder.GetAllBindings()[0].bindingType == BindingType.MULTITON);
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].valueList.Count == 2 &&
+                binder.GetAll()[0].valueList[0] == o1 &&
+                binder.GetAll()[0].valueList[1] == o2 &&
+                binder.GetAll()[0].bindingType == BindingType.MULTITON);
         }
 
         /// <summary>
@@ -356,11 +356,11 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].valueList.Count == 2 &&
-                binder.GetAllBindings()[0].valueList[0] == o1 &&
-                binder.GetAllBindings()[0].valueList[1] == o2 &&
-                binder.GetAllBindings()[0].constraint == ConstraintType.MULTIPLE);
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].valueList.Count == 2 &&
+                binder.GetAll()[0].valueList[0] == o1 &&
+                binder.GetAll()[0].valueList[1] == o2 &&
+                binder.GetAll()[0].constraint == ConstraintType.MULTIPLE);
         }
 
         /// <summary>
@@ -378,10 +378,10 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
-                binder.GetAllBindings()[0].valueList.Count == 2 &&
-                binder.GetAllBindings()[0].valueList[0] == o1 &&
-                binder.GetAllBindings()[0].valueList[1] == o2);
+                binder.GetAll().Count == 1 &&
+                binder.GetAll()[0].valueList.Count == 2 &&
+                binder.GetAll()[0].valueList[0] == o1 &&
+                binder.GetAll()[0].valueList[1] == o2);
         }
 
         /// <summary>
@@ -399,7 +399,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings()[0].valueList.Count == 3);
+                binder.GetAll()[0].valueList.Count == 3);
         }
 
         /// <summary>
@@ -417,7 +417,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings()[0].valueList.Count == 2);
+                binder.GetAll()[0].valueList.Count == 2);
         }
 
         /// <summary>
@@ -435,7 +435,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1);
+                binder.GetAll().Count == 1);
         }
 
         #endregion
@@ -519,7 +519,7 @@ namespace uMVVMCS_NUitTests
             //Act
             binder.Bind<object>().To(o).Bind<object>().To(new object());
             //Assert
-            Assert.AreEqual(2, binder.GetAllBindings().Count);
+            Assert.AreEqual(2, binder.GetAll().Count);
         }
 
         /// <summary>
@@ -534,7 +534,7 @@ namespace uMVVMCS_NUitTests
             //Act
             binder.Bind<object>().To(o).BindSingleton<object>().To(new object());
             //Assert
-            Assert.AreEqual(2, binder.GetAllBindings().Count);
+            Assert.AreEqual(2, binder.GetAll().Count);
         }
 
         /// <summary>
@@ -549,7 +549,7 @@ namespace uMVVMCS_NUitTests
             //Act
             binder.BindFactory<someClass>().To(o).BindSingleton<someClass>().To(new someClass ());
             //Assert
-            Assert.AreEqual(2, binder.GetAllBindings().Count);
+            Assert.AreEqual(2, binder.GetAll().Count);
         }
 
         /// <summary>
@@ -564,7 +564,7 @@ namespace uMVVMCS_NUitTests
             //Act
             binder.Bind<object>().To(o).BindMultiton<object>().To(new object());
             //Assert
-            Assert.AreEqual(2, binder.GetAllBindings().Count);
+            Assert.AreEqual(2, binder.GetAll().Count);
         }
 
         /// <summary>
@@ -579,7 +579,7 @@ namespace uMVVMCS_NUitTests
             //Act
             binder.Bind<object>().To(o).MultipleBind(new Type[] { typeof(int), typeof(float) }, new BindingType[] { BindingType.SINGLETON, BindingType.SINGLETON }).As(new object[] { 1, 2 });
             //Assert
-            Assert.AreEqual(3, binder.GetAllBindings().Count);
+            Assert.AreEqual(3, binder.GetAll().Count);
         }
 
         #endregion
@@ -600,7 +600,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true, 
-                binder.GetAllBindings().Count == 0 &&
+                binder.GetAll().Count == 0 &&
                 binding.valueList.Count == 0);
         }
 
@@ -618,7 +618,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 0 &&
+                binder.GetAll().Count == 0 &&
                 binding.valueList.Count == 0);
         }
 
@@ -636,7 +636,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 0 &&
+                binder.GetAll().Count == 0 &&
                 binding.valueList.Count == 0);
         }
 
@@ -654,7 +654,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
+                binder.GetAll().Count == 1 &&
                 binding.valueList.Count == 5);
         }
 
@@ -672,7 +672,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
+                binder.GetAll().Count == 1 &&
                 binding.valueList.Count == 4);
         }
 
@@ -690,7 +690,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 0 &&
+                binder.GetAll().Count == 0 &&
                 binding.valueList.Count == 0);
         }
 
@@ -712,7 +712,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
+                binder.GetAll().Count == 1 &&
                 binding.value == typeof(object));
         }
 
@@ -731,7 +731,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true, 
-                binder.GetAllBindings().Count == 1 &&
+                binder.GetAll().Count == 1 &&
                 binding.value == o);
         }
 
@@ -750,7 +750,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
+                binder.GetAll().Count == 1 &&
                 binding.value == typeof(object));
         }
 
@@ -768,7 +768,7 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetAllBindings().Count == 1 &&
+                binder.GetAll().Count == 1 &&
                 binding.valueList.Count == 3);
         }
 

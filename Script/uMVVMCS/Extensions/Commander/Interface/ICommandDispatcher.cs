@@ -31,12 +31,12 @@ namespace uMVVMCS
         void Dispatch(Type type, params object[] parameters);
 
         /// <summary>
-        /// 通过 EventContainer.eventBehaviour 在等待指定秒后发送一个 command 
+        /// 通过 EventContainerAOT.eventBehaviour 在等待指定秒后发送一个 command 
         /// </summary>
         void InvokeDispatch<T>(float time, params object[] parameters) where T : ICommand;
 
         /// <summary>
-        /// 通过 EventContainer.eventBehaviour 在等待指定秒后发送一个 command 
+        /// 通过 EventContainerAOT.eventBehaviour 在等待指定秒后发送一个 command 
         /// </summary>
         void InvokeDispatch(Type type, float time, params object[] parameters);
 

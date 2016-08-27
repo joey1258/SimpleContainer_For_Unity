@@ -102,7 +102,7 @@ namespace uMVVMCS.DIContainer
         /// </summary>
         public void CacheFromBinder(IBinder binder)
         {
-            var bindings = binder.GetAllBindings();
+            var bindings = binder.GetAll();
 
             // 遍历所有 binding，如果是 ADDRESS 类型则缓存其 Type 类型的值；
             // 如果是 SINGLETON 类型，缓存 value 属性的值的类型

@@ -19,20 +19,20 @@ using UnityEngine;
 
 namespace uMVVMCS.DIContainer
 {
-    public class UnityContainer : IContainerAOT
+    public class UnityContainerAOT : IContainerAOT
     {
         #region IContainerExtension implementation 
 
         public void OnRegister(IInjectionContainer container)
         {
             container.beforeAddBinding += OnBeforeAddBinding;
-            container.bindingEvaluation += this.OnBindingEvaluation;
+            container.beforeDefaultInstantiate += this.OnBindingEvaluation;
         }
 
         public void OnUnregister(IInjectionContainer container)
         {
             container.beforeAddBinding -= this.OnBeforeAddBinding;
-            container.bindingEvaluation -= this.OnBindingEvaluation;
+            container.beforeDefaultInstantiate -= this.OnBindingEvaluation;
         }
 
         #endregion

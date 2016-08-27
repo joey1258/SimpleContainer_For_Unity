@@ -68,27 +68,27 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
-        IList<IBinding> GetBindingsByType<T>();
+        IList<IBinding> GetTypes<T>();
 
         /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
-        IList<IBinding> GetBindingsByType(Type type);
+        IList<IBinding> GetTypes(Type type);
 
         /// <summary>
         /// 获取储存容器中所有指定 id 的 binding
         /// </summary>
-        IList<IBinding> GetBindingsById(object id);
+        IList<IBinding> GetIds(object id);
 
         /// <summary>
         /// 获取 binder 中所有的 Binding
         /// </summary>
-		IList<IBinding> GetAllBindings();
+		IList<IBinding> GetAll();
 
         /// <summary>
         /// 返回储存容器中除自身以外所有 type 和值都相同的 binding
         /// </summary>
-        IList<IBinding> GetSameNullIdBinding(IBinding binding);
+        IList<IBinding> GetSameNullId(IBinding binding);
 
         /// <summary>
         /// 根据类型和id获取储存容器中的 Binding
@@ -107,27 +107,27 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        void UnbindByType<T>();
+        void UnbindType<T>();
 
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        void UnbindByType(Type type);
+        void UnbindType(Type type);
 
         /// <summary>
         /// 根据 id 从所有容器中删除所有同类型 Binding
         /// </summary>
-        void UnbindById(object id);
+        void UnbindId(object id);
 
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        void UnbindNullIdBindingByType<T>();
+        void UnbindNullIdType<T>();
 
         /// <summary>
         /// 根据类型从所有容器中删除所有同类型 Binding
         /// </summary>
-        void UnbindNullIdBindingByType(Type type);
+        void UnbindNullIdType(Type type);
 
         /// <summary>
         /// 根据类型和 id 从所有容器中删除 Binding
