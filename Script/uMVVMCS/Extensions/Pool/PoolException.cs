@@ -21,7 +21,7 @@ namespace uMVVMCS.DIContainer
     public class PoolSystemException : Exception
     {
         public const string TYPE_NOT_ASSIGNABLE = "The type is not assignable to pool";
-        public const string POOL_NUM_ERROR = "Pool size is not 0 && instanceCount != 0";
+        public const string POOL_REQUESTS_EXCESS = "This pool size is not 0 && is not a new pool(instanceCount != 0). This represents the number of requests has exceeded the maximum number.";
 
         public PoolSystemException() : base() { }
         public PoolSystemException(string message) : base(message) { }

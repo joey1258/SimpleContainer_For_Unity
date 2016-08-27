@@ -512,6 +512,34 @@ namespace uMVVMCS.DIContainer
 
         #endregion
 
+        #region ToResource
+
+        /// <summary>
+        /// 绑定一个单例的资源（比如说声音等非 prefab 资源）
+        /// </summary>
+        public static IBinding ToResource(this IBinding binding, string name)
+        {
+            if (!TypeUtils.IsAssignable(typeof(UnityEngine.Object), binding.type))
+            {
+                throw new Exception(TYPE_NOT_OBJECT);
+            }
+
+            var resource = Resources.Load(name);
+            if (resource == null)
+            {
+                throw new Exception(RESOURCE_IS_NULL);
+            }
+
+            binding.SetBindingType(BindingType.SINGLETON);
+            binding.SetValue(resource);
+
+            binding.binder.Storing(binding);
+
+            return binding;
+        }
+
+        #endregion
+
         #region Instantiate
 
         public static IBinding Instantiate(this IBinding binding)
