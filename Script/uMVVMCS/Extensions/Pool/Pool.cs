@@ -41,10 +41,22 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// IPool<T>接口成员，如果对象池中有可用的实例则返回该实例
         /// </summary>
-		new public T GetInstance(bool doublue = true, bool throwException = true)
+		new public T GetInstance()
         {
-            return (T)base.GetInstance(doublue, throwException);
+            return (T)base.GetInstance(true, true);
         }
+
+        /// <summary>
+        /// IPool<T>接口成员，如果对象池中有可用的实例则返回该实例
+        /// </summary>
+        new public T GetInstance(bool doublue)
+        { return (T)base.GetInstance(doublue, true); }
+
+        /// <summary>
+        /// IPool<T>接口成员，如果对象池中有可用的实例则返回该实例
+        /// </summary>
+        new public T GetInstance(bool doublue, bool throwException)
+        { return (T)base.GetInstance(doublue, throwException); }
     }
 
     /// <summary>
@@ -100,7 +112,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 返回instancesAvailable栈中元素的总数
         /// </summary>
-        virtual public int availableCount
+        public int availableCount
         {
             get
             {
@@ -135,7 +147,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 增加一个元素
         /// </summary>
-        virtual public IPool Add(object value)
+        public IPool Add(object value)
         {
             // 如果参数类型与对象池类型不同就抛出错误
             if (value.GetType() != type)
@@ -154,7 +166,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 增加多个元素
         /// </summary>
-        virtual public IPool Add(object[] list)
+        public IPool Add(object[] list)
         {
             // 遍历参数中的每一个元素，为其调用add方法，将其压入栈中
             int length = list.Length;
@@ -169,7 +181,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 移除一个元素
         /// </summary>
-        virtual public IPool Remove(object value)
+        public IPool Remove(object value)
         {
             // 当前由对象池管理的实例总数递减
             _instanceCount--;
@@ -182,7 +194,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 移除多个元素
         /// </summary>
-        virtual public IPool Remove(object[] list)
+        public IPool Remove(object[] list)
         {
             // 遍历参数，为每一个元素调用Remove方法移除元素
             int length = list.Length;
@@ -207,21 +219,21 @@ namespace uMVVMCS.DIContainer
         /// 返回一个实例，将其从 instancesAvailable 栈中推出，并存入 HashSet 中
         /// 如果对象池是空的，就新建实例，如果不符合任何条件，返回空
         /// </summary>
-        virtual public object GetInstance()
+        public object GetInstance()
         { return GetInstance(true, true); }
 
         /// <summary>
         /// 返回一个实例，将其从 instancesAvailable 栈中推出，并存入 HashSet 中
         /// 如果对象池是空的，就新建实例，如果不符合任何条件，返回空
         /// </summary>
-        virtual public object GetInstance(bool doublue)
+        public object GetInstance(bool doublue)
         { return GetInstance(doublue, true); }
 
         /// <summary>
         /// 返回一个实例，将其从 instancesAvailable 栈中推出，并存入 HashSet 中
         /// 如果对象池是空的，就新建实例，如果不符合任何条件，返回空
         /// </summary>
-        virtual public object GetInstance(bool doublue, bool throwException)
+        public object GetInstance(bool doublue, bool throwException)
         {
             int instancesToCreate = 1;
             if (doublue){ instancesToCreate = instanceCount; }
@@ -297,7 +309,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 将一个实例返回到对象池
         /// </summary>
-		virtual public void ReturnInstance(object value)
+		public void ReturnInstance(object value)
         {
             // 如果instancesInUse中有参数传入的值
             if (instancesInUse.Contains(value))
@@ -317,7 +329,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 清空对象池
         /// </summary>
-        virtual public void Clean()
+        public void Clean()
         {
             //清空instancesAvailable栈、重置instancesInUse、设置储存的实例总数为0
             instancesUnUse.Clear();
@@ -360,7 +372,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 从对象池中删除一个实例
         /// </summary>
-        virtual protected void removeInstance(object value)
+        protected void removeInstance(object value)
         {
             // 如果参数的类型和对象池的类型不符抛出一个错误
             if(value.GetType() != type)
