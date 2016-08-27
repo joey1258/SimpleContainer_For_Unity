@@ -14,10 +14,6 @@
  *		limitations under the License.
  */
 
-/*
- * id 对应 binding 的 id 属性，binding 的 id 属性只为快速在字典中获取，从而避免 for 或者 foreach
- */
-
 using System;
 
 namespace uMVVMCS
@@ -27,8 +23,10 @@ namespace uMVVMCS
     /// 例如：“[Inject(SomeEnum.VALUE)]”
     /// </summary>
     [AttributeUsage
-        (AttributeTargets.Field |
-        AttributeTargets.Property | 
+        (AttributeTargets.Constructor | 
+        AttributeTargets.Field | 
+        AttributeTargets.Property |
+        AttributeTargets.Method | 
         AttributeTargets.Parameter, 
         AllowMultiple = false, 
         Inherited = true)]
@@ -46,22 +44,9 @@ namespace uMVVMCS
     }
 
     /// <summary>
-    /// [Construct]特性标首选构造函数。如果没有加上这个属性，Reflector 将会挑选一个参数最短的构造函数。
-    /// 很明显的，如果只有一个构造函数，就没有必要使用这个特性。
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = false, Inherited = true)]
-    public class Construct : Attribute { }
-
-    /// <summary>
-    /// [PostConstruct]标记一个方法，使它在注入后被立即调用。
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class PostConstruct : Attribute { }
-
-    /// <summary>
     /// [Priority]标记一个方法的优先级，以便决定执行顺序。
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class Priority : Attribute
     {
         public int priority;

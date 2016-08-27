@@ -20,8 +20,7 @@ namespace uMVVMCS
 {
     public class UtilsSystemException : Exception
     {
-        public const string NULL_PARAMETER = "The parameter {0} of method {1} cannot be null.";
-
+        public const string SingletonInstanceNotNUll = "This {0} Singleton Instance is not null !";
         public UtilsSystemException() : base() { }
         public UtilsSystemException(string message) : base(message) { }
     }

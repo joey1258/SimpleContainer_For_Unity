@@ -15,20 +15,9 @@
  */
 
 /*
- * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类 但不建议将 value 直接设为
- * 值类型的具体值,如：
- * ==================
- * bind<int>().to(1);
- * ==================
- * 等,容易导致查找相同无 id binding 时将类型相同、值也恰好相同的两个不同用途的 binding 被认为是相同的
- * 一个，同时TEMP 类型的 Binding 也不可以储存值类型的实际值，在该类型中也不存在任何存实际值的意义
- *
- * 如需要储存值类型的实际值，可以使用 SINGLETON 类型，如要储存多个，可以配合如数组等结构转为 object 储存
- *
- * Binding 默认 value 属性同样的值只能有1个，如果需要多个同样的值，可以将值约束设为 POOL（目前尚未实现）
- *
- * 当 bind TEMP 类型 binding 时，即使 To 了多个同类型的不同实例给多个 binding，binder最终也只会保持1个
- * 因为 TEMP 类型 binding 在保存时实例会自动被替换为其自身 Type（值类型）而被判断为相同而只保留1个
+ * 一般来说，binding 的 type 是其自身 value （类型或者实例）的同类或者父类
+ * id 用于快速获取 binding，如果需要同1个类型的多个实例，可以将其以数组的形式保存在同一个 binding
+ * ADDRESS 类型的 Binding 只能储存类型值，或者 prefab 信息类等可供复用的类型
  */
 
 using System;
@@ -38,91 +27,121 @@ namespace uMVVMCS.DIContainer
 {
     public class Binding : IBinding
     {
-        /// <summary>
-        /// 用于储存 binding 到 binder 字典的委托
-        /// </summary>
-        public Binder.BindingStoring storing;
-
-        protected IInfo bindingInfo;
-
         #region constructor
 
-        public Binding(Binder.BindingStoring s, Type t, BindingType bt)
+        public Binding(IBinder b, Type t)
         {
-            storing = s;
+            _binder = b;
 
-            bindingInfo = new Info(t, bt);
+            _type = t;
+
+            _value = new List<object>();
         }
 
-        public Binding(Binder.BindingStoring s, Type t, BindingType bt, ConstraintType c)
+        public Binding(IBinder b, Type t, BindingType bt)
         {
-            storing = s;
+            _binder = b;
 
-            bindingInfo = new Info(t, bt, c);
+            _type = t;
+
+            _bindingType = bt;
+
+            _value = new List<object>();
+        }
+
+        public Binding(IBinder b, Type t, BindingType bt, ConstraintType c)
+        {
+            _binder = b;
+
+            _type = t;
+
+            _bindingType = bt;
+
+            _constraint = c;
+
+            _value = new List<object>();
         }
 
         #endregion
 
         #region IBinding implementation 
 
+
         #region property
 
         /// <summary>
-        /// type 属性，返回 bindingInfo 的type值
+        /// binder 属性
+        /// </summary>
+        public IBinder binder
+        {
+            get { return _binder; }
+        }
+        protected IBinder _binder;
+
+        /// <summary>
+        /// type 属性
         /// </summary>
         public Type type
         {
-            get { return bindingInfo.type; }
+            get { return _type; }
         }
+        protected Type _type;
 
         /// <summary>
-        ///  value 属性，返回 bindingInfo 的value值
+        ///  value 属性 返回 valueList 的第一个元素
+        ///  valueList 返回整个 valueList
         /// </summary>
         public object value
         {
             get
             {
-                if(bindingInfo.value is Array) { return ((object[])bindingInfo.value)[0]; }
-                return bindingInfo.value;
+                if (_value == null) { _value = new List<object>(); }
+                if (_value.Count == 0) { return null; }
+                return _value[0];
             }
         }
-        public object[] valueArray
+        public IList<object> valueList
         {
-            get { return (object[])bindingInfo.value; }
+            get
+            {
+                if (_value == null) { _value = new List<object>(); }
+                return _value;
+            }
         }
+        protected IList<object> _value;
 
         /// <summary>
-        /// id 属性，返回 bindingInfo 的id值
+        /// id 属性
         /// </summary>
         public object id
         {
-            get { return bindingInfo.id; }
+            get { return _id; }
+            set { _id = value; }
         }
+        protected object _id;
 
         /// <summary>
         /// constraint 属性，(ONE \ MULTIPLE \ POOL)
         /// </summary>
         public ConstraintType constraint
         {
-            get { return bindingInfo.valueConstraint; }
+            get { return _constraint; }
         }
+        protected ConstraintType _constraint;
 
         /// <summary>
         /// bindingType 属性
         /// </summary>
         public BindingType bindingType
         {
-            get { return bindingInfo.bindingType; }
+            get { return _bindingType; }
         }
+        protected BindingType _bindingType;
 
         /// <summary>
         /// condition 属性
         /// </summary>
-        public Condition condition
-        {
-            get { return bindingInfo.condition; }
-            set { bindingInfo.condition = value; }
-        }
+        public Condition condition { get; set; }
 
         #endregion
 
@@ -131,24 +150,21 @@ namespace uMVVMCS.DIContainer
         #region To
 
         /// <summary>
-        /// 将 binding 所存储的 Info 实例中的 value 属性设为其自身的 type
+        /// 将 value 属性设为其自身的 type
         /// </summary>
         virtual public IBinding ToSelf()
         {
-            // if (bindingInfo.valueConstraint == ConstraintType.POOL)逻辑等 Pool 类实现后再补充
-            if (bindingInfo.valueConstraint != ConstraintType.MULTIPLE)
-            {
-                bindingInfo.value = bindingInfo.type;
-            }
-            else { bindingInfo.value = new object[] { bindingInfo.type }; }
-            
-            if (storing != null) { storing(this); }
+            // 每个 binding 只有一个 type，所以绑定到自身也必然只有一个值
+            _constraint = ConstraintType.SINGLE;
+            _value = new List<object>() { _type };
+
+            binder.Storing(this);
 
             return this;
         }
 
         /// <summary>
-        /// 向 binding 所存储的 Info 实例中的 value 属性中添加一个类型
+        /// 向 binding 的 value 属性中添加一个类型
         /// </summary>
         virtual public IBinding To<T>() where T : class
         {
@@ -156,68 +172,81 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 向 binding 所存储的 Info 实例中的 value 属性中添加一个object
+        /// 向 binding 的 value 属性中添加一个object
         /// </summary>
         virtual public IBinding To(object o)
         {
-            if (!PassToAdd(ref o))
+            if (_bindingType == BindingType.ADDRESS && !(o is Type))
             {
-                throw new BindingSystemException(BindingSystemException.VALUE_NOT_ASSIGNABLE);
+                _bindingType = BindingType.SINGLETON;
+                _constraint = ConstraintType.SINGLE;
             }
-            
-            if (bindingInfo.valueConstraint != ConstraintType.MULTIPLE)
-            {
-                bindingInfo.value = o;
-            }
-            else { AddValue(o); }
 
-            if (storing != null) { storing(this); }
+            if (!PassToAdd(o))
+            {
+                throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
+            }
+
+            bool add = true;
+            int count = _value.Count;
+            for (int n = 0; n < count; n++)
+            {
+                if (_value[n] == o) { add = false; }
+            }
+
+            if (_constraint == ConstraintType.SINGLE || _value == null)
+            {
+                if (add) { _value = new List<object>() { o }; }
+            }
+            else
+            {
+                if (add) { _value.Add(o); }
+            }
+
+            binder.Storing(this);
 
             return this;
         }
 
         /// <summary>
-        /// 将多个 object 添加到 binding 的所存储的 Info 实例中的 value 属性中
+        /// 将多个 object 添加到 binding 的 value 属性中
         /// </summary>
-        virtual public IBinding To(IList<object> os)
+        virtual public IBinding To(object[] os)
         {
-            // 如果约束类型为单例就抛出异常
-            if (bindingInfo.valueConstraint != ConstraintType.MULTIPLE)
+            if (_bindingType == BindingType.ADDRESS)
+            {
+                _bindingType = BindingType.MULTITON;
+                _constraint = ConstraintType.MULTIPLE;
+            }
+
+            // 如果值约束不为复数就抛出异常
+            if (_constraint == ConstraintType.SINGLE)
             {
                 throw new BindingSystemException(
-                    string.Format(BindingSystemException.CONSTRAINTYPE_NOT_ASSIGNABLE,
-                    "[To(IList<object> os)]",
-                    "[ConstraintType.SINGLE]"));
+                    string.Format(BindingSystemException.BINDINGTYPE_NOT_ASSIGNABLE,
+                    "[To(object[] os)]",
+                    _bindingType));
             }
 
-            int length = os.Count;
+            int length = os.Length;
             for (int i = 0; i < length; i++)
             {
-                var osi = os[i];
-                if (!PassToAdd(ref osi))
+                bool add = true;
+                int count = _value.Count;
+                for (int n = 0; n < count; n++)
                 {
-                    throw new BindingSystemException(BindingSystemException.VALUE_NOT_ASSIGNABLE);
+                    if(_value[n] == os[i]) { add = false; }
                 }
-                AddValue(osi);
+                
+                if (!PassToAdd(os[i]))
+                {
+                    throw new BindingSystemException(BindingSystemException.TYPE_NOT_ASSIGNABLE);
+                }
+
+                if (add) { _value.Add(os[i]); }
             }
 
-            if (storing != null) { storing(this); }
-
-            return this;
-        }
-
-        /// <summary>
-        /// 直接设置一个值给 binding 的所存储的 Info 实例而不进行兼容检查
-        /// </summary>
-        virtual public IBinding SetValue(object o)
-        {
-            if (bindingInfo.valueConstraint != ConstraintType.MULTIPLE)
-            {
-                bindingInfo.value = o;
-            }
-            else { AddValue(o); }
-
-            if (storing != null) { storing(this); }
+            binder.Storing(this);
 
             return this;
         }
@@ -227,7 +256,7 @@ namespace uMVVMCS.DIContainer
         #region As
 
         /// <summary>
-        /// 设置 binding 所存储的 Info 实例中的 id 属性
+        /// 设置 binding 的 id 属性
         /// </summary>
         virtual public IBinding As<T>() where T : class
         {
@@ -235,13 +264,12 @@ namespace uMVVMCS.DIContainer
         }
 
         /// <summary>
-        /// 设置 binding 所存储的 Info 实例中的 id 属性
+        /// 设置 binding 的 id 属性
         /// </summary>
         virtual public IBinding As(object o)
         {
-            bindingInfo.id = (o == null) ? null : o;
-
-            if (storing != null) { storing(this); }
+            _id = (o == null) ? null : o;
+            binder.Storing(this);
 
             return this;
         }
@@ -251,11 +279,11 @@ namespace uMVVMCS.DIContainer
         #region When
 
         /// <summary>
-        /// 设置 binding 所存储的 Info 实例中的 condition 属性
+        /// 设置 binding 的 condition 属性
         /// </summary>
         virtual public IBinding When(Condition c)
         {
-            bindingInfo.condition = c;
+            condition = c;
 
             return this;
         }
@@ -265,39 +293,106 @@ namespace uMVVMCS.DIContainer
         #region Into
 
         /// <summary>
-        /// 设置 binding 所存储的 Info 实例中的 condition 属性为 context.parentType 与参数 T 相等
+        /// 设置 binding 的 condition 属性为 context.parentType 与参数 T 相等
         /// </summary>
         virtual public IBinding Into<T>() where T : class
         {
-            bindingInfo.condition = context => context.parentType == typeof(T);
+            condition = context => context.parentType == typeof(T);
 
             return this;
         }
 
         /// <summary>
-        /// 设置 binding 所存储的 Info 实例中的 condition 属性 context.parentType 与指定类型相等
+        /// 设置 binding 的 condition 属性为 context.parentType 与指定类型相等
         /// </summary>
         virtual public IBinding Into(Type t)
         {
-            bindingInfo.condition = context => context.parentType == t;
+            condition = context => context.parentType == t;
 
             return this;
         }
 
         #endregion
 
-        /// <summary>
-        /// 设置 binding 所存储的 Info 实例中的 condition 属性为返回 context.parentInstance 与参数 i 相等
-        /// </summary>
-        virtual public IBinding ParentInstanceCondition(object i)
-        {
-            bindingInfo.condition = context => context.parentInstance == i;
+        #region ReBind
 
-            return this;
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 ADDRESS，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding Bind<T>()
+        {
+            return _binder.Bind<T>();
         }
 
         /// <summary>
-        /// 从 binding 所存储的 Info 实例中的 value 属性中移除指定的值
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 属性为 ADDRESS，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding Bind(Type type)
+        {
+            return _binder.Bind(type);
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindSingleton<T>()
+        {
+            return _binder.BindSingleton<T>();
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 SINGLETON，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindSingleton(Type type)
+        {
+            return _binder.BindSingleton(type);
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindFactory<T>()
+        {
+            return _binder.BindFactory<T>();
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 FACTORY，值约束为 SINGLE
+        /// </summary>
+        virtual public IBinding BindFactory(Type type)
+        {
+            return _binder.BindFactory(type);
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
+        /// </summary>
+        virtual public IBinding BindMultiton<T>()
+        {
+            return _binder.BindMultiton<T>();
+        }
+
+        /// <summary>
+        /// 返回一个指定 type 属性的新 Binding 实例，BindingType 为 MULTITON，值约束为 MULTIPLE
+        virtual public IBinding BindMultiton(Type type)
+        {
+            return _binder.BindMultiton(type);
+        }
+
+        /// <summary>
+        /// 创建多个指定 type 属性的 binding，并返回 IBindingFactory
+        /// </summary>
+        virtual public IBindingFactory MultipleBind(Type[] types, BindingType[] bindingTypes)
+        {
+            return _binder.MultipleBind(types, bindingTypes);
+        }
+
+        #endregion
+
+        #region RemoveValue
+
+        /// <summary>
+        /// 从 binding 的 value 属性中移除指定的值，如果删除后值为空，则移除 binding
         /// </summary>
         virtual public IBinding RemoveValue(object o)
         {
@@ -305,50 +400,53 @@ namespace uMVVMCS.DIContainer
             if (o == null) { return this; }
 
             // 值约束过滤
-            if(bindingInfo.valueConstraint == ConstraintType.MULTIPLE)
+            if (_constraint == ConstraintType.MULTIPLE)
             {
-                if (bindingInfo.bindingType == BindingType.TEMP)
-                {
-                    Type t = o.GetType();
-                    RemoveArrayValue(t);
-                }
-                RemoveArrayValue(o);
+                _value.Remove(o);
+                if(_value.Count == 0) { binder.Unbind(this); }
                 return this;
             }
 
-            bindingInfo.value = null;
+            _value = null;
+            binder.Unbind(this);
             return this;
         }
 
         /// <summary>
-        /// 从 binding 所存储的 Info 实例中的 value 属性中移除多个值
+        /// 从 binding 的 value 属性中移除多个值，如果删除后值为空，则移除 binding
         /// </summary>
-        virtual public IBinding RemoveValues(IList<object> os)
+        virtual public IBinding RemoveValues(object[] os)
         {
-            // 过滤空值、值约束
-            if (os == null || bindingInfo.valueConstraint != ConstraintType.MULTIPLE) { return this; }
+            // 过滤空值、值约束、要删除的值比已储存的值更多的情况
+            if (os == null || os.Length > _value.Count ||
+                _constraint != ConstraintType.MULTIPLE)
+            { return this; }
 
-            List<object> list = new List<object>(valueArray);
-
-            // 为 TEMP 类型 binding 获取 Type List
-            List<Type> types = new List<Type>();
-            int length = os.Count;
-            if (bindingInfo.bindingType == BindingType.TEMP)
-            {
-                for (int i = 0; i < length; i++)
-                {
-                    if (os[i] is Type) { types.Add(os[i] as Type); }
-                    else { types.Add(os[i].GetType()); }
-                }
-            }
-
+            int length = os.Length;
             for (int i = 0; i < length; i++)
             {
-                if (bindingInfo.bindingType == BindingType.TEMP) { list.Remove(types[i]); }
-                else { list.Remove(os[i]); }
+                _value.Remove(os[i]);
             }
 
-            bindingInfo.value = list.ToArray();
+            if(_value.Count == 0)
+            {
+                _value = null;
+                binder.Unbind(this);
+                return this;
+            }
+            
+            return this;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 设置 binding 的 condition 属性为返回 context.parentInstance 与参数 i 相等
+        /// </summary>
+        virtual public IBinding ParentInstanceCondition(object i)
+        {
+            condition = context => context.parentInstance == i;
+
             return this;
         }
 
@@ -359,25 +457,10 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// 返回 是否符合添加当前要求
         /// </summary>
-        virtual public bool PassToAdd(ref object v)
+        virtual public bool PassToAdd(object v)
         {
-            // 如果是 TEMP 类型且 value 是值类型的值，返回 false；否则如果是实例，获取实例的类型替代原值
-            if (bindingInfo.bindingType == BindingType.TEMP)
-            {
-                if (v is Type)
-                {
-                    return TypeUtils.IsAssignable(bindingInfo.type, (v as Type));
-                }
-                else
-                {
-                    if (v is ValueType) { return false; }
-                    v = v.GetType();
-                    return TypeUtils.IsAssignable(bindingInfo.type, (v as Type));
-                }
-            }
-
             // 如果是工厂类型，返回参数 v 是否继承 IInjectionFactory
-            if (bindingInfo.bindingType == BindingType.FACTORY)
+            if (_bindingType == BindingType.FACTORY)
             {
                 if (v is Type)
                 {
@@ -387,85 +470,68 @@ namespace uMVVMCS.DIContainer
                 return TypeUtils.IsAssignable(typeof(IInjectionFactory), v.GetType());
             }
 
-            // 如果 binding 是 TEMP 类型，返回自身 type 与参数 v 是否是同类或继承关系
-            if (v is Type) { return TypeUtils.IsAssignable(bindingInfo.type, (v as Type)); }
+            // 如果 binding 是 ADDRESS 类型，返回自身 type 与参数 v 是否是同类或继承关系
+            if (v is Type) { return TypeUtils.IsAssignable(_type, (v as Type)); }
 
-            return TypeUtils.IsAssignable(bindingInfo.type, v.GetType());
+            return TypeUtils.IsAssignable(_type, v.GetType());
+        }
+
+        #region set binding property
+
+        /// <summary>
+        /// 设置 binding 的值
+        /// </summary>
+        virtual public IBinding SetValue(object o)
+        {
+            if (_constraint != ConstraintType.MULTIPLE)
+            {
+                _value = new List<object>() { o };
+            }
+            else { _value.Add(o); }
+
+            return this;
         }
 
         /// <summary>
-        /// 当值约束为 MULTIPLE 时向 value 属性的末尾添加不重复的新元素
+        /// 设置 binding 的 ConstraintType
         /// </summary>
-        virtual public void AddValue(object o)
+        virtual public IBinding SetConstraint(ConstraintType ct)
         {
-            // 过滤空值、值约束
-            if (o == null || bindingInfo.valueConstraint != ConstraintType.MULTIPLE) { return; }
-
-            if (bindingInfo.value is Array)
-            {
-                // 过滤同值
-                int length = valueArray.Length;
-                for (int i = 0; i < length; i++)
-                {
-                    if (o.Equals(valueArray[i])) { return; }
-                }
-
-                // 添加元素
-                object[] newArray = new object[length + 1];
-                valueArray.CopyTo(newArray, 0);
-                newArray[length] = o;
-                bindingInfo.value = newArray;
-            }
-            // 如果值还不是数组，直接赋1个新数组
-            else { bindingInfo.value = new object[] { o }; }
+            _constraint = ct;
+            return this;
         }
 
         /// <summary>
-        /// 当值约束为 MULTIPLE 时移除 value 属性中指定的值(如果找不到相同的值则不做处理)
+        /// 设置 binding 的 BindingType
         /// </summary>
-        virtual public void RemoveArrayValue(object o)
+        virtual public IBinding SetBindingType(BindingType bt)
         {
-            // 过滤空值、值约束
-            if (o == null || bindingInfo.valueConstraint != ConstraintType.MULTIPLE) { return; }
-
-            // 如果 value 为空或与参数相等，将其置空并返回
-            if (o.Equals(bindingInfo.value) || bindingInfo.value == null)
-            {
-                bindingInfo.value = null;
-                return;
-            }
-
-            // 遍历数组，将找到的相同的元素移除
-            int length = valueArray.Length;
-            for (int i = 0; i < length; i++)
-            {
-                if (o.Equals(valueArray[i]))
-                {
-                    spliceValueAt(i);
-                    return;
-                }
-            }
+            _bindingType = bt;
+            return this;
         }
 
-        /// <summary>
-        /// 移除数组中指定位置的值
-        /// </summary>
-        protected void spliceValueAt(int splicePos)
-        {
-            int mod = 0;
-            int length = valueArray.Length;
-            object[] newArray = new object[length - 1];
+        #endregion
 
-            for (int i = 0; i < length; i++)
-            {
-                if (i == splicePos)
-                {
-                    mod = -1;
-                    continue;
-                }
-                newArray[i + mod] = valueArray[i];
-            }
-            bindingInfo.value = (newArray.Length == 0) ? null : newArray;
+        /// <summary>
+        /// 配合 BindingsPrinter 窗口显示 binding 信息
+        /// </summary>
+        public override string ToString()
+        {
+            return string.Format(
+            "Type: {0}\n" +
+            "Value: {1} ({2})\n" +
+            "Id: {3}\n"+
+            "BindingType: {4}\n" +
+            "constraint: {5}\n" +
+            "Conditions: {6}\n",
+            type.FullName,
+            (value == null ? "null" : this.value.ToString()),
+            (value is Type ? "type" : "instance"),
+            (id == null ? "null" : this.id.ToString()),
+            bindingType.ToString(),
+            constraint.ToString(),
+            (condition == null ? "no" : "yes")
+            );
         }
     }
 }

@@ -22,15 +22,15 @@ namespace uMVVMCS.DIContainer
     /// <summary>
     /// 条件判断委托
     /// </summary>
-    public delegate bool Condition(InjectionContext context);
+    public delegate bool Condition(InjectionInfo context);
 
     /// <summary>
-    /// 添加 Binding 的 AOT 委托
+    /// 添加 Binding 的 aots 委托
     /// </summary>
     public delegate void BindingAddedHandler(IBinder source, ref IBinding binding);
 
     /// <summary>
-    /// 移除 Binding 的 AOT 委托
+    /// 移除 Binding 的 aots 委托
     /// </summary>
     public delegate void BindingRemovedHandler(IBinder source, IList<IBinding> bindings);
 
@@ -47,10 +47,6 @@ namespace uMVVMCS.DIContainer
         /// 约束Segment可以携带多个值
         /// </summary>
         MULTIPLE,
-        /// <summary>
-        /// 约束Binding接受Segment的对象池
-        /// </summary>
-        POOL,
     }
 
     /// <summary>
@@ -59,31 +55,25 @@ namespace uMVVMCS.DIContainer
     public enum BindingType
     {
         /// <summary> 
-        /// binging 的 value 属性为 Type，如果设为实例，将会自动将实例转为 Type
+        /// binging 的 value 属性为 Type，或 prefab 路径信息类等，用于储存将要多次使用或创建的类型或路径
         /// 实例化的结果不会储存并覆盖到 value
         /// </summary>
-        TEMP,
+        ADDRESS,
         /// <summary> 
         /// bingding 的 value 为类型或实例，如果是类型，Inject 系统会自动为其创建实例并为实例执行注入
         /// 实例将会保存并覆盖到 bingding 的 value，以保证每次获取的都是同一个实例。
         /// </summary>
         SINGLETON,
         /// <summary> 
+        /// bingding 的 value 为类型或实例，如果是类型，Inject 系统会自动为其创建实例并为实例执行注入
+        /// bingding 的 value 将储存复数个值，注入的实例将会保存并覆盖到指定元素
+        /// </summary>
+        MULTITON,
+        /// <summary> 
         /// bingding 的 value 为工厂类型或者实例，如果是类型，Inject 系统会自动创建实例并注入
         /// 实例将会保存并覆盖到 bingding 的 value，以保证每次获取的都是同一个实例
         /// 而一旦工厂类被实例化，之后就都是通过工厂类的 Create 方法的具体实现来创建实例 
         /// </summary>
         FACTORY
-    }
-
-    /// <summary>
-    /// Binding 常量
-    /// </summary>
-    public enum BindingConst
-    {
-        /// <summary> 
-        /// 预删除
-        /// </summary>
-        PREPARETOREMOVE,
     }
 }

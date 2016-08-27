@@ -29,17 +29,17 @@ namespace uMVVMCS.DIContainer
     public delegate object ParamsConstructor(object[] parameters);
 
     /// <summary>
-    /// 为一个实例回调一个无参数的 post 注入方法
+    /// 回调一个无参数方法
     /// </summary>
-    public delegate void PostConstructor(object instance);
+    public delegate void ParameterlessMethod(object instance);
 
     /// <summary>
-    /// 为一个实例回调一个有参数的 post 注入方法
+    /// 回调一个有参数方法
     /// </summary>
-    public delegate void ParamsPostConstructor(object instance, object[] parameters);
+    public delegate void ParamsMethod(object instance, object[] parameters);
 
     /// <summary>
-    /// 为一个属性或字段回调一个设置注入方法
+    /// 为一个属性或字段回调一个设值注入方法
     /// </summary>
     public delegate void Setter(object instance, object value);
 
@@ -90,28 +90,28 @@ namespace uMVVMCS.DIContainer
     }
 
     /// <summary>
-    /// 注入完成后执行方法信息类
+    /// Method 信息类
     /// </summary>
-    public class PostConstructorInfo
+    public class MethodInfo
     {
         /// <summary>
         /// 无参数方法
         /// </summary>
-        public PostConstructor postConstructor;
+        public ParameterlessMethod method;
 
         /// <summary>
-        /// 带参数方法
+        /// 有参数方法
         /// </summary>
-        public ParamsPostConstructor paramsPostConstructor;
+        public ParamsMethod paramsMethod;
 
         /// <summary>
-        /// 方法参数信息
+        /// 参数信息类
         /// </summary>
         public ParameterInfo[] parameters;
 
         #region constructor
 
-        public PostConstructorInfo(ParameterInfo[] parameters)
+        public MethodInfo(ParameterInfo[] parameters)
         {
             this.parameters = parameters;
         }

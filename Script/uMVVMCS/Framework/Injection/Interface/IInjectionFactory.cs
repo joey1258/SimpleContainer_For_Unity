@@ -23,7 +23,7 @@ namespace uMVVMCS.DIContainer
         /// <summary>
         /// Creates an instance of the object of the type created by the factory.
         /// </summary>
-        object Create(InjectionContext context);
+        object Create(InjectionInfo context);
 
     }
 }
