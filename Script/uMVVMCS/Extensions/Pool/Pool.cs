@@ -87,17 +87,6 @@ namespace uMVVMCS.DIContainer
         public Object[] parameters { get; set; }
 
         /// <summary>
-        /// 如果对象池中有可用实例则返回一个，否则返回空
-        /// </summary>
-        public object value
-        {
-            get
-            {
-                return GetInstance();
-            }
-        }
-
-        /// <summary>
         /// 返回当前由对象池管理的实例总数
         /// </summary>
         public int instanceCount
@@ -124,11 +113,6 @@ namespace uMVVMCS.DIContainer
         /// 获取或设置对象池可以储存多少个对象，设置为0表示无限。
         /// </summary>
         virtual public int size { get; set; }
-
-        /// <summary>
-        /// 是否保留对象，保留为真
-        /// </summary>
-        public bool retain { get; set; }
 
         #endregion
 
@@ -205,15 +189,6 @@ namespace uMVVMCS.DIContainer
             
             return this;
         }
-
-        #endregion
-
-        #region 
-
-
-        #endregion
-
-        #region IPool implementation 实现IPool接口成员
 
         /// <summary>
         /// 返回一个实例，将其从 instancesAvailable 栈中推出，并存入 HashSet 中
@@ -337,10 +312,6 @@ namespace uMVVMCS.DIContainer
             _instanceCount = 0;
         }
 
-        #endregion
-
-        #region IPoolable implementation  实现IPoolable接口成员
-
         /// <summary>
         /// 重置
         /// </summary>
@@ -349,22 +320,6 @@ namespace uMVVMCS.DIContainer
             //清空对象池，设置大小为无限
             Clean();
             size = 0;
-        }
-
-        /// <summary>
-        /// 设置为保留对象
-        /// </summary>
-        public void Retain()
-        {
-            retain = true;
-        }
-
-        /// <summary>
-        /// 设置为不保留对象
-        /// </summary>
-        public void Release()
-        {
-            retain = false;
         }
 
         #endregion
