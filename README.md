@@ -15,3 +15,5 @@ ToluaContainer 是基于 adic （https://github.com/intentor/adic） 进行改�
 二、 添加 PrefabInfo 类，为加载 prefab 提供异步和携程方法。
 
 三、 添加 AssetBundleInfo 类，提供 AssetBundle 相关方法以及异步、携程方法。
+
+请移动到 https://github.com/joey1258/SimpleContainer_For_Unity5_3_x/wiki 了解更多
