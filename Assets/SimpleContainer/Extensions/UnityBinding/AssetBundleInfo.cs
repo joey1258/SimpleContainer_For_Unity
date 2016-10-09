@@ -188,12 +188,12 @@ namespace ToluaContainer.Container
         public void LoadFromCacheOrDownload()
         {
             WWW www = WWW.LoadFromCacheOrDownload(url, 5);
-
-            _asetBundle = www.assetBundle;
             if (www.error != null)
             {
                 throw new Exception("WWW download had an error:" + www.error);
             }
+
+            _asetBundle = www.assetBundle;
 
             if (_asetBundle == null)
             {
