@@ -17,3 +17,10 @@ ToluaContainer （https://github.com/joey1258/ToluaContainer） 是基于 adic �
 三、 添加 AssetBundleInfo 类，提供 AssetBundle 相关方法以及异步、携程方法。
 
 请移动到 https://github.com/joey1258/SimpleContainer_For_Unity5_3_x/wiki 了解更多
+
+
+*****************************************************************************
+双11修正：
+无法设置 Container 的 id 的问题
+
+回复某位热心朋友的反馈：关于执行注入导致UINTY崩溃的问题：目前测试的结果是如果对静态变量附加[Inject]特性执行注入确实会导致崩溃，暂时还没有找到解决办法，当前只能避免对静态变量附加[Inject]特性执行注入，待有解决方法后再行修正。
