@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ToluaContainer
+namespace SimpleContainer
 {
     public abstract class Command : ICommand, IDisposable
     {

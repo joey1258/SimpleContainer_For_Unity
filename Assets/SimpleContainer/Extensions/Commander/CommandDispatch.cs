@@ -2,9 +2,9 @@
 using System;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
-    [AddComponentMenu("ToluaContainer/Command dispatch")]
+    [AddComponentMenu("SimpleContainer/Command dispatch")]
     public class CommandDispatch : NamespaceCommandBehaviour
     {
         /// <summary>

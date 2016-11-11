@@ -1,9 +1,9 @@
 ﻿using UnityEditor;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 using System;
 using System.Collections.Generic;
 
-namespace ToluaContainer.Editors
+namespace SimpleContainer.Editors
 {
     public abstract class NamespaceCommandEditor<T> : Editor where T : NamespaceCommandBehaviour
     {

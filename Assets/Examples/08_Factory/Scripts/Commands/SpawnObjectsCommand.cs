@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using ToluaContainer.Container;
-using ToluaContainer.Examples.Factory.Behaviours;
+using SimpleContainer.Container;
+using SimpleContainer.Examples.Factory.Behaviours;
 
-namespace ToluaContainer.Examples.Factory.Commands
+namespace SimpleContainer.Examples.Factory.Commands
 {
 	public class SpawnObjectsCommand : Command
     {

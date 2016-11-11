@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     /// <summary>
     /// Storage<T> 是为了实现双 Key 检索，这里并不需要两个 Key 检索，所以单独实现

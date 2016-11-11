@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace ToluaContainer.Examples.Factory.Behaviours
+namespace SimpleContainer.Examples.Factory.Behaviours
 {
 	[RequireComponent(typeof(Renderer))]
 	public class Cube : MonoBehaviour {

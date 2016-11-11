@@ -1,4 +1,4 @@
-﻿namespace ToluaContainer.Examples.HelloWorld
+﻿namespace SimpleContainer.Examples.HelloWorld
 {
     public class HelloWorld
     {

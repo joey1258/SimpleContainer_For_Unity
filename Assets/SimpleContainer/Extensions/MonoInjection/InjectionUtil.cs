@@ -1,6 +1,6 @@
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer
+namespace SimpleContainer
 {
 	public static class InjectionUtil {
         /// <summary>

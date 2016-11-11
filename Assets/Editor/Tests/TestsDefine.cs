@@ -25,8 +25,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ToluaContainer;
-using ToluaContainer.Container;
+using SimpleContainer;
+using SimpleContainer.Container;
 
 namespace uMVVMCS_NUitTests
 {

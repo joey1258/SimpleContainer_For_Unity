@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public static class CommanderUtils
     {
@@ -34,8 +34,8 @@ namespace ToluaContainer.Container
                 {
                     var type = allTypes[n];
 
-                    // 如果命名空间不是 ToluaContainer
-                    if (type.Namespace != "ToluaContainer" &&
+                    // 如果命名空间不是 SimpleContainer
+                    if (type.Namespace != "SimpleContainer" &&
                         type.IsClass &&
                         TypeUtils.IsAssignable(typeof(ICommand), type))
                     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     [AddComponentMenu("")]
     public abstract class NamespaceCommandBehaviour : MonoBehaviour

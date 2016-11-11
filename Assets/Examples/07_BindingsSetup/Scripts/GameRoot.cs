@@ -1,14 +1,14 @@
 using UnityEngine;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Examples.BindingsSetup
+namespace SimpleContainer.Examples.BindingsSetup
 {
 	public class GameRoot : ContextRoot {
 		public override void SetupContainers()
         {
 			AddContainer<InjectionContainer>()
 				.RegisterAOT<UnityContainerAOT>()
-				.SetupBindings("ToluaContainer.Examples.BindingsSetup.Bindings");
+				.SetupBindings("SimpleContainer.Examples.BindingsSetup.Bindings");
         }
 		
 		public override void Init() {

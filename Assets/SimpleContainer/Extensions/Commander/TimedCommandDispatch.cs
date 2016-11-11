@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
-    [AddComponentMenu("ToluaContainer/Timed command dispatch")]
+    [AddComponentMenu("SimpleContainer/Timed command dispatch")]
     public class TimedCommandDispatch : CommandDispatch
     {
         /// <summary>

@@ -1,6 +1,6 @@
-﻿using ToluaContainer.Container;
+﻿using SimpleContainer.Container;
 
-namespace ToluaContainer.Examples.HelloWorld
+namespace SimpleContainer.Examples.HelloWorld
 {
     public class HelloWorldRoot : ContextRoot
     {

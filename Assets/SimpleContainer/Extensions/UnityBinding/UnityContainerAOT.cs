@@ -2,7 +2,7 @@
 using UnityEngine;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public class UnityContainerAOT : IContainerAOT
     {

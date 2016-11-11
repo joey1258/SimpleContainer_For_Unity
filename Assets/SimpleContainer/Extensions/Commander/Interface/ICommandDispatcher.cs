@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ToluaContainer
+namespace SimpleContainer
 {
     public interface ICommandDispatcher
     {

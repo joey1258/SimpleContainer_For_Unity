@@ -90,6 +90,11 @@
     <Compile Include="Assets\Examples\08_Factory\Scripts\Commands\SpawnObjectsCommand.cs" />
     <Compile Include="Assets\Examples\08_Factory\Scripts\Factories\CubeFactory.cs" />
     <Compile Include="Assets\Examples\08_Factory\Scripts\GameRoot.cs" />
+    <Compile Include="Assets\New Folder\Hello.cs" />
+    <Compile Include="Assets\New Folder\HelloA.cs" />
+    <Compile Include="Assets\New Folder\HelloB.cs" />
+    <Compile Include="Assets\New Folder\PrintHelloWorld.cs" />
+    <Compile Include="Assets\New Folder\Root.cs" />
     <Compile Include="Assets\SimpleContainer\Container\Attribute\Attributes.cs" />
     <Compile Include="Assets\SimpleContainer\Container\Binding\Binder.cs" />
     <Compile Include="Assets\SimpleContainer\Container\Binding\Binding.cs" />

@@ -1,4 +1,4 @@
-﻿namespace ToluaContainer.Container
+﻿namespace SimpleContainer.Container
 {
     public interface IContextRoot
     {

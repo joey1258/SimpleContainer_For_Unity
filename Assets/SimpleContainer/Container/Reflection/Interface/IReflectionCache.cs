@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public interface IReflectionCache
     {

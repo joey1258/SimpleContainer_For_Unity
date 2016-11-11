@@ -1,7 +1,7 @@
 ﻿using System;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public static class BindingsSetup
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ToluaContainer
+namespace SimpleContainer
 {
     public class EventBehaviour : MonoBehaviour
     {

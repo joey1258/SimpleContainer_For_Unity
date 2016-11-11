@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     /// <summary>
     /// 无参数构造函数委托

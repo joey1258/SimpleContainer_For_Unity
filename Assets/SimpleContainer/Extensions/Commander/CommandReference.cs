@@ -1,8 +1,8 @@
 ﻿using System;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 using Utils;
 
-namespace ToluaContainer
+namespace SimpleContainer
 {
     [Serializable]
     public class CommandReference

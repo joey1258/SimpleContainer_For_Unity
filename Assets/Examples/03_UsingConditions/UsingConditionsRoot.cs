@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Examples.UsingConditions
+namespace SimpleContainer.Examples.UsingConditions
 {
     public class UsingConditionsRoot : ContextRoot
     {

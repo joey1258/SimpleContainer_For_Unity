@@ -3,10 +3,10 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using System;
 using System.Collections.Generic;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 using Utils;
 
-namespace ToluaContainer.Editors
+namespace SimpleContainer.Editors
 {
     [CustomEditor(typeof(ContextRoot), true)]
     public class ContextRootEditor : Editor
@@ -44,8 +44,8 @@ namespace ToluaContainer.Editors
             int length = customTypes.Length;
             for (int i = 0; i < length; i++)
             {
-                // 如果不是 ToluaContainer 命名空间下的类型才添加到 customScriptsNames
-                if (!customTypes[i].FullName.StartsWith("ToluaContainer"))
+                // 如果不是 SimpleContainer 命名空间下的类型才添加到 customScriptsNames
+                if (!customTypes[i].FullName.StartsWith("SimpleContainer"))
                 {
                     customScriptsNames.Add(customTypes[i].FullName);
                 }

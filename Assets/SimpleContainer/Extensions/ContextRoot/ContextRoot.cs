@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public abstract class ContextRoot : MonoBehaviour, IContextRoot
     {
@@ -51,9 +51,9 @@ namespace ToluaContainer.Container
         public static List<IInjectionContainer> containers { get; set; }
 
         /// <summary>
-        /// 容器仓库 (储存 containers List 中 id 不为空的binding，并用 type 和 id 索引)
+        /// 容器仓库 (储存 containers List 中 id 不为空的 container)
         /// </summary>
-        public static Dictionary<object, List<IInjectionContainer>> containersDic { get; protected set; }
+        public static Dictionary<object, IInjectionContainer> containersDic { get; protected set; }
 
         #endregion
 
@@ -63,7 +63,7 @@ namespace ToluaContainer.Container
 
         virtual protected void Awake()
         {
-            containersDic = new Dictionary<object, List<IInjectionContainer>>();
+            containersDic = new Dictionary<object, IInjectionContainer>();
             // 如果容器数据list为空，设置它的长度为1
             if (containers == null)
             {
@@ -112,6 +112,15 @@ namespace ToluaContainer.Container
         }
 
         /// <summary>
+        /// 将 container添加到 containers List
+        /// </summary>
+        virtual public IInjectionContainer AddContainer<T>(bool destroyOnLoad) where T : IInjectionContainer, new()
+        {
+            var container = Activator.CreateInstance<T>();
+            return AddContainer(container, destroyOnLoad);
+        }
+
+        /// <summary>
         /// 将 container添加到 containers List，并默认 destroyOnLoad 为真
         /// </summary>
         virtual public IInjectionContainer AddContainer(IInjectionContainer container)
@@ -140,9 +149,9 @@ namespace ToluaContainer.Container
         /// </summary>
         virtual public void Dispose(object id)
         {
-            containers.Remove(containersDic[id][0]);
-            containersDic[id][0].Dispose();
-            containersDic[id][0] = null;
+            containers.Remove(containersDic[id]);
+            containersDic[id].Dispose();
+            containersDic[id] = null;
             containersDic.Remove(containersDic[id]);
         }
 
@@ -183,11 +192,9 @@ namespace ToluaContainer.Container
         {
             if (container.id != null)
             {
-                print(container == null);
                 if (!containersDic.ContainsKey(container.id))
                 {
-                    containersDic[container.id] = new List<IInjectionContainer>(1);
-                    containersDic[container.id].Add(container);
+                    containersDic[container.id] = container;
                 }
                 else
                 {
@@ -196,11 +203,7 @@ namespace ToluaContainer.Container
             }
             else
             {
-                if(!containersDic.ContainsKey(ContainerNullId.Null))
-                {
-                    containersDic[ContainerNullId.Null] = new List<IInjectionContainer>();
-                }
-                containersDic[ContainerNullId.Null].Add(container);
+                containersDic[ContainerNullId.Null] = container;
             }
         }
 

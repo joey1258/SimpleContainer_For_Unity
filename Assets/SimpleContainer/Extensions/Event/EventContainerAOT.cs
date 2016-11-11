@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer
+namespace SimpleContainer
 {
     public class EventContainerAOT : IContainerAOT
     {

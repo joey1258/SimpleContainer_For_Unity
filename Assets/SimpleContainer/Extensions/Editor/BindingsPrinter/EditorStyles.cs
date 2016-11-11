@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ToluaContainer.Editors
+namespace SimpleContainer.Editors
 {
     public static class EditorStyles
     {

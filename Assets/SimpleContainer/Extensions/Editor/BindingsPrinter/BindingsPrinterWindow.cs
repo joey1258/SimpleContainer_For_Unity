@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Editors
+namespace SimpleContainer.Editors
 {
     public class BindingsPrinterWindow : EditorWindow
     {
@@ -21,7 +21,7 @@ namespace ToluaContainer.Editors
         /// </summary>
         private Vector2 scrollPosition = Vector2.zero;
 
-        [MenuItem("Window/ToluaContainer/Bindings Printer")]
+        [MenuItem("Window/SimpleContainer/Bindings Printer")]
         protected static void Init()
         {
             // 获取当前屏幕中 SceneView 类型的第一个 EditorWindow，标题为 Bindings Printer
@@ -64,7 +64,7 @@ namespace ToluaContainer.Editors
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 
             GUILayout.Space(WINDOW_MARGIN);
-            GUILayout.Label("ToluaContainer Bindings Printer", EditorStyles.title);
+            GUILayout.Label("SimpleContainer Bindings Printer", EditorStyles.title);
             GUILayout.Label("Displays all bindings of all available containersArray", EditorStyles.containerInfo);
 
             // 显示容器及其中的 binding

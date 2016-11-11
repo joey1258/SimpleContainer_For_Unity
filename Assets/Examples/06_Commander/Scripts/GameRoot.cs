@@ -1,7 +1,7 @@
 using UnityEngine;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Examples.Commander
+namespace SimpleContainer.Examples.Commander
 {
 	public class GameRoot : ContextRoot
     {
@@ -18,7 +18,7 @@ namespace ToluaContainer.Examples.Commander
 				.RegisterAOT<EventContainerAOT>()
 				.RegisterAOT<UnityContainerAOT>()
                 // 注册 "uMVVMCS.Examples.Commander" 命名空间下的所有 Command
-                .RegisterCommands("ToluaContainer.Examples.Commander")
+                .RegisterCommands("SimpleContainer.Examples.Commander")
 				// 绑定 prefab
 				.Bind<Transform>().ToPrefab("06_Commander/Prism");
 		

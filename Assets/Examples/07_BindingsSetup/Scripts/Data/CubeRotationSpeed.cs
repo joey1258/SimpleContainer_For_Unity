@@ -1,4 +1,4 @@
-﻿namespace ToluaContainer.Examples.BindingsSetup.Data
+﻿namespace SimpleContainer.Examples.BindingsSetup.Data
 {
 	public class CubeRotationSpeed {		
 		public float speed { get; set; }

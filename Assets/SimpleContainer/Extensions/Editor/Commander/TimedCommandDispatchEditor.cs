@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Editors
+namespace SimpleContainer.Editors
 {
     [CustomEditor(typeof(TimedCommandDispatch))]
     public class TimedCommandDispatchEditor : NamespaceCommandEditor<TimedCommandDispatch>

@@ -6,7 +6,7 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright Joey1258
- * @link https://github.com/joey1258/ToluaContainer
+ * @link https://github.com/joey1258/SimpleContainer
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public class Binding : IBinding
     {

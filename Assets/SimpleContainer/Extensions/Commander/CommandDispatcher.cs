@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer
+namespace SimpleContainer
 {
     public class CommandDispatcher : IDisposable, ICommandDispatcher, ICommandPool
     {

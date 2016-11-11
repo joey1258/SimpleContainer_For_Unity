@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Examples.BindingGameObjects
+namespace SimpleContainer.Examples.BindingGameObjects
 {
     public class BindingGameObjectsRoot : ContextRoot
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public class ReflectionFactory : IReflectionFactory
     {
@@ -112,9 +112,9 @@ namespace ToluaContainer.Container
         /// <summary>
         /// 获取指定类型注入后需要执行的方法的信息类
         /// </summary>
-        virtual protected ToluaContainer.Container.MethodInfo[] GetMethods(Type type)
+        virtual protected SimpleContainer.Container.MethodInfo[] GetMethods(Type type)
         {
-            var parameterlessMethods = new List<ToluaContainer.Container.MethodInfo>();
+            var parameterlessMethods = new List<SimpleContainer.Container.MethodInfo>();
             // 获取参数 type 中的方法
             var methods = type.GetMethods (
                 BindingFlags.FlattenHierarchy |
@@ -147,7 +147,7 @@ namespace ToluaContainer.Container
                         methodParameters[n] = new ParameterInfo(parameter.ParameterType, id);
                     }
 
-                    var parameterlessMethod = new ToluaContainer.Container.MethodInfo(methodParameters);
+                    var parameterlessMethod = new SimpleContainer.Container.MethodInfo(methodParameters);
 
                     // 根据参数个数创建方法委托
                     if (methodParameters.Length == 0)

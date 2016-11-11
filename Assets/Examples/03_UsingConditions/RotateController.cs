@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ToluaContainer.Examples.UsingConditions
+namespace SimpleContainer.Examples.UsingConditions
 {
     public class RotateController : MonoBehaviour
     {

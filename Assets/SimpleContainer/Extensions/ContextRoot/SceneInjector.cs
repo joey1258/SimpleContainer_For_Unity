@@ -2,7 +2,7 @@
 using System;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     [RequireComponent(typeof(ContextRoot))]
     public class SceneInjector : MonoBehaviour

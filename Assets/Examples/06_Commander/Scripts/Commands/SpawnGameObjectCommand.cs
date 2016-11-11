@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Examples.Commander
+namespace SimpleContainer.Examples.Commander
 {
 	public class SpawnGameObjectCommand : Command
     {

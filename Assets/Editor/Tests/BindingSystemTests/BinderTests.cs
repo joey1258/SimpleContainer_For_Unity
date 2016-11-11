@@ -6,7 +6,7 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright Joey1258
- * @link https://github.com/joey1258/ToluaContainer
+ * @link https://github.com/joey1258/SimpleContainer
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -15,8 +15,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ToluaContainer;
-using ToluaContainer.Container;
+using SimpleContainer;
+using SimpleContainer.Container;
 
 namespace uMVVMCS_NUitTests
 {
@@ -41,6 +41,25 @@ namespace uMVVMCS_NUitTests
                 binding != null && 
                 binding.bindingType == BindingType.ADDRESS &&
                 binding.constraint == ConstraintType.MULTIPLE);
+        }
+
+        /// <summary>
+        /// 测试 Bind 方法是否生成了 ADDRESS 类型的 binding,值约束为 Multiple
+        /// </summary>
+        [Test]
+        public void BindWithID_CreateTempBinding_True()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            //Act
+            IBinding binding = binder.Bind<object>().As("a");
+            //Assert
+            Assert.AreEqual(
+                true,
+                binding != null &&
+                binding.bindingType == BindingType.ADDRESS &&
+                binding.constraint == ConstraintType.MULTIPLE &&
+                binder.GetIds("a").Count == 1);
         }
 
         /// <summary>

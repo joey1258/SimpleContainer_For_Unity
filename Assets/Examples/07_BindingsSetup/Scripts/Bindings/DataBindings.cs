@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using ToluaContainer.Container;
-using ToluaContainer.Examples.BindingsSetup.Data;
+using SimpleContainer.Container;
+using SimpleContainer.Examples.BindingsSetup.Data;
 
-namespace ToluaContainer.Examples.BindingsSetup.Bindings
+namespace SimpleContainer.Examples.BindingsSetup.Bindings
 {
 	[Priority]
 	public class DataBindings : IBindingsSetup

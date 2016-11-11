@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public class Injector : IInjector
     {

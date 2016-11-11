@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ToluaContainer
+namespace SimpleContainer
 {
     /// <summary>
     /// [Inject]标记需要注入的对象，可以在构造函数中传入一个 object 类型的值作为 id

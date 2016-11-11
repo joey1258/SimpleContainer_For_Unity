@@ -1,4 +1,4 @@
-﻿namespace ToluaContainer
+﻿namespace SimpleContainer
 {
     public interface ICommand
     {

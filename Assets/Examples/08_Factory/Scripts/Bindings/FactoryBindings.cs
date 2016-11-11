@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Examples.Factory.Bindings
+namespace SimpleContainer.Examples.Factory.Bindings
 {
-	public class PrefabsBindings : ToluaContainer.Container.IBindingsSetup
+	public class PrefabsBindings : SimpleContainer.Container.IBindingsSetup
     {
 		public void SetupBindings(IInjectionContainer container)
         {

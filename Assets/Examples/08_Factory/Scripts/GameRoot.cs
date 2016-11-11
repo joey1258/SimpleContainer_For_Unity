@@ -1,7 +1,7 @@
-using ToluaContainer.Container;
-using ToluaContainer.Examples.Factory.Commands;
+using SimpleContainer.Container;
+using SimpleContainer.Examples.Factory.Commands;
 
-namespace ToluaContainer.Examples.Factory
+namespace SimpleContainer.Examples.Factory
 {
 	public class GameRoot : ContextRoot
     {
@@ -13,8 +13,8 @@ namespace ToluaContainer.Examples.Factory
 				.RegisterAOT<CommanderContainerAOT>()
 				.RegisterAOT<EventContainerAOT>()
 				.RegisterAOT<UnityContainerAOT>()
-				.SetupBindings("ToluaContainer.Examples.Factory.Bindings")			
-				.RegisterCommands("ToluaContainer.Examples.Factory.Commands")
+				.SetupBindings("SimpleContainer.Examples.Factory.Bindings")			
+				.RegisterCommands("SimpleContainer.Examples.Factory.Commands")
 				.GetCommandDispatcher();
 		}
 		

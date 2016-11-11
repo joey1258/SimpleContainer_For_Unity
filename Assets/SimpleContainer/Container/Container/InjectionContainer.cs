@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Utils;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     public class InjectionContainer : Injector, IInjectionContainer
     {
@@ -28,21 +28,21 @@ namespace ToluaContainer.Container
 
         #region constructor
 
-        public InjectionContainer() 
+        public InjectionContainer()
             : base(new ReflectionCache(), new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             RegisterSelf();
         }
 
-        public InjectionContainer(object id) 
+        public InjectionContainer(object id)
             : base(new ReflectionCache(), new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
             RegisterSelf();
         }
 
-        public InjectionContainer(IReflectionCache cache) 
-            : base(cache, new Binder(),  DEFAULT_RESOLUTION_MODE)
+        public InjectionContainer(IReflectionCache cache)
+            : base(cache, new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             RegisterSelf();
         }
@@ -53,7 +53,7 @@ namespace ToluaContainer.Container
             RegisterSelf();
         }
 
-        public InjectionContainer(object id, IReflectionCache cache) 
+        public InjectionContainer(object id, IReflectionCache cache)
             : base(cache, new Binder(), DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
@@ -66,13 +66,13 @@ namespace ToluaContainer.Container
             RegisterSelf();
         }
 
-        public InjectionContainer(IReflectionCache cache, IBinder binder) 
+        public InjectionContainer(IReflectionCache cache, IBinder binder)
             : base(cache, binder, DEFAULT_RESOLUTION_MODE)
         {
             RegisterSelf();
         }
 
-        public InjectionContainer(object id, IReflectionCache cache, IBinder binder) 
+        public InjectionContainer(object id, IReflectionCache cache, IBinder binder)
             : base(cache, binder, DEFAULT_RESOLUTION_MODE)
         {
             this.id = id;
@@ -80,10 +80,10 @@ namespace ToluaContainer.Container
         }
 
         public InjectionContainer(
-            object id, 
-            IReflectionCache cache, 
+            object id,
+            IReflectionCache cache,
             IBinder binder,
-            ResolutionMode resolutionMode) 
+            ResolutionMode resolutionMode)
             : base(cache, binder, resolutionMode)
         {
             this.id = id;
@@ -414,8 +414,8 @@ namespace ToluaContainer.Container
         /// </summary>
         virtual protected void RegisterSelf()
         {
-            BindSingleton<IInjectionContainer>().To(this);
+            if (id != null) { BindSingleton<IInjectionContainer>().To(this).As(id); }
+            else { BindSingleton<IInjectionContainer>().To(this); }
         }
-
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ToluaContainer.Container
+namespace SimpleContainer.Container
 {
     /// <summary>
     /// Resolve 方法的 AOT 委托，在 Resolve 方法实际操作开始之前和完成之后根据类型参数进行前置/后置操作

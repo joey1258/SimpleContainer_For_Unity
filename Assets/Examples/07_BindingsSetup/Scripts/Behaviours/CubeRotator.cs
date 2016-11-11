@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using ToluaContainer.Container;
+using SimpleContainer.Container;
 
-namespace ToluaContainer.Examples.BindingsSetup.Behaviours
+namespace SimpleContainer.Examples.BindingsSetup.Behaviours
 {
 	public class CubeRotator : MonoBehaviour
     {

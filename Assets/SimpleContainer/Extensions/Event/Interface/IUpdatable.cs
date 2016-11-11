@@ -1,4 +1,4 @@
-﻿namespace ToluaContainer
+﻿namespace SimpleContainer
 {
     /// <summary>
     /// 允许一个 object 接受 updates 更新
