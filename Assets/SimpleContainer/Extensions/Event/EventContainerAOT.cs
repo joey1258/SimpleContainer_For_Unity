@@ -44,7 +44,7 @@ namespace SimpleContainer
             disposable.Add(container);
 
             // 如果容器中含有 ICommandDispatcher 类型的 binding，且它实现了 IDisposable 接口
-            // 就实例化 ICommandDispatcher 类型并将其也添加到 IDisposable list
+            // 就获取它的 ICommandDispatcher 类型实例并将其也添加到 IDisposable list
             var commandDispatches = container.GetTypes<ICommandDispatcher>();
             if (commandDispatches != null && commandDispatches.Count != 0)
             {
