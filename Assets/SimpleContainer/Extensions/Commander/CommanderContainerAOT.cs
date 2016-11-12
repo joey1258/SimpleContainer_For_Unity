@@ -6,13 +6,13 @@ namespace SimpleContainer
     {
         public void OnRegister(IInjectionContainer container)
         {
-            // 绑定一个单例的 ICommandDispatcher binding
-            container.BindSingleton<ICommandDispatcher>().To<CommandDispatcher>();
-            // 实例化 binding value，所有命令都通过该实例化后的 value 传播
-            var dispatcher = (CommandDispatcher)container.Resolve<ICommandDispatcher>();
-            // 将实例化后的 binding value 作为值绑定一条 ICommandPool 类型的 binding
-            // 此时 container 中将有两条 binding，都为单例类型，且值都为 dispatcher，只有类型不同
-            container.Bind<ICommandPool>().To(dispatcher);
+            // 创建一条 CommandDispatcher 实例
+            CommandDispatcher dispatcher = new CommandDispatcher(container);
+            // 将实例绑定到绑定一个单例的 ICommandDispatcher binding
+            container.BindSingleton<ICommandDispatcher>().To(dispatcher);
+            // 再将实例绑定到一个 ICommandPool binding，此时 container 中将有两条 binding
+            // 都为单例类型，且值都为 dispatcher，只有类型不同
+            container.BindSingleton<ICommandPool>().To(dispatcher);
         }
 
         public void OnUnregister(IInjectionContainer container)
