@@ -33,7 +33,7 @@ namespace SimpleContainer
         {
             if (!type.IsClass && type.IsAssignableFrom(typeof(ICommand)))
             {
-                throw new CommandException(CommandException.TYPE_NOT_A_COMMAND);
+                throw new Exceptions(Exceptions.TYPE_NOT_A_COMMAND);
             }
 
             container.Bind<ICommand>().To(type);

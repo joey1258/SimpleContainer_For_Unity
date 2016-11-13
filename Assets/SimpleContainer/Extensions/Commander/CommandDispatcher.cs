@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using SimpleContainer.Container;
+using Utils;
 
 namespace SimpleContainer
 {
@@ -83,8 +84,8 @@ namespace SimpleContainer
             // 如果不含有该 command 就抛出异常
             else
             {
-                throw new CommandException(
-                    string.Format(CommandException.NO_COMMAND_FOR_TYPE, type));
+                throw new Exceptions(
+                    string.Format(Exceptions.NO_COMMAND_FOR_TYPE, type));
             }
         }
 
@@ -322,8 +323,8 @@ namespace SimpleContainer
                 // 如果参数 pool 不为空且数量大于对象池的上限就抛出错误
                 if (pool.Count > 0 && pool.Count >= pool[0].maxPoolSize)
                 {
-                    throw new CommandException(
-                        string.Format(CommandException.MAX_POOL_SIZE, pool[0].ToString()));
+                    throw new Exceptions(
+                        string.Format(Exceptions.MAX_POOL_SIZE, pool[0].ToString()));
                 }
 
                 // 获取实例化结果并添加到对象池

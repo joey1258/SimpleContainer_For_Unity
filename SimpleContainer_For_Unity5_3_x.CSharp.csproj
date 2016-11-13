@@ -122,7 +122,6 @@
     <Compile Include="Assets\SimpleContainer\Extensions\Commander\Command.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\Commander\CommandDispatch.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\Commander\CommandDispatcher.cs" />
-    <Compile Include="Assets\SimpleContainer\Extensions\Commander\CommandException.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\Commander\CommandReference.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\Commander\CommanderContainerAOT.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\Commander\CommanderContainerExtension.cs" />

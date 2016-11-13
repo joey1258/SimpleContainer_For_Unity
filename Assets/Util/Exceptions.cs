@@ -43,6 +43,11 @@ namespace Utils
         public const string VALUE_ISNOT_PREFAB = "The value must be PrefabInfo.";
         public const string SAME_OBJECT = "The object with the same key and id already exists.";
 
+        // command 相关
+        public const string TYPE_NOT_A_COMMAND = "The type is not a command.";
+        public const string MAX_POOL_SIZE = "Reached max pool size for command {0}.";
+        public const string NO_COMMAND_FOR_TYPE = "no command registered for the type {0}.";
+
         public Exceptions() : base() { }
         public Exceptions(string message) : base(message) { }
     }

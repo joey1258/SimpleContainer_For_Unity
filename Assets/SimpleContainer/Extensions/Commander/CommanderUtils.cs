@@ -76,7 +76,7 @@ namespace SimpleContainer.Container
 
             if (!found)
             {
-                throw new CommandException(string.Format(CommandException.NO_COMMAND_FOR_TYPE, type));
+                throw new Exceptions(string.Format(Exceptions.NO_COMMAND_FOR_TYPE, type));
             }
         }
 
