@@ -58,7 +58,7 @@ namespace SimpleContainer.Container
         /// </summary>
         virtual public T Resolve<T>()
         {
-            return (T)Resolve(typeof(T), InjectionInto.None, null, null);
+            return (T)Resolve(typeof(T), InjectionInto.None, null, null, null, false);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace SimpleContainer.Container
         /// </summary>
         public T Resolve<T>(object identifier)
         {
-            return (T)Resolve(typeof(T), InjectionInto.None, null, identifier);
+            return (T)Resolve(typeof(T), InjectionInto.None, null, null, identifier, false);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace SimpleContainer.Container
         /// </summary>
         public object Resolve(Type type, object identifier)
         {
-            return Resolve(type, InjectionInto.None, null, identifier);
+            return Resolve(type, InjectionInto.None, null, null, identifier, false);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace SimpleContainer.Container
         /// </summary>
         virtual public object Resolve(Type type)
         {
-            return Resolve(type, InjectionInto.None, null, null);
+            return Resolve(type, InjectionInto.None, null, null, null, false);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace SimpleContainer.Container
         /// </summary>
         public object Resolve(object identifier)
         {
-            var instances = (object[])this.Resolve(null, InjectionInto.None, null, identifier);
+            var instances = (object[])this.Resolve(null, InjectionInto.None, null, null, identifier, false);
 
             if (instances != null && instances.Length > 0) { return instances[0]; }
             else { return instances; }
@@ -166,8 +166,10 @@ namespace SimpleContainer.Container
         virtual protected object Resolve(
             Type type,
             InjectionInto member,
+            string memberName,
             object parentInstance,
-            object id)
+            object id,
+            bool alwaysResolve)
         {
             object resolution = null;
 
@@ -203,7 +205,12 @@ namespace SimpleContainer.Container
             // 不能根据 id 是否为空来过滤，因为 unityBinding 是通过 AOT 来获取实例的，因此即使没有 
             // id 也必须进入 ResolveBinding 方法,所以必须先获取其 binding 自身
             // 如果类型为空 id 不为空，根据 id 来获取 binding
-            if (type == null) { bindings = binder.GetIds(id); }
+            if (type == null)
+            {
+                bindings = binder.GetByDelegate(
+                    binding => binding.id != null && binding.id.Equals(id)
+                    );
+            }
             else
             {
                 // 判断参数 type 是否为数组是因为实参可能会传入类似 typeof(Type[]) 这样的值
@@ -227,7 +234,7 @@ namespace SimpleContainer.Container
             // 就调用 Instantiate 方法返回参数 type 的执行结果并添加到 instances 中,否则返回空
             if (bindings == null || bindings.Count == 0)
             {
-                if (resolutionMode == ResolutionMode.ALWAYS_RESOLVE)
+                if (alwaysResolve || resolutionMode == ResolutionMode.ALWAYS_RESOLVE)
                 {
                     instances.Add(Instantiate(type as Type));
                 }
@@ -245,6 +252,7 @@ namespace SimpleContainer.Container
                         bindings[i],
                         type,
                         member,
+                        memberName,
                         parentInstance,
                         id);
 
@@ -388,6 +396,7 @@ namespace SimpleContainer.Container
             IBinding binding,
             Type type,
             InjectionInto member,
+            string memberName,
             object parentInstance,
             object id)
         {
@@ -548,7 +557,8 @@ namespace SimpleContainer.Container
                 // 根据缓存的参数类型生成所有所需参数的实例
                 object[] parameters = GetParametersFromInfo(
                     null,
-                    info.constructorParameters);
+                    info.constructorParameters,
+                    InjectionInto.Constructor);
                 instance = info.paramsConstructor(parameters);
             }
 
@@ -573,8 +583,10 @@ namespace SimpleContainer.Container
                 var valueToSet = Resolve(
                     field.type,
                     InjectionInto.Field,
+                    field.name,
                     instance,
-                    field.id);
+                    field.id,
+                    false);
 
                 field.setter(instance, valueToSet);
             }
@@ -591,8 +603,10 @@ namespace SimpleContainer.Container
                 var valueToSet = Resolve(
                     property.type,
                     InjectionInto.Property,
+                    property.name,
                     instance,
-                    property.id);
+                    property.id,
+                    false);
 
                 property.setter(instance, valueToSet);
             }
@@ -617,7 +631,8 @@ namespace SimpleContainer.Container
                 {
                     object[] parameters = this.GetParametersFromInfo(
                         instance, 
-                        method.parameters);
+                        method.parameters,
+                        InjectionInto.Method);
                     method.paramsMethod(instance, parameters);
                 }
             }
@@ -627,7 +642,7 @@ namespace SimpleContainer.Container
         /// 根据缓存的构造函数参数属性 constructorParameters 实例化并返回所有所需参数 
         /// instance 参数最终会传递到 ResolveBinding 方法的 parentInstance 参数，用于传递 InjectionInfo 同名属性的值
         /// </summary>
-        virtual protected object[] GetParametersFromInfo(object instance, ParameterInfo[] parametersInfo)
+        virtual protected object[] GetParametersFromInfo(object instance, ParameterInfo[] parametersInfo, InjectionInto injectionInto)
         {
             object[] parameters = new object[parametersInfo.Length];
 
@@ -637,9 +652,11 @@ namespace SimpleContainer.Container
 
                 parameters[i] = Resolve(
                     parameterInfo.type,
-                    InjectionInto.Constructor,
+                    injectionInto,
+                    parameterInfo.name,
                     instance,
-                    parameterInfo.id);
+                    parameterInfo.id,
+                    false);
             }
 
             return parameters;
@@ -654,7 +671,7 @@ namespace SimpleContainer.Container
         /// </summary>
         virtual protected void OnBeforeAddBinding(IBinder source, ref IBinding binding)
         {
-            // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查了
+            // 由于 AOT 委托在 Storing 方法过滤空 binding 之后才执行，所以这里就不重复检查 binding 是否为空了
             int length = binding.valueList.Count;
             for (int i = 0; i < length; i++)
             {

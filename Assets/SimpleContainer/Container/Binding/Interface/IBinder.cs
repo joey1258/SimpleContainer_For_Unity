@@ -62,6 +62,16 @@ namespace SimpleContainer.Container
         #region GetBinding
 
         /// <summary>
+        /// 根据类型和 id 获取储存容器中的 Binding
+        /// </summary>
+        IBinding GetBinding<T>(object id);
+
+        /// <summary>
+        /// 根据类型和 id 获取储存容器中的 Binding
+        /// </summary>
+        IBinding GetBinding(Type type, object id);
+
+        /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
         IList<IBinding> GetTypes<T>();
@@ -72,61 +82,31 @@ namespace SimpleContainer.Container
         IList<IBinding> GetTypes(Type type);
 
         /// <summary>
-        /// 获取储存容器中所有指定 id 的 binding
-        /// </summary>
-        IList<IBinding> GetIds(object id);
-
-        /// <summary>
         /// 获取 binder 中所有的 Binding
         /// </summary>
 		IList<IBinding> GetAll();
 
         /// <summary>
-        /// 返回储存容器中除自身以外所有 type 和值都相同的 binding
+        /// 根据是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-        IList<IBinding> GetSameNullId(IBinding binding);
+		IList<IBinding> GetByDelegate(IsBindingAccordHandler isBindingAccordHandler);
 
         /// <summary>
-        /// 根据类型和 id 获取储存容器中的 Binding
+        /// 根据类型和是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-        IBinding GetBinding<T>(object id);
+		IList<IBinding> GetByDelegate<T>(IsBindingAccordHandler isBindingAccordHandler);
 
         /// <summary>
-        /// 根据类型和 id 获取储存容器中的 Binding
+        /// 根据类型和是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-        IBinding GetBinding(Type type, object id);
+		IList<IBinding> GetByDelegate(Type type, IsBindingAccordHandler isBindingAccordHandler);
 
         #endregion
 
         #region Unbind
 
         /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
-        /// </summary>
-        void UnbindType<T>();
-
-        /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
-        /// </summary>
-        void UnbindType(Type type);
-
-        /// <summary>
-        /// 根据 id 从所有容器中删除所有同类型 Binding
-        /// </summary>
-        void UnbindId(object id);
-
-        /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
-        /// </summary>
-        void UnbindNullIdType<T>();
-
-        /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
-        /// </summary>
-        void UnbindNullIdType(Type type);
-
-        /// <summary>
-        /// 根据类型和 id 从所有容器中删除 Binding
+        /// 根据类型和 id 从容器中删除 Binding
         /// </summary>
 		void Unbind<T>(object id);
 
@@ -136,9 +116,44 @@ namespace SimpleContainer.Container
 		void Unbind(Type type, object id);
 
         /// <summary>
-        /// 根据 binding 从所有容器中删除 Binding
+        /// 根据 binding 从容器中删除 Binding
         /// </summary>
         void Unbind(IBinding binding);
+
+        /// <summary>
+        /// 根据类型从容器中删除所有同类型 Binding
+        /// </summary>
+        void UnbindType<T>();
+
+        /// <summary>
+        /// 根据类型从容器中删除所有同类型 Binding
+        /// </summary>
+        void UnbindType(Type type);
+
+        /// <summary>
+        /// 从容器中删除值或 condition 与 instance 相同的 binding
+        /// </summary>
+        void UnbindInstance(object instance);
+
+        /// <summary>
+        /// 从容器中删除值或 condition 与 instance 相同的 binding
+        /// </summary>
+        void UnbindTag(string tag);
+
+        /// <summary>
+        /// 根据委托从容器中删除 binding
+        /// </summary>
+        void UnbindByDelegate(IsBindingAccordHandler isBindingAccordHandler);
+
+        /// <summary>
+        /// 根据类型和委托从容器中删除 binding
+        /// </summary>
+        void UnbindByDelegate<T>(IsBindingAccordHandler isBindingAccordHandler);
+
+        /// <summary>
+        /// 根据类型和委托从容器中删除 binding
+        /// </summary>
+        void UnbindByDelegate(Type type, IsBindingAccordHandler isBindingAccordHandler);
 
         #endregion
 

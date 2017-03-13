@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using SimpleContainer;
 using SimpleContainer.Container;
+using Utils;
 
 namespace uMVVMCS_NUitTests
 {
@@ -59,7 +60,9 @@ namespace uMVVMCS_NUitTests
                 binding != null &&
                 binding.bindingType == BindingType.ADDRESS &&
                 binding.constraint == ConstraintType.MULTIPLE &&
-                binder.GetIds("a").Count == 1);
+                binder.GetByDelegate(
+                    dBinding => dBinding.id != null && dBinding.id.Equals("a")
+                    ).Count == 1);
         }
 
         /// <summary>
@@ -201,10 +204,14 @@ namespace uMVVMCS_NUitTests
             //Assert
             Assert.AreEqual(
                 true,
-                binder.GetIds(1).Count == 3 &&
-                binder.GetIds(2).Count == 1 &&
-                binder.GetIds(3).Count == 2 &&
-                binder.GetIds(5).Count == 2);
+                binder.GetByDelegate(
+                    dBinding => dBinding.id != null && dBinding.id.Equals(1)).Count == 3 &&
+                binder.GetByDelegate(
+                    dBinding => dBinding.id != null && dBinding.id.Equals(2)).Count == 1 &&
+                binder.GetByDelegate(
+                    dBinding => dBinding.id != null && dBinding.id.Equals(3)).Count == 2 &&
+                binder.GetByDelegate(
+                    dBinding => dBinding.id != null && dBinding.id.Equals(5)).Count == 2);
         }
 
         /// <summary>
@@ -259,11 +266,39 @@ namespace uMVVMCS_NUitTests
             Assert.AreEqual(
                 true,
                 /*确认没有取到多余的值，且取到的不是自身*/
-                binder.GetSameNullId(binding1).Count == 1 &&
-                binder.GetSameNullId(binding1)[0].GetHashCode() !=
+                binder.GetByDelegate(
+                binding1.type,
+                delegateBinding =>
+                delegateBinding.id == null &&
+                delegateBinding.constraint == binding1.constraint &&
+                CompareUtils.isSameValueIList(delegateBinding.valueList, binding1.valueList) &&
+                !CompareUtils.isSameObject(delegateBinding, binding1)
+            ).Count == 1 &&
+            binder.GetByDelegate(
+                binding2.type,
+                delegateBinding =>
+                delegateBinding.id == null &&
+                delegateBinding.constraint == binding2.constraint &&
+                CompareUtils.isSameValueIList(delegateBinding.valueList, binding2.valueList) &&
+                !CompareUtils.isSameObject(delegateBinding, binding2)
+            )[0].GetHashCode() !=
                 binding1.GetHashCode() &&
-                binder.GetSameNullId(binding2).Count == 1 &&
-                binder.GetSameNullId(binding2)[0].GetHashCode() !=
+                binder.GetByDelegate(
+                binding2.type,
+                delegateBinding =>
+                delegateBinding.id == null &&
+                delegateBinding.constraint == binding2.constraint &&
+                CompareUtils.isSameValueIList(delegateBinding.valueList, binding2.valueList) &&
+                !CompareUtils.isSameObject(delegateBinding, binding2)
+            ).Count == 1 &&
+                binder.GetByDelegate(
+                binding2.type,
+                delegateBinding =>
+                delegateBinding.id == null &&
+                delegateBinding.constraint == binding2.constraint &&
+                CompareUtils.isSameValueIList(delegateBinding.valueList, binding2.valueList) &&
+                !CompareUtils.isSameObject(delegateBinding, binding2)
+            )[0].GetHashCode() !=
                 binding2.GetHashCode());
         }
 
@@ -296,6 +331,67 @@ namespace uMVVMCS_NUitTests
         #endregion
 
         #region Unbind
+
+        /// <summary>
+        /// 测试 UnbindTag 获取的 binding 是否正确
+        /// </summary>
+        [Test]
+        public void UnbindTag_ReturnBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+
+            //Act
+            binder
+                .Bind<object>()
+                .To(1)
+                .Tag("a")
+                .Bind<object>()
+                .To(2)
+                .Tag("c")
+                .BindMultiton<object>()
+                .To(new object[] { 7, 8, 9 })
+                .Tag("a")
+                .Bind<int>()
+                .To(1)
+                .Tag("b")
+                .BindMultiton<int>()
+                .To(new object[] { 7, 8, 9 })
+                .Tag("c");
+            binder
+                .UnbindTag("c");
+            //Assert
+            Assert.AreEqual(
+                true,
+                /*确认没有取到多余的值，且取到的不是自身*/
+                binder.GetAll().Count == 3);
+        }
+
+        /// <summary>
+        /// 测试 UnbindInstance 获取的 binding 是否正确
+        /// </summary>
+        [Test]
+        public void UnbindInstance_ReturnBinding_Correct()
+        {
+            //Arrange 
+            IBinder binder = new Binder();
+            object instance = 1;
+
+            //Act
+            binder
+                .Bind<object>()
+                .To(1)
+                .Bind<object>()
+                .To(2)
+                .Bind<int>()
+                .To(1);
+            binder.UnbindInstance(1);
+            //Assert
+            Assert.AreEqual(
+                true,
+                /*确认没有取到多余的值，且取到的不是自身*/
+                binder.GetAll().Count == 1);
+        }
 
         /// <summary>
         /// 测试 UnbindType 方法是否正确的移除了相应的 binding
@@ -355,7 +451,7 @@ namespace uMVVMCS_NUitTests
                 .To(2f)
                 .As(2);
             //Act
-            binder.UnbindId(1);
+            binder.UnbindByDelegate(DBinding => DBinding.id != null && DBinding.id.Equals(1));
             //Assert
             Assert.AreEqual(
                 true,
@@ -386,9 +482,9 @@ namespace uMVVMCS_NUitTests
                 .Bind<float>()
                 .To(2f);
             //Act
-            binder.UnbindNullIdType<object>();
-            binder.UnbindNullIdType<int>();
-            binder.UnbindNullIdType<float>();
+            binder.UnbindByDelegate<object>(DBinding => DBinding.id == null);
+            binder.UnbindByDelegate<int>(DBinding => DBinding.id == null);
+            binder.UnbindByDelegate<float>(DBinding => DBinding.id == null);
             //Assert
             Assert.AreEqual(
                 true,

@@ -274,6 +274,22 @@ namespace SimpleContainer.Container
         #region GetBinding
 
         /// <summary>
+        /// 根据类型和id获取储存容器中的 Binding
+        /// </summary>
+        virtual public IBinding GetBinding<T>(object id)
+        {
+            return binder.GetBinding(typeof(T), id);
+        }
+
+        /// <summary>
+        /// 根据类型和id获取储存容器中的 Binding
+        /// </summary>
+        virtual public IBinding GetBinding(Type type, object id)
+        {
+            return binder.GetBinding(type, id);
+        }
+
+        /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
         virtual public IList<IBinding> GetTypes<T>()
@@ -290,14 +306,6 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 获取储存容器中所有指定 id 的 binding
-        /// </summary>
-        virtual public IList<IBinding> GetIds(object id)
-        {
-            return binder.GetIds(id);
-        }
-
-        /// <summary>
         /// 获取 binder 中所有的 Binding
         /// </summary>
         virtual public IList<IBinding> GetAll()
@@ -306,27 +314,27 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 返回储存容器中除自身以外所有 type 和值都相同的 binding
+        /// 根据是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-        virtual public IList<IBinding> GetSameNullId(IBinding binding)
+		virtual public IList<IBinding> GetByDelegate(IsBindingAccordHandler isBindingAccordHandler)
         {
-            return binder.GetSameNullId(binding);
+            return binder.GetByDelegate(isBindingAccordHandler);
         }
 
         /// <summary>
-        /// 根据类型和id获取储存容器中的 Binding
+        /// 根据类型和是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-        virtual public IBinding GetBinding<T>(object id)
+		virtual public IList<IBinding> GetByDelegate<T>(IsBindingAccordHandler isBindingAccordHandler)
         {
-            return binder.GetBinding(typeof(T), id);
+            return binder.GetByDelegate(typeof(T), isBindingAccordHandler);
         }
 
         /// <summary>
-        /// 根据类型和id获取储存容器中的 Binding
+        /// 根据类型和是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-        virtual public IBinding GetBinding(Type type, object id)
+		virtual public IList<IBinding> GetByDelegate(Type type, IsBindingAccordHandler isBindingAccordHandler)
         {
-            return binder.GetBinding(type, id);
+            return binder.GetByDelegate(type, isBindingAccordHandler);
         }
 
         #endregion
@@ -334,7 +342,7 @@ namespace SimpleContainer.Container
         #region Unbind
 
         /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
+        /// 根据类型从容器中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindType<T>()
         {
@@ -342,7 +350,7 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
+        /// 根据类型从容器中删除所有同类型 Binding
         /// </summary>
         virtual public void UnbindType(Type type)
         {
@@ -350,31 +358,47 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 根据 id 从所有容器中删除所有同类型 Binding
+        /// 从容器中删除值或 condition 与 instance 相同的 binding
         /// </summary>
-        virtual public void UnbindId(object id)
+        virtual public void UnbindInstance(object instance)
         {
-            binder.UnbindId(id);
+            binder.UnbindInstance(instance);
         }
 
         /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
+        /// 从容器中删除值或 condition 与 instance 相同的 binding
         /// </summary>
-        virtual public void UnbindNullIdType<T>()
+        virtual public void UnbindTag(string tag)
         {
-            binder.UnbindNullIdType<T>();
+            binder.UnbindTag(tag);
         }
 
         /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
+        /// 根据委托从容器中删除 binding
         /// </summary>
-        virtual public void UnbindNullIdType(Type type)
+        virtual public void UnbindByDelegate(IsBindingAccordHandler isBindingAccordHandler)
         {
-            binder.UnbindNullIdType(type);
+            binder.UnbindByDelegate(isBindingAccordHandler);
         }
 
         /// <summary>
-        /// 根据类型和 id 从所有容器中删除 Binding
+        /// 根据类型和委托从容器中删除 binding
+        /// </summary>
+        virtual public void UnbindByDelegate<T>(IsBindingAccordHandler isBindingAccordHandler)
+        {
+            binder.UnbindByDelegate(typeof(T), isBindingAccordHandler);
+        }
+
+        /// <summary>
+        /// 根据类型和委托从容器中删除 binding
+        /// </summary>
+        virtual public void UnbindByDelegate(Type type, IsBindingAccordHandler isBindingAccordHandler)
+        {
+            binder.UnbindByDelegate(type, isBindingAccordHandler);
+        }
+
+        /// <summary>
+        /// 根据类型和 id 从容器中删除 Binding
         /// </summary>
 		virtual public void Unbind<T>(object id)
         {
@@ -382,7 +406,7 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 根据类型和 id 从所有容器中删除 Binding
+        /// 根据类型和 id 从容器中删除 Binding
         /// </summary>
 		virtual public void Unbind(Type type, object id)
         {
@@ -390,7 +414,7 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 根据 binding 从所有容器中删除 Binding
+        /// 根据 binding 从容器中删除 Binding
         /// </summary>
         virtual public void Unbind(IBinding binding)
         {

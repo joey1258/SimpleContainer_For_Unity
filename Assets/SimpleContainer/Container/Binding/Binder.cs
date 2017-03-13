@@ -143,6 +143,35 @@ namespace SimpleContainer.Container
         #region GetBinding
 
         /// <summary>
+        /// 根据类型和id获取储存容器中的 Binding
+        /// </summary>
+		virtual public IBinding GetBinding<T>(object id)
+        {
+            return GetBinding(typeof(T), id);
+        }
+
+        /// <summary>
+        /// 根据类型和id获取储存容器中的 Binding
+        /// </summary>
+		virtual public IBinding GetBinding(Type type, object id)
+        {
+            if (id == null)
+            {
+                throw new Exceptions(string.Format(Exceptions.PARAMETER_NUll, "id"));
+            }
+
+            var bindings = typeBindings[type];
+
+            int lenght = bindings.Count;
+            for (int i = 0; i < lenght; i++)
+            {
+                if (id.Equals(bindings[i].id)) { return bindings[i]; }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// 根据类型获取储存容器中的所有同类型 Binding
         /// </summary>
         virtual public IList<IBinding> GetTypes<T>()
@@ -157,36 +186,6 @@ namespace SimpleContainer.Container
         {
             if (!typeBindings.ContainsKey(type)) { return null; }
             return typeBindings[type];
-        }
-
-        /// <summary>
-        /// 获取储存容器中所有指定 id 的 binding
-        /// </summary>
-        virtual public IList<IBinding> GetIds(object id)
-        {
-            if (id == null)
-            {
-                throw new Exceptions(string.Format(Exceptions.PARAMETER_NUll, "id"));
-            }
-
-            List<IBinding> idBindings = new List<IBinding>();
-
-            List<Type> keys = new List<Type>(typeBindings.Keys);
-            int lenght = keys.Count;
-            for(int i = 0; i < lenght; i++)
-            {
-                int count = typeBindings[keys[i]].Count;
-                for (int n = 0; n < count; n++)
-                {
-                    if (id.Equals(typeBindings[keys[i]][n].id))
-                    {
-                        idBindings.Add(typeBindings[keys[i]][n]);
-                    }
-                }
-            }
-
-            if (idBindings.Count == 0) { return null; }
-            else { return idBindings; }
         }
 
         /// <summary>
@@ -207,37 +206,21 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 返回储存容器中除自身以外所有 type 和值都相同的 binding
+        /// 根据是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-        virtual public IList<IBinding> GetSameNullId(IBinding binding)
+		virtual public IList<IBinding> GetByDelegate(IsBindingAccordHandler isBindingAccordHandler)
         {
             List<IBinding> bindingList = new List<IBinding>();
 
-            int length = typeBindings[binding.type].Count;
+            List<Type> keys = new List<Type>(typeBindings.Keys);
+            int length = typeBindings.Count;
             for (int i = 0; i < length; i++)
             {
-                if (typeBindings[binding.type][i].id != null || 
-                    typeBindings[binding.type][i].constraint != binding.constraint)
-                { continue; }
-
-                if (binding.constraint == ConstraintType.MULTIPLE)
+                for (int n = 0; n < typeBindings[keys[i]].Count; n++)
                 {
-                    if (CompareUtils.isSameValueIList(
-                        typeBindings[binding.type][i].valueList,
-                        binding.valueList) &&
-                        !CompareUtils.isSameObject(typeBindings[binding.type][i], binding))
+                    if (isBindingAccordHandler(typeBindings[keys[i]][n]))
                     {
-                        bindingList.Add(typeBindings[binding.type][i]);
-                    }
-                }
-                else
-                {
-                    if (CompareUtils.isSameObject(
-                        typeBindings[binding.type][i].value,
-                        binding.value) &&
-                        !CompareUtils.isSameObject(typeBindings[binding.type][i], binding))
-                    {
-                        bindingList.Add(typeBindings[binding.type][i]);
+                        bindingList.Add(typeBindings[keys[i]][n]);
                     }
                 }
             }
@@ -246,32 +229,31 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 根据类型和id获取储存容器中的 Binding
+        /// 根据类型和是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-		virtual public IBinding GetBinding<T>(object id)
+		virtual public IList<IBinding> GetByDelegate<T>(IsBindingAccordHandler isBindingAccordHandler)
         {
-            return GetBinding(typeof(T), id);
+            return GetByDelegate(typeof(T), isBindingAccordHandler);
         }
 
         /// <summary>
-        /// 根据类型和id获取储存容器中的 Binding
+        /// 根据类型和是否符合委托的内容获取储存容器中的 Binding
         /// </summary>
-		virtual public IBinding GetBinding(Type type, object id)
+		virtual public IList<IBinding> GetByDelegate(Type type, IsBindingAccordHandler isBindingAccordHandler)
         {
-            if(id == null)
+            if (!typeBindings.ContainsKey(type)) { return null; }
+
+            List<IBinding> bindingList = new List<IBinding>();
+            int length = typeBindings[type].Count;
+            for (int i = 0; i < length; i++)
             {
-                throw new Exceptions(string.Format(Exceptions.PARAMETER_NUll, "id"));
+                if (isBindingAccordHandler(typeBindings[type][i]))
+                {
+                    bindingList.Add(typeBindings[type][i]);
+                }
             }
 
-            var bindings = typeBindings[type];
-
-            int lenght = bindings.Count;
-            for (int i = 0; i < lenght; i++)
-            {
-                if (id.Equals(bindings[i].id)) { return bindings[i];}
-            }
-
-            return null;
+            return bindingList;
         }
 
         #endregion
@@ -279,118 +261,15 @@ namespace SimpleContainer.Container
         #region Unbind
 
         /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
+        /// 根据类型和 id 从容器中删除 Binding
         /// </summary>
-        virtual public void UnbindType<T>()
-        {
-            UnbindType(typeof(T));
-        }
-
-        /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindType(Type type)
-        {
-            var bindings = GetTypes(type);
-
-            if (bindings != null && bindings.Count != 0)
-            {
-                // 如果 AOT 前置委托不为空就执行它
-                if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
-
-                int length = bindings.Count;
-                // 使用 while 不稳定且容易死循环，必须使用稳定的 for
-                for (int i = 0; i < length; i++)
-                {
-                    RemoveBinding(bindings[0]);
-                }
-
-                // 如果 AOT 后置委托不为空就执行它
-                if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
-            }
-        }
-
-        /// <summary>
-        /// 根据 id 从所有容器中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindId(object id)
-        {
-            var bindings = GetIds(id);
-
-            if (bindings != null && bindings.Count != 0)
-            {
-                // 如果 AOT 前置委托不为空就执行它
-                if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
-
-                int length = bindings.Count;
-                for (int i = 0; i < length; i++)
-                {
-                    // bindings 是直接获取的 typeBindings 中的引用，当 typeBindings 中的引用被
-                    // 移除后 bindings 的数量就会跟随着发生变化，GetTypes 方法也是直接返
-                    // 回 typeBindings[type],所以一样会随着元素被删除而变化长度，所以每次移除第一个
-                    // 元素就可以将所有的元素都移除干净
-                    RemoveBinding(bindings[i]);
-                }
-
-                // 如果 AOT 后置委托不为空就执行它
-                if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
-            }
-        }
-
-        /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindNullIdType<T>()
-        {
-            UnbindNullIdType(typeof(T));
-        }
-
-        /// <summary>
-        /// 根据类型从所有容器中删除所有同类型 Binding
-        /// </summary>
-        virtual public void UnbindNullIdType(Type type)
-        {
-            var bindings = typeBindings[type];
-            IList<IBinding> nullIds = new List<IBinding>();
-            int length = bindings.Count;
-            for (int i = 0; i < length; i++)
-            {
-                if (bindings[i].id == null) { nullIds.Add(bindings[i]); }
-            }
-
-            if (nullIds.Count != 0)
-            {
-                // 如果 AOT 前置委托不为空就执行它
-                if (beforeRemoveBinding != null) { beforeRemoveBinding(this, nullIds); }
-
-                length = nullIds.Count;
-                for (int i = 0; i < length; i++)
-                {
-                    // bindings 是直接获取的 typeBindings 中的引用，当 typeBindings 中的引用被
-                    // 移除后 bindings 的数量就会跟随着发生变化，GetTypes 方法也是直接返
-                    // 回 typeBindings[type],所以一样会随着元素被删除而变化长度；而当前的方法中使用
-                    // 了一个新的 List 来储存 typeBindings 中的引用，所以删除元素后 nullIds 的长度
-                    // 不会发生变化，所以 index 必须随着循环而变化才能正确的删除所有的元素
-                    RemoveBinding(nullIds[i]);
-                }
-
-                // 如果 AOT 后置委托不为空就执行它
-                if (afterRemoveBinding != null) { afterRemoveBinding(this, nullIds); }
-            }
-
-            nullIds = null;
-        }
-
-        /// <summary>
-        /// 根据类型和 id 从所有容器中删除 Binding
-        /// </summary>
-		virtual public void Unbind<T>(object id)
+        virtual public void Unbind<T>(object id)
         {
             Unbind(typeof(T), id);
         }
 
         /// <summary>
-        /// 根据 type 和 id 从所有容器中删除 Binding (type 和 id 不可为空)
+        /// 根据 type 和 id 从容器中删除 Binding (type 和 id 不可为空)
         /// </summary>
 		virtual public void Unbind(Type type, object id)
         {
@@ -415,7 +294,7 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 根据 binding 从所有容器中删除 Binding
+        /// 根据 binding 从容器中删除 Binding
         /// </summary>
         virtual public void Unbind(IBinding binding)
         {
@@ -433,6 +312,137 @@ namespace SimpleContainer.Container
             if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
         }
 
+        /// <summary>
+        /// 根据类型从容器中删除所有同类型 Binding
+        /// </summary>
+        virtual public void UnbindType<T>()
+        {
+            UnbindType(typeof(T));
+        }
+
+        /// <summary>
+        /// 根据类型从容器中删除所有同类型 Binding
+        /// </summary>
+        virtual public void UnbindType(Type type)
+        {
+            var bindings = GetTypes(type);
+
+            if (bindings != null && bindings.Count != 0)
+            {
+                // 如果 AOT 前置委托不为空就执行它
+                if (beforeRemoveBinding != null) { beforeRemoveBinding(this, bindings); }
+
+                int length = bindings.Count;
+                // 使用 while 不稳定且容易死循环，必须使用稳定的 for
+                for (int i = 0; i < length; i++)
+                {
+                    RemoveBinding(bindings[0]);
+                }
+
+                // 如果 AOT 后置委托不为空就执行它
+                if (afterRemoveBinding != null) { afterRemoveBinding(this, bindings); }
+            }
+
+            bindings = null;
+        }
+
+        /// <summary>
+        /// 从容器中删除值或 condition 与 instance 相同的 binding
+        /// </summary>
+        virtual public void UnbindInstance(object instance)
+        {
+            UnbindByDelegate(
+                binding =>
+                binding.value.Equals(instance) ||
+                (binding.condition != null && 
+                binding.condition(new InjectionInfo() { parentInstance = instance })));
+        }
+
+        /// <summary>
+        /// 从容器中删除值或 condition 与 instance 相同的 binding
+        /// </summary>
+        virtual public void UnbindTag(string tag)
+        {
+            if (!string.IsNullOrEmpty(tag))
+            {
+                UnbindByDelegate(
+                binding =>
+                binding.tags != null &&
+                binding.tags.Contains(tag));
+            }
+        }
+
+        /// <summary>
+        /// 根据委托从容器中删除 binding
+        /// </summary>
+        virtual public void UnbindByDelegate(IsBindingAccordHandler isBindingAccordHandler)
+        {
+            // 为了可以放入 AOT 委托执行而采用 List 形式储存
+            var binding = new List<IBinding>();
+
+            List<Type> keys = new List<Type>(typeBindings.Keys);
+            int length = typeBindings.Count;
+            for (int i = 0; i < length; i++)
+            {
+                for (int n = 0; n < typeBindings[keys[i]].Count; n++)
+                {
+                    binding.Clear();
+
+                    if (isBindingAccordHandler(typeBindings[keys[i]][n]))
+                    {
+                        binding.Add(typeBindings[keys[i]][n]);
+
+                        // 如果 AOT 前置委托不为空就执行它
+                        if (beforeRemoveBinding != null) { beforeRemoveBinding(this, binding); }
+
+                        RemoveBinding(typeBindings[keys[i]][n]);
+                        n--;
+
+                        // 如果 AOT 后置委托不为空就执行它
+                        if (afterRemoveBinding != null) { afterRemoveBinding(this, binding); }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据类型和委托从容器中删除 binding
+        /// </summary>
+        virtual public void UnbindByDelegate<T>(IsBindingAccordHandler isBindingAccordHandler)
+        {
+            UnbindByDelegate(typeof(T), isBindingAccordHandler);
+        }
+
+        /// <summary>
+        /// 根据类型和委托从容器中删除 binding
+        /// </summary>
+        virtual public void UnbindByDelegate(Type type, IsBindingAccordHandler isBindingAccordHandler)
+        {
+            if (!typeBindings.ContainsKey(type)) { return; }
+
+            // 为了可以放入 AOT 委托执行而采用 List 形式储存
+            List<IBinding> binding = new List<IBinding>();
+
+            for (int i = 0; i < typeBindings[type].Count; i++)
+            {
+                binding.Clear();
+
+                if (isBindingAccordHandler(typeBindings[type][i]))
+                {
+                    binding.Add(typeBindings[type][i]);
+
+                    // 如果 AOT 前置委托不为空就执行它
+                    if (beforeRemoveBinding != null) { beforeRemoveBinding(this, binding); }
+
+                    RemoveBinding(typeBindings[type][i]);
+                    i--;
+
+                    // 如果 AOT 后置委托不为空就执行它
+                    if (afterRemoveBinding != null) { afterRemoveBinding(this, binding); }
+                }
+            }
+        }
+
         #endregion
 
         /// <summary>
@@ -443,16 +453,7 @@ namespace SimpleContainer.Container
             // 如果参数 binding 为空，就直接退出
             if (binding == null) { return; }
 
-            // 如果 binding 的 id 为空，就移除 typeBindings 中HashCode相同的 binding
-            if (binding.id == null)
-            {
-                typeBindings[binding.type].Remove(binding);
-            }
-            // 如果 binding 的 id 不为空，从 bindingStorage、typeBindings、idBindings 三处移除
-            else
-            {
-                typeBindings[binding.type].Remove(binding);
-            }
+            typeBindings[binding.type].Remove(binding);
         }
 
         #endregion 

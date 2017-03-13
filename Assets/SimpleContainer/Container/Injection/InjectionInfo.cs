@@ -15,6 +15,11 @@ namespace SimpleContainer.Container
         public Type memberType;
 
         /// <summary>
+        /// 注入成员的名称
+        /// </summary>
+        public string memberName;
+
+        /// <summary>
         /// 对应 binding 的 id 属性，储存于Inject等特性中，用于注入时通过比较是否相同来确认身份
         /// </summary>
         public object id;

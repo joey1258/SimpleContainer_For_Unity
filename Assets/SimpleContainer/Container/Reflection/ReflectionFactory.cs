@@ -103,7 +103,7 @@ namespace SimpleContainer.Container
                 var attributes = parameter.GetCustomAttributes(typeof(Inject), true);
                 if (attributes.Length > 0) { id = (attributes[0] as Inject).id; }
 
-                constructorParameters[i] = new ParameterInfo(parameter.ParameterType, id);
+                constructorParameters[i] = new ParameterInfo(parameter.ParameterType, parameter.Name, id);
             }
 
             return constructorParameters;
@@ -112,9 +112,9 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 获取指定类型注入后需要执行的方法的信息类
         /// </summary>
-        virtual protected SimpleContainer.Container.MethodInfo[] GetMethods(Type type)
+        virtual protected MethodInfo[] GetMethods(Type type)
         {
-            var parameterlessMethods = new List<SimpleContainer.Container.MethodInfo>();
+            var parameterlessMethods = new List<MethodInfo>();
             // 获取参数 type 中的方法
             var methods = type.GetMethods (
                 BindingFlags.FlattenHierarchy |
@@ -144,10 +144,10 @@ namespace SimpleContainer.Container
                             id = (parameterAttributes[0] as Inject).id;
                         }
 
-                        methodParameters[n] = new ParameterInfo(parameter.ParameterType, id);
+                        methodParameters[n] = new ParameterInfo(parameter.ParameterType, parameter.Name, id);
                     }
 
-                    var parameterlessMethod = new SimpleContainer.Container.MethodInfo(methodParameters);
+                    var parameterlessMethod = new MethodInfo(method.Name, methodParameters);
 
                     // 根据参数个数创建方法委托
                     if (methodParameters.Length == 0)
@@ -191,7 +191,7 @@ namespace SimpleContainer.Container
                 {
                     var attribute = attributes[0] as Inject;
                     var method = MethodUtils.CreatePropertySetter(type, property);
-                    var info = new SetterInfo(property.PropertyType, attribute.id, method);
+                    var info = new SetterInfo(property.PropertyType, property.Name, attribute.id, method);
                     setters.Add(info);
             }
             }
@@ -222,7 +222,7 @@ namespace SimpleContainer.Container
                 {
                     var attribute = attributes[0] as Inject;
                     var method = MethodUtils.CreateFieldSetter(type, field);
-                    var info = new SetterInfo(field.FieldType, attribute.id, method);
+                    var info = new SetterInfo(field.FieldType, field.Name, attribute.id, method);
                     setters.Add(info);
                 }
             }

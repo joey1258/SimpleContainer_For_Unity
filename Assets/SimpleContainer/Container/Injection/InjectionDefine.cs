@@ -33,6 +33,7 @@ namespace SimpleContainer.Container
     {
         None,
         Constructor,
+        Method,
         Field,
         Property
     }

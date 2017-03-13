@@ -34,6 +34,8 @@ namespace SimpleContainer.Container
             _type = t;
 
             _value = new List<object>();
+
+            _tags = new List<string>();
         }
 
         public Binding(IBinder b, Type t, BindingType bt)
@@ -45,6 +47,8 @@ namespace SimpleContainer.Container
             _bindingType = bt;
 
             _value = new List<object>();
+
+            _tags = new List<string>();
         }
 
         public Binding(IBinder b, Type t, BindingType bt, ConstraintType c)
@@ -58,6 +62,8 @@ namespace SimpleContainer.Container
             _constraint = c;
 
             _value = new List<object>();
+
+            _tags = new List<string>();
         }
 
         #endregion
@@ -139,6 +145,19 @@ namespace SimpleContainer.Container
         /// condition 属性
         /// </summary>
         public Condition condition { get; set; }
+
+        /// <summary>
+        /// tags 标签
+        /// </summary>
+        public IList<string> tags
+        {
+            get
+            {
+                if (_tags == null) { _tags = new List<string>(); }
+                return _tags;
+            }
+        }
+        protected IList<string> _tags;
 
         #endregion
 
@@ -288,6 +307,27 @@ namespace SimpleContainer.Container
             return this;
         }
 
+        #endregion
+
+        #region Tag
+
+        /// <summary>
+        /// 设置 binding 的 tags
+        /// </summary>
+        virtual public IBinding Tag(string t)
+        {
+            if (string.IsNullOrEmpty(t)) { return this; }
+            
+            if (!_tags.Contains(t))
+            {
+                _tags.Add(t);
+            }
+
+            binder.Storing(this);
+
+            return this;
+        }
+        
         #endregion
 
         #region When
@@ -449,6 +489,25 @@ namespace SimpleContainer.Container
                 return this;
             }
             
+            return this;
+        }
+
+        #endregion
+
+        #region RemoveTag
+
+        /// <summary>
+        /// 从 binding 中移除多个 tag
+        /// </summary>
+        virtual public IBinding RemoveTag(string t)
+        {
+            if (string.IsNullOrEmpty(t)) { return this; }
+
+            if (_tags.Contains(t))
+            {
+                _tags.Remove(t);
+            }
+
             return this;
         }
 

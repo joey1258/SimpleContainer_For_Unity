@@ -39,7 +39,7 @@ namespace SimpleContainer.Container
 
         #region constructor
 
-        public SetterInfo(Type type, object id, Setter setter) : base(type, id)
+        public SetterInfo(Type type, string name, object id, Setter setter) : base(type, name, id)
         {
             this.setter = setter;
         }
@@ -62,11 +62,17 @@ namespace SimpleContainer.Container
         /// </summary>
         public object id;
 
+        /// <summary>
+        /// name
+        /// </summary>
+        public string name;
+
         #region constructor
 
-        public ParameterInfo(Type type, object id)
+        public ParameterInfo(Type type, string name, object id)
         {
             this.type = type;
+            this.name = name;
             this.id = id;
         }
 
@@ -78,6 +84,11 @@ namespace SimpleContainer.Container
     /// </summary>
     public class MethodInfo
     {
+        /// <summary>
+        /// name
+        /// </summary>
+        public string name;
+
         /// <summary>
         /// 无参数方法
         /// </summary>
@@ -95,8 +106,9 @@ namespace SimpleContainer.Container
 
         #region constructor
 
-        public MethodInfo(ParameterInfo[] parameters)
+        public MethodInfo(string name, ParameterInfo[] parameters)
         {
+            this.name = name;
             this.parameters = parameters;
         }
 

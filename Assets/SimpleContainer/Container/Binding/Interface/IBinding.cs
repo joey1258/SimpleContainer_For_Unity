@@ -56,6 +56,11 @@ namespace SimpleContainer.Container
         /// </summary>
         Condition condition { get; set; }
 
+        /// <summary>
+        /// tags 标签
+        /// </summary>
+        IList<string> tags { get; }
+
         #endregion
 
         #region To
@@ -92,6 +97,15 @@ namespace SimpleContainer.Container
         /// 设置 binding 的 name 属性
         /// </summary>
         IBinding As(object name);
+
+        #endregion
+
+        #region Tag
+
+        /// <summary>
+        /// 设置 binding 的 tags
+        /// </summary>
+        IBinding Tag(string t);
 
         #endregion
 
@@ -162,6 +176,15 @@ namespace SimpleContainer.Container
         /// 从 binding 的 value 属性中移除指定的值，如果删除后值为空，则移除 binding
         /// </summary>
         IBinding RemoveValues(object[] values);
+
+        #endregion
+
+        #region RemoveTag
+
+        /// <summary>
+        /// 从 binding 中移除多个 tag
+        /// </summary>
+        IBinding RemoveTag(string t);
 
         #endregion
 

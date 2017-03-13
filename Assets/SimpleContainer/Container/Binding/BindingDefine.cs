@@ -30,6 +30,11 @@ namespace SimpleContainer.Container
     public delegate void BindingRemovedHandler(IBinder source, IList<IBinding> bindings);
 
     /// <summary>
+    /// 用于返回 Binding 是否符合某些条件的 aots 委托
+    /// </summary>
+    public delegate bool IsBindingAccordHandler(IBinding binding);
+
+    /// <summary>
     /// 约束类型
     /// </summary>
 	public enum ConstraintType
