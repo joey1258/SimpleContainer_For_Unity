@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using UnityEngine;
 
 namespace SimpleContainer
 {
@@ -60,9 +62,14 @@ namespace SimpleContainer
         Type[] GetAllRegistrations();
 
         /// <summary>
-        /// 将容器中所有 ICommand 对象实例化并缓存到字典
+        /// Starts a coroutine.
         /// </summary>
-        void Pool();
+        Coroutine StartCoroutine(IEnumerator routine);
+
+        /// <summary>
+        /// Stops a coroutine.
+        /// </summary>
+        void StopCoroutine(Coroutine coroutine);
     }
 }
 

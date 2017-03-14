@@ -99,7 +99,7 @@ namespace SimpleContainer
         protected Coroutine StartCoroutine(IEnumerator routine)
         {
             // 使用 EventContainerAOT.eventBehaviour 来调用协程并传人参数 routine
-            var coroutine = EventContainerAOT.eventBehaviour.StartCoroutine(routine);
+            var coroutine = dispatcher.StartCoroutine(routine);
             // 将结果添加到 Coroutine list
             coroutines.Add(coroutine);
             // keepAlive 设为真
@@ -114,7 +114,7 @@ namespace SimpleContainer
         /// <param name="coroutine">Coroutine to be stopped.</param>
         protected void StopCoroutine(Coroutine coroutine)
         {
-            EventContainerAOT.eventBehaviour.StopCoroutine(coroutine);
+            dispatcher.StopCoroutine(coroutine);
             coroutines.Remove(coroutine);
         }
 

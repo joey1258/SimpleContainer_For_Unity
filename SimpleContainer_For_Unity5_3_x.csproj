@@ -144,6 +144,11 @@
     <Compile Include="Assets\SimpleContainer\Extensions\ContextRoot\SceneInjector.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\Event\EventBehaviour.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\Event\EventContainerAOT.cs" />
+    <Compile Include="Assets\SimpleContainer\Extensions\Event\Interface\IFixedUpdatable.cs" />
+    <Compile Include="Assets\SimpleContainer\Extensions\Event\Interface\IFocusable.cs" />
+    <Compile Include="Assets\SimpleContainer\Extensions\Event\Interface\ILateUpdatable.cs" />
+    <Compile Include="Assets\SimpleContainer\Extensions\Event\Interface\IPausable.cs" />
+    <Compile Include="Assets\SimpleContainer\Extensions\Event\Interface\IQuitable.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\Event\Interface\IUpdatable.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\MonoInjection\InjectionUtil.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\MonoInjection\MonoInjection.cs" />

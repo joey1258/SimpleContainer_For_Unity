@@ -163,6 +163,49 @@ namespace SimpleContainer.Container
             return this;
         }
 
+        /// <summary>
+        /// 从 aots list 中获取指定容器
+        /// </summary>
+        virtual public T GetAOT<T>() where T : IContainerAOT
+        {
+            return (T) GetAOT(typeof(T));
+        }
+
+        /// <summary>
+        /// 从 aots list 中获取指定容器
+        /// </summary>
+        virtual public IContainerAOT GetAOT(Type type)
+        {
+            if (aots != null)
+            {
+                for (int i = 0; i < aots.Count; i++)
+                {
+                    if (aots[i].GetType().Equals(type))
+                    {
+                        return aots[i];
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 反回 aots list 中是否含有指定容器
+        /// </summary>
+        virtual public bool HasAOT<T>()
+        {
+            return HasAOT(typeof(T));
+        }
+
+        /// <summary>
+        /// 反回 aots list 中是否含有指定容器
+        /// </summary>
+        virtual public bool HasAOT(Type type)
+        {
+            return GetAOT(type) != null;
+        }
+
         #endregion
 
         #region binder AOT event

@@ -27,8 +27,9 @@ namespace uMVVMCS_NUitTests
 
         /// <summary>
         /// 测试 RegisterSelf 方法创建 binding 结果是否正确
+        /// 新版本代码加入了 DDOL 相关功能，需要在播放模式才能正常运行，因此无法继续在此测试
         /// </summary>
-        [Test]
+        /*[Test]
         public void RegisterAOT_T_Correct()
         {
             //Arrange 
@@ -42,7 +43,6 @@ namespace uMVVMCS_NUitTests
                 .RegisterAOT<CommanderContainerAOT>()
                 .RegisterCommand<TestCommand1>()
                 .Bind<Transform>().ToPrefab("06_Commander/Prism");
-            container.PoolCommands();
 
             dispatcher = container.GetCommandDispatcher();
             dispatcher.Dispatch<TestCommand1>(sc);
@@ -53,7 +53,7 @@ namespace uMVVMCS_NUitTests
                 sc.id == 1 &&
                 container.GetTypes<Transform>().Count == 1 &&
                 ((PrefabInfo)container.GetTypes<Transform>()[0].value).path == "06_Commander/Prism");
-        }
+        }*/
 
         /// <summary>
         /// 测试 RegisterSelf 方法创建 binding 结果是否正确

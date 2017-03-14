@@ -3,9 +3,9 @@
     public interface ICommandPool
     {
         /// <summary>
-        /// 将容器中所有 ICommand 对象实例化并缓存到字典
+        /// 将指定类型的 Command 储存到 Pool
         /// </summary>
-        void Pool();
+		void PoolCommand(System.Type commandType);
 
         /// <summary>
         /// 从对象池的字典中获取一个 command

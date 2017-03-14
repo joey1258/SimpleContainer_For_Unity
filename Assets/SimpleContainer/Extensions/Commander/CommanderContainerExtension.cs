@@ -37,6 +37,7 @@ namespace SimpleContainer
             }
 
             container.Bind<ICommand>().To(type);
+            container.Resolve<ICommandPool>().PoolCommand(type);
 
             return container;
         }
@@ -64,31 +65,18 @@ namespace SimpleContainer
             // 如果不为空，就讲其类型作为值逐一绑定一条 ICommand 类型的 TEMP binding
             if (commands.Length > 0)
             {
+                var commandPool = container.Resolve<ICommandPool>();
+
                 for (var i = 0; i < commands.Length; i++)
                 {
                     var commandType = commands[i];
                     if (!commandType.IsAbstract)
                     {
                         container.Bind<ICommand>().To(commandType);
+                        commandPool.PoolCommand(commandType);
                     }
                 }
-                // 为容器实例化一个 ICommandPool（CommandDispatcher）实例，并将容器内的所有 commands
-                // 实例化、注入并存入对象池（储存为 List<ICommand> 并根据类型添加到 CommandDispatcher 
-                // 的字典中）
-                PoolCommands(container);
             }
-
-            return container;
-        }
-
-        /// <summary>
-        /// 为容器实例化一个 ICommandPool（CommandDispatcher）实例，并将容器内的所有 commands 实例化、
-        /// 注入并存入对象池（储存为 List<ICommand> 并根据类型添加到 CommandDispatcher 的字典中）
-        /// </summary>
-        public static IInjectionContainer PoolCommands(this IInjectionContainer container)
-        {
-            var commandPool = container.Resolve<ICommandPool>();
-            commandPool.Pool();
 
             return container;
         }

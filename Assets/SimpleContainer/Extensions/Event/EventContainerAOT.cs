@@ -10,25 +10,54 @@ namespace SimpleContainer
         /// <summary>
         /// 可释放对象 list
         /// </summary>
-        public static List<IDisposable> disposable = new List<IDisposable>();
+        public List<IDisposable> disposable = new List<IDisposable>();
 
         /// <summary>
         /// 每帧更新对象 list
         /// </summary>
-        public static List<IUpdatable> updateable = new List<IUpdatable>();
+        public List<IUpdatable> updateable = new List<IUpdatable>();
+
+        /// <summary>
+        /// 每帧更新完成后调用一次对象 list
+        /// </summary>
+        public List<ILateUpdatable> lateUpdateable { get; private set; }
+
+        /// <summary>
+        /// FixedUpdatable 更新对象 list
+        /// </summary>
+        public List<IFixedUpdatable> fixedUpdateable { get; private set; }
+
+        /// <summary>
+        /// 允许接收 onapplicationfocus 事件
+        /// </summary>
+        public List<IFocusable> focusable { get; private set; }
+
+        /// <summary>
+        /// 允许接收 OnApplicationPause 事件
+        /// </summary>
+        public List<IPausable> pausable { get; private set; }
+
+        /// <summary>
+        /// 当 app 退出时调用
+        /// </summary>
+        public List<IQuitable> quitable { get; private set; }
 
         /// <summary>
         /// event
         /// </summary>
-        public static EventBehaviour eventBehaviour;
+        public EventBehaviour eventBehaviour;
 
         #region constructor
 
         public EventContainerAOT()
         {
-            //在游戏中创建一个游戏物体来挂载 EventBehaviour 组件
-            var gameObject = new GameObject("EventBehaviour");
-            eventBehaviour = gameObject.AddComponent<EventBehaviour>();
+            disposable = new List<IDisposable>();
+            updateable = new List<IUpdatable>();
+            lateUpdateable = new List<ILateUpdatable>();
+            fixedUpdateable = new List<IFixedUpdatable>();
+            focusable = new List<IFocusable>();
+            pausable = new List<IPausable>();
+            quitable = new List<IQuitable>();
         }
 
         #endregion
@@ -40,6 +69,8 @@ namespace SimpleContainer
         /// </summary>
         public void OnRegister(IInjectionContainer container)
         {
+            CreateBehaviour(container.id);
+
             // 将容器添加到 IDisposable list.
             disposable.Add(container);
 
@@ -49,15 +80,13 @@ namespace SimpleContainer
             if (commandDispatches != null && commandDispatches.Count != 0)
             {
                 var dispatcher = container.Resolve<ICommandDispatcher>();
-                if (dispatcher is IDisposable)
-                {
-                    disposable.Add((IDisposable)dispatcher);
-                }
+                BindInstance(disposable, dispatcher);
             }
 
+
             // 添加 AOT 委托
-            container.afterAddBinding += this.OnAfterAddBinding;
-            container.afterInstantiate += this.OnBindingResolution;
+            container.afterAddBinding += OnAfterAddBinding;
+            container.afterInstantiate += OnBindingResolution;
         }
 
         /// <summary>
@@ -66,13 +95,41 @@ namespace SimpleContainer
         public void OnUnregister(IInjectionContainer container)
         {
             // 取消 AOT 委托
-            container.afterAddBinding -= this.OnAfterAddBinding;
-            container.afterInstantiate -= this.OnBindingResolution;
+            container.afterAddBinding -= OnAfterAddBinding;
+            container.afterInstantiate -= OnBindingResolution;
 
             // 释放 list 并销毁组件
             disposable.Clear();
             updateable.Clear();
-            MonoBehaviour.Destroy(eventBehaviour);
+            lateUpdateable.Clear();
+            fixedUpdateable.Clear();
+            focusable.Clear();
+            pausable.Clear();
+            quitable.Clear();
+
+            if (eventBehaviour != null && eventBehaviour.gameObject != null)
+            {
+                MonoBehaviour.DestroyImmediate(eventBehaviour.gameObject);
+            }
+            eventBehaviour = null;
+        }
+
+        /// <summary>
+        /// 创建 EventBehaviour 并将其挂载在 DDOL 物体上
+        private void CreateBehaviour(object containerID)
+        {
+            if (eventBehaviour == null)
+            {
+                //Creates a new game object for UpdateableBehaviour.
+                var gameObject = new GameObject();
+                gameObject.name = String.Format("EventContainerAOT ({0})", containerID);
+
+                //The behaviour should only be removed during unregister.
+                MonoBehaviour.DontDestroyOnLoad(gameObject);
+
+                eventBehaviour = gameObject.AddComponent<EventBehaviour>();
+                eventBehaviour.aot = this;
+            }
         }
 
         /// <summary>
@@ -90,19 +147,13 @@ namespace SimpleContainer
                     // 如果是 ICommand 对象就直接退出
                     if (binding.valueList[i] is ICommand) { return; }
 
-                    // 如果是 IDisposable 对象且 disposable list 中没有该对象，就进行添加
-                    if (binding.valueList[i] is IDisposable && 
-                        !disposable.Contains((IDisposable)binding.valueList[i]))
-                    {
-                        disposable.Add((IDisposable)binding.valueList[i]);
-                    }
-
-                    // 如果是 IUpdatable 对象且 updateable list 中没有该对象，就进行添加
-                    if (binding.valueList[i] is IUpdatable && 
-                        !updateable.Contains((IUpdatable)binding.valueList[i]))
-                    {
-                        updateable.Add((IUpdatable)binding.valueList[i]);
-                    }
+                    BindInstance(disposable, binding.valueList[i]);
+                    BindInstance(updateable, binding.valueList[i]);
+                    BindInstance(lateUpdateable, binding.valueList[i]);
+                    BindInstance(fixedUpdateable, binding.valueList[i]);
+                    BindInstance(focusable, binding.valueList[i]);
+                    BindInstance(pausable, binding.valueList[i]);
+                    BindInstance(quitable, binding.valueList[i]);
                 }
             }
         }
@@ -119,14 +170,27 @@ namespace SimpleContainer
                 instance is ICommand)
             { return; }
 
-            // 根据各自的类型添加到相应的 list
-            if (instance is IDisposable && !disposable.Contains((IDisposable)instance))
+            int length = binding.valueList.Count;
+            for (int i = 0; i < length; i++)
             {
-                disposable.Add((IDisposable)instance);
+                BindInstance(disposable, binding.valueList[i]);
+                BindInstance(updateable, binding.valueList[i]);
+                BindInstance(lateUpdateable, binding.valueList[i]);
+                BindInstance(fixedUpdateable, binding.valueList[i]);
+                BindInstance(focusable, binding.valueList[i]);
+                BindInstance(pausable, binding.valueList[i]);
+                BindInstance(quitable, binding.valueList[i]);
             }
-            if (instance is IUpdatable && !updateable.Contains((IUpdatable)instance))
+        }
+
+        /// <summary>
+        /// 将指定类型的实例（参数 object instance）绑定（有则不处理，没有时进行添加）到参数 List<T> instances 中
+        /// </summary>
+        protected void BindInstance<T>(List<T> instances, object instance)
+        {
+            if (instance is T && !instances.Contains((T)instance))
             {
-                updateable.Add((IUpdatable)instance);
+                instances.Add((T)instance);
             }
         }
 

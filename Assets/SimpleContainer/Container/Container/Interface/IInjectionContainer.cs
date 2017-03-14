@@ -38,5 +38,25 @@ namespace SimpleContainer.Container
         /// 将一个容器从 aots list 中移除
         /// </summary>
         IInjectionContainer UnregisterAOT(IContainerAOT extension);
+
+        /// <summary>
+        /// 从 aots list 中获取指定容器
+        /// </summary>
+        T GetAOT<T>() where T : IContainerAOT;
+
+        /// <summary>
+        /// 从 aots list 中获取指定容器
+        /// </summary>
+        IContainerAOT GetAOT(Type type);
+
+        /// <summary>
+        /// 反回 aots list 中是否含有指定容器
+        /// </summary>
+        bool HasAOT<T>();
+
+        /// <summary>
+        /// 反回 aots list 中是否含有指定容器
+        /// </summary>
+        bool HasAOT(Type type);
     }
 }

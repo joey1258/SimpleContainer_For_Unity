@@ -1,4 +1,1 @@
-sceneSetups:
-- path: Assets/Examples/New Folder/a.unity
-  isLoaded: 1
-  isActive: 1
+sceneSetups: []

@@ -18,12 +18,24 @@ namespace SimpleContainer
         /// </summary>
         protected IInjectionContainer container;
 
+        /// <summary>
+        /// commandDispatcher 的容器
+        /// </summary>
+        protected EventContainerAOT eventContainerAOT;
+
         #region constructor
 
         public CommandDispatcher(IInjectionContainer container)
         {
             commands = new Dictionary<Type, object>();
             this.container = container;
+
+            eventContainerAOT = this.container.GetAOT<EventContainerAOT>();
+            if (eventContainerAOT == null)
+            {
+                this.container.RegisterAOT<EventContainerAOT>();
+                eventContainerAOT = this.container.GetAOT<EventContainerAOT>();
+            }
         }
 
         #endregion
@@ -70,9 +82,9 @@ namespace SimpleContainer
                 if (command.keepAlive)
                 {
                     //如果命令实现了 IUpdatable 接口，并且 EventContainerAOT 的 IUpdatable list 中还没有添加该 command 就进行添加
-                    if (command is IUpdatable && !EventContainerAOT.updateable.Contains((IUpdatable)command))
+                    if (command is IUpdatable && !eventContainerAOT.updateable.Contains((IUpdatable)command))
                     {
-                        EventContainerAOT.updateable.Add((IUpdatable)command);
+                        eventContainerAOT.updateable.Add((IUpdatable)command);
                     }
                 }
                 else
@@ -98,7 +110,7 @@ namespace SimpleContainer
         /// </summary>
         public void InvokeDispatch<T>(float time, params object[] parameters) where T : ICommand
         {
-            EventContainerAOT.eventBehaviour.StartCoroutine(this.DispatchInvoke(typeof(T), time, parameters));
+            StartCoroutine(DispatchInvoke(typeof(T), time, parameters));
         }
 
         /// <summary>
@@ -106,7 +118,7 @@ namespace SimpleContainer
         /// </summary>
         public void InvokeDispatch(Type type, float time, params object[] parameters)
         {
-            EventContainerAOT.eventBehaviour.StartCoroutine(DispatchInvoke(type, time, parameters));
+            StartCoroutine(DispatchInvoke(type, time, parameters));
         }
 
         /// <summary>
@@ -131,9 +143,9 @@ namespace SimpleContainer
             if (!command.running) { return; }
 
             // 如果 command 实现了 IUpdatable 接口，且添加到了 EventContainerAOT 的 IUpdatable list 就进行移除
-            if (command is IUpdatable && EventContainerAOT.updateable.Contains((IUpdatable)command))
+            if (command is IUpdatable && eventContainerAOT.updateable.Contains((IUpdatable)command))
             {
-                EventContainerAOT.updateable.Remove((IUpdatable)command);
+                eventContainerAOT.updateable.Remove((IUpdatable)command);
             }
             // 如果 command 实现了 IDisposable 接口, 就调用 Dispose 方法
             if (command is IDisposable)
@@ -210,49 +222,6 @@ namespace SimpleContainer
 
         #endregion
 
-        /// <summary>
-        /// 将容器中所有 ICommand 对象实例化并缓存到字典
-        /// </summary>
-        public void Pool()
-        {
-            // 获取所有执行过注入后的 ICommand 对象实例
-            var resolvedCommands = container.ResolveAll<ICommand>();
-
-            for (var i = 0; i < resolvedCommands.Length; i++)
-            {
-                // 获取类型和实例
-                var command = resolvedCommands[i];
-                var commandType = command.GetType();
-
-                // 如果字典中已经有了就直接进行下次循环
-                if (commands.ContainsKey(commandType)) { continue; }
-                // 如果是单例类型就直接进行添加
-                if (command.singleton)
-                {
-                    commands.Add(commandType, command);
-                }
-                else
-                {
-                    // 否则用 list 来作为对象池
-                    var commandPool = new List<ICommand>(command.preloadPoolSize);
-
-                    // 将当前元素添加到 list 中
-                    commandPool.Add(command);
-
-                    // 如果对象池初始化数量大于1就继续进行实例化并添加到 list
-                    if (command.preloadPoolSize > 1)
-                    {
-                        for (int n = 1; n < command.preloadPoolSize; n++)
-                        {
-                            commandPool.Add((ICommand)container.Resolve(commandType));
-                        }
-                    }
-                    // 将 list 添加到字典
-                    commands.Add(commandType, commandPool);
-                }
-            }
-        }
-
         #region ContainsCommands
 
         /// <summary>
@@ -282,7 +251,53 @@ namespace SimpleContainer
             return keys.ToArray();
         }
 
+        /// <summary>
+        /// Starts a coroutine.
+        /// </remarks>
+        public UnityEngine.Coroutine StartCoroutine(IEnumerator routine)
+        {
+            return eventContainerAOT.eventBehaviour.StartCoroutine(routine);
+        }
+
+        /// <summary>
+        /// Stops a coroutine.
+        /// </summary>
+        public void StopCoroutine(UnityEngine.Coroutine coroutine)
+        {
+            eventContainerAOT.eventBehaviour.StopCoroutine(coroutine);
+        }
+
         #region GetCommandFromPool
+
+        /// <summary>
+        /// 将指定类型的 Command 储存到 Pool
+        /// </summary>
+        public void PoolCommand(Type commandType)
+        {
+            var command = (ICommand)container.Resolve(commandType);
+            if (commands.ContainsKey(commandType)) return;
+
+            if (command.singleton)
+            {
+                commands.Add(commandType, command);
+            }
+            else
+            {
+                var commandPool = new List<ICommand>(command.preloadPoolSize);
+
+                commandPool.Add(command);
+
+                if (command.preloadPoolSize > 1)
+                {
+                    for (int i = 1; i < command.preloadPoolSize; i++)
+                    {
+                        commandPool.Add((ICommand)container.Resolve(commandType));
+                    }
+                }
+
+                commands.Add(commandType, commandPool);
+            }
+        }
 
         /// <summary>
         /// 从对象池的字典中获取一个 command
