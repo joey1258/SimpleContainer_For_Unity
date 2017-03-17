@@ -90,6 +90,11 @@ namespace SimpleContainer.Container
             RegisterSelf();
         }
 
+        public InjectionContainer(object identifier, ResolutionMode resolutionMode)
+            : this(identifier, new ReflectionCache(), new Binder(), resolutionMode)
+        {
+        }
+
         #endregion
 
         #region IDisposable implementation 
@@ -99,6 +104,13 @@ namespace SimpleContainer.Container
         /// </summary>
         public void Dispose()
         {
+            if (aots != null)
+            {
+                for (int i = 0; i < aots.Count; i++)
+                {
+                    aots[i].OnUnregister(this);
+                }
+            }
             cache = null;
             binder = null;
         }
@@ -124,10 +136,13 @@ namespace SimpleContainer.Container
         {
             // 如果 List<IContainerAOT> aots 为空,将其初始化
             if (aots == null) { aots = new List<IContainerAOT>(); }
-            // 添加参数到 list
-            aots.Add(aot);
-            // 执行 OnRegister 方法
-            aot.OnRegister(this);
+            // 在之前未进行过添加的情况下才添加参数到 list
+            if (GetAOT(aot.GetType()) == null)
+            {
+                aots.Add(aot);
+                // 执行 OnRegister 方法
+                aot.OnRegister(this);
+            }
 
             return this;
         }

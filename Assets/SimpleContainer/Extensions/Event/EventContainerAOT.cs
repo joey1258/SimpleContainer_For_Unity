@@ -106,12 +106,6 @@ namespace SimpleContainer
             focusable.Clear();
             pausable.Clear();
             quitable.Clear();
-
-            if (eventBehaviour != null && eventBehaviour.gameObject != null)
-            {
-                MonoBehaviour.DestroyImmediate(eventBehaviour.gameObject);
-            }
-            eventBehaviour = null;
         }
 
         /// <summary>

@@ -236,7 +236,7 @@ namespace SimpleContainer.Container
             {
                 if (alwaysResolve || resolutionMode == ResolutionMode.ALWAYS_RESOLVE)
                 {
-                    instances.Add(Instantiate(type as Type));
+                    instances.Add(Instantiate(inwardType));
                 }
                 else
                 {
@@ -536,6 +536,11 @@ namespace SimpleContainer.Container
         /// </summary>
         virtual protected object Instantiate(Type type)
         {
+            if (type.IsInterface)
+            {
+                throw new Exception("Type Is Interface");
+            }
+
             var info = cache.GetInfo(type);
             object instance = null;
 
@@ -575,12 +580,15 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 字段注入
         /// </summary>
-        virtual protected void InjectFields(object instance, SetterInfo[] fields)
+        virtual protected void InjectFields(object instance, AcessorInfo[] fields)
         {
             for (int i = 0; i < fields.Length; i++)
             {
                 var field = fields[i];
-                var valueToSet = Resolve(
+                var value = field.getter(instance);
+                if (value == null || value.Equals(null))
+                {
+                    var valueToSet = Resolve(
                     field.type,
                     InjectionInto.Field,
                     field.name,
@@ -588,19 +596,23 @@ namespace SimpleContainer.Container
                     field.id,
                     false);
 
-                field.setter(instance, valueToSet);
+                    field.setter(instance, valueToSet);
+                }
             }
         }
 
         /// <summary>
         /// 属性注入
         /// </summary>
-        virtual protected void InjectProperties(object instance, SetterInfo[] properties)
+        virtual protected void InjectProperties(object instance, AcessorInfo[] properties)
         {
             for (int i = 0; i < properties.Length; i++)
             {
                 var property = properties[i];
-                var valueToSet = Resolve(
+                var value = property.getter == null ? null : property.getter(instance);
+                if (value == null || value.Equals(null))
+                {
+                    var valueToSet = Resolve(
                     property.type,
                     InjectionInto.Property,
                     property.name,
@@ -608,7 +620,8 @@ namespace SimpleContainer.Container
                     property.id,
                     false);
 
-                property.setter(instance, valueToSet);
+                    property.setter(instance, valueToSet);
+                }
             }
         }
 

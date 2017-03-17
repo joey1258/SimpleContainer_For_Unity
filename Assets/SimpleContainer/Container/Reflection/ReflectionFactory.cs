@@ -171,9 +171,9 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 返回接受注入的属性信息 : type 为 key，object 为 id， PropertyInfo 为值
         /// </summary>
-        virtual protected SetterInfo[] GetProperties(Type type)
+        virtual protected AcessorInfo[] GetProperties(Type type)
         {
-            var setters = new List<SetterInfo>();
+            var setters = new List<AcessorInfo>();
 
             // 获取参数 type 的属性
             var properties = type.GetProperties (
@@ -190,8 +190,9 @@ namespace SimpleContainer.Container
                 if (attributes.Length > 0)
                 {
                     var attribute = attributes[0] as Inject;
-                    var method = MethodUtils.CreatePropertySetter(type, property);
-                    var info = new SetterInfo(property.PropertyType, property.Name, attribute.id, method);
+                    var getter = MethodUtils.CreatePropertyGetter(type, property);
+                    var setter = MethodUtils.CreatePropertySetter(type, property);
+                    var info = new AcessorInfo(property.PropertyType, property.Name, attribute.id, getter, setter);
                     setters.Add(info);
             }
             }
@@ -202,9 +203,9 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 返回接受注入的字段信息 : type 为 key，object 为 id， PropertyInfo 为值
         /// </summary>
-        virtual protected SetterInfo[] GetFields(Type type)
+        virtual protected AcessorInfo[] GetFields(Type type)
         {
-            var setters = new List<SetterInfo>();
+            var setters = new List<AcessorInfo>();
 
             // 获取参数 type 的属性
             var fields = type.GetFields (
@@ -221,8 +222,9 @@ namespace SimpleContainer.Container
                 if (attributes.Length > 0)
                 {
                     var attribute = attributes[0] as Inject;
-                    var method = MethodUtils.CreateFieldSetter(type, field);
-                    var info = new SetterInfo(field.FieldType, field.Name, attribute.id, method);
+                    var getter = MethodUtils.CreateFieldGetter(type, field);
+                    var setter = MethodUtils.CreateFieldSetter(type, field);
+                    var info = new AcessorInfo(field.FieldType, field.Name, attribute.id, getter, setter);
                     setters.Add(info);
                 }
             }

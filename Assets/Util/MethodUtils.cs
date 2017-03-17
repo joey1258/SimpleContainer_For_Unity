@@ -104,6 +104,14 @@ namespace Utils
         }
 
         /// <summary>
+        /// 返回字段取置器
+        /// </summary>
+        public static Getter CreateFieldGetter(Type type, FieldInfo fieldInfo)
+        {
+            return (object instance) => fieldInfo.GetValue(instance);
+        }
+
+        /// <summary>
         /// 返回字段设值器方法委托
         /// </summary>
         public static Setter CreateFieldSetter(Type type, FieldInfo fieldInfo)
@@ -131,7 +139,22 @@ namespace Utils
         }
 
         /// <summary>
-        /// 返回属性设置器方法委托
+        /// 返回属性取置器
+        /// </summary>
+        public static Getter CreatePropertyGetter(Type type, PropertyInfo propertyInfo)
+        {
+            if (propertyInfo.CanRead)
+            {
+                return (object instance) => propertyInfo.GetValue(instance, null);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 返回属性设置器
         /// </summary>
         public static Setter CreatePropertySetter(Type type, PropertyInfo propertyInfo)
         {

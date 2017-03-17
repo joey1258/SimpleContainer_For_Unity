@@ -28,24 +28,9 @@ namespace SimpleContainer.Container
     public delegate void Setter(object instance, object value);
 
     /// <summary>
-    /// Setter 信息类
+    /// 为一个属性或字段回调一个取值方法
     /// </summary>
-    public class SetterInfo : ParameterInfo
-    {
-        /// <summary>
-        /// Setter 方法
-        /// </summary>
-        public Setter setter;
-
-        #region constructor
-
-        public SetterInfo(Type type, string name, object id, Setter setter) : base(type, name, id)
-        {
-            this.setter = setter;
-        }
-
-        #endregion
-    }
+    public delegate object Getter(object instance);
 
     /// <summary>
     /// 参数信息类
@@ -113,5 +98,21 @@ namespace SimpleContainer.Container
         }
 
         #endregion
+    }
+    /// <summary>
+    /// 储存 (fields and properties) 信息类
+    /// </summary>
+    public class AcessorInfo : ParameterInfo
+    {
+        public Getter getter;
+
+        public Setter setter;
+
+        public AcessorInfo(Type type, string name, object identifier, Getter getter, Setter setter)
+            : base(type, name, identifier)
+        {
+            this.getter = getter;
+            this.setter = setter;
+        }
     }
 }

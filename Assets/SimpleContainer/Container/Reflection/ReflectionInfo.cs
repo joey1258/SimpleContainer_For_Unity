@@ -32,11 +32,11 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 接受注入的公共属性
         /// </summary>
-        public SetterInfo[] properties { get; set; }
+        public AcessorInfo[] properties { get; set; }
 
         /// <summary>
         /// 接受注入的公共字段
         /// </summary>
-        public SetterInfo[] fields { get; set; }
+        public AcessorInfo[] fields { get; set; }
     }
 }
