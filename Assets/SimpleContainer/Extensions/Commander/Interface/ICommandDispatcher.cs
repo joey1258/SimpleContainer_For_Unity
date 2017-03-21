@@ -6,6 +6,8 @@ namespace SimpleContainer
 {
     public interface ICommandDispatcher
     {
+        void Init();
+
         /// <summary>
         /// 发送一个指定类型的 command
         /// </summary>

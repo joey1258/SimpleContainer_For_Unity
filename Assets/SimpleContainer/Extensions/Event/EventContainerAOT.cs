@@ -64,6 +64,8 @@ namespace SimpleContainer
 
         #region functions
 
+        public void Init(IInjectionContainer container) { }
+
         /// <summary>
         /// 注册容器
         /// </summary>

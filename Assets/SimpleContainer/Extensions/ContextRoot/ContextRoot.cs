@@ -73,7 +73,7 @@ namespace SimpleContainer.Container
             SetupContainers();
 
             // 缓存所有容器中所有 binding 的 value 属性所储存的类型信息
-            CacheBindings();
+            InitContainers();
         }
 
         virtual protected void Start()
@@ -176,12 +176,11 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 缓存所有容器中所有 binding 的 value 属性所储存的类型信息
         /// </summary>
-        private void CacheBindings()
+        private void InitContainers()
         {
             for (var i = 0; i < containers.Count; i++)
             {
-                var container = containers[i];
-                container.cache.CacheFromBinder(container);
+                containers[i].Init();
             }
         }
 

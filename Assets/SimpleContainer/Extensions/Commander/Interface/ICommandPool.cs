@@ -3,6 +3,11 @@
     public interface ICommandPool
     {
         /// <summary>
+        /// 添加一个指定类型的 Command
+        /// </summary>
+        void AddCommand(System.Type type);
+
+        /// <summary>
         /// 将指定类型的 Command 储存到 Pool
         /// </summary>
 		void PoolCommand(System.Type commandType);

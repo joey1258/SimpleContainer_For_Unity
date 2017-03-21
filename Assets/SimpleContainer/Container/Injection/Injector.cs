@@ -588,15 +588,23 @@ namespace SimpleContainer.Container
                 var value = field.getter(instance);
                 if (value == null || value.Equals(null))
                 {
-                    var valueToSet = Resolve(
-                    field.type,
-                    InjectionInto.Field,
-                    field.name,
-                    instance,
-                    field.id,
-                    false);
+                    try
+                    {
+                        var valueToSet = Resolve(
+                        field.type,
+                        InjectionInto.Field,
+                        field.name,
+                        instance,
+                        field.id,
+                        false);
 
-                    field.setter(instance, valueToSet);
+                        field.setter(instance, valueToSet);
+                    }
+                    catch(Exception e)
+                    {
+                        throw new Exception(string.Format("Unable to inject on field {0} at object {1}.\n" +
+                               "Caused by: {2}", field.name, instance.GetType(), e.Message), e);
+                    }
                 }
             }
         }
@@ -612,15 +620,23 @@ namespace SimpleContainer.Container
                 var value = property.getter == null ? null : property.getter(instance);
                 if (value == null || value.Equals(null))
                 {
-                    var valueToSet = Resolve(
-                    property.type,
-                    InjectionInto.Property,
-                    property.name,
-                    instance,
-                    property.id,
-                    false);
+                    try
+                    {
+                        var valueToSet = Resolve(
+                        property.type,
+                        InjectionInto.Property,
+                        property.name,
+                        instance,
+                        property.id,
+                        false);
 
-                    property.setter(instance, valueToSet);
+                        property.setter(instance, valueToSet);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(string.Format("Unable to inject on property {0} at object {1}.\n" +
+                            "Caused by: {2}", property.name, instance.GetType(), e.Message), e);
+                    }
                 }
             }
         }
@@ -636,17 +652,25 @@ namespace SimpleContainer.Container
             {
                 var method = methods[i];
 
-                if (method.parameters.Length == 0)
+                try
                 {
-                    method.method(instance);
+                    if (method.parameters.Length == 0)
+                    {
+                        method.method(instance);
+                    }
+                    else
+                    {
+                        object[] parameters = this.GetParametersFromInfo(
+                            instance,
+                            method.parameters,
+                            InjectionInto.Method);
+                        method.paramsMethod(instance, parameters);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    object[] parameters = this.GetParametersFromInfo(
-                        instance, 
-                        method.parameters,
-                        InjectionInto.Method);
-                    method.paramsMethod(instance, parameters);
+                    throw new Exception(string.Format("Unable to inject on method {0} at object {1}.\n" +
+                        "Caused by: {2}", method.name, instance.GetType(), e.Message), e);
                 }
             }
         }

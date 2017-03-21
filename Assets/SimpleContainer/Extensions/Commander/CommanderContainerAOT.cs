@@ -4,6 +4,11 @@ namespace SimpleContainer
 {
     public class CommanderContainerAOT : IContainerAOT
     {
+        public void Init(IInjectionContainer container)
+        {
+            container.Resolve<ICommandDispatcher>().Init();
+        }
+
         public void OnRegister(IInjectionContainer container)
         {
             // 创建一条 CommandDispatcher 实例

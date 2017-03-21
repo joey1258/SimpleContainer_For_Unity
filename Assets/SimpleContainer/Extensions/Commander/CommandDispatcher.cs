@@ -23,6 +23,11 @@ namespace SimpleContainer
         /// </summary>
         protected EventContainerAOT eventContainerAOT;
 
+        /// <summary>
+        /// 需要注册的 commands 的类型
+        /// </summary>
+        protected IList<Type> commandsToRegister;
+
         #region constructor
 
         public CommandDispatcher(IInjectionContainer container)
@@ -35,6 +40,14 @@ namespace SimpleContainer
             {
                 this.container.RegisterAOT<EventContainerAOT>();
                 eventContainerAOT = this.container.GetAOT<EventContainerAOT>();
+            }
+        }
+
+        public void Init()
+        {
+            for (int i = 0; i < commandsToRegister.Count; i++)
+            {
+                RegisterCommand(commandsToRegister[i]);
             }
         }
 
@@ -360,6 +373,31 @@ namespace SimpleContainer
         {
             ReleaseAll();
             commands.Clear();
+        }
+
+        /// <summary>
+        /// 注册一个指定类型的 command.
+        /// </summary>
+        private void RegisterCommand(Type commandType)
+        {
+            if (!commandType.IsClass && commandType.IsAssignableFrom(typeof(ICommand)))
+            {
+                throw new Exception("TYPE_NOT_A_COMMAND");
+            }
+
+            if (!commandType.IsAbstract)
+            {
+                container.Bind<ICommand>().To(commandType);
+                PoolCommand(commandType);
+            }
+        }
+
+        /// <summary>
+        /// 添加一个指定类型的 Command
+        /// </summary>
+        public void AddCommand(Type type)
+        {
+            commandsToRegister.Add(type);
         }
     }
 }

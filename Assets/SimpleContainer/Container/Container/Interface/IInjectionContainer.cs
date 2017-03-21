@@ -5,6 +5,11 @@ namespace SimpleContainer.Container
     public interface IInjectionContainer : IBinder, IInjector, IDisposable
     {
         /// <summary>
+        /// 初始化容器
+        /// </summary>
+        void Init();
+
+        /// <summary>
         /// load 时是否摧毁容器
         /// </summary>
         bool destroyOnLoad { get; set; }

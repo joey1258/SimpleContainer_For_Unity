@@ -22,6 +22,11 @@ namespace SimpleContainer.Container
         public object id { get; private set; }
 
         /// <summary>
+        /// 是否已经初始化
+        /// </summary>
+        private bool isInitialized;
+
+        /// <summary>
         /// 容器 IContainerAOT 接口 list
         /// </summary>
         private List<IContainerAOT> aots;
@@ -96,6 +101,26 @@ namespace SimpleContainer.Container
         }
 
         #endregion
+
+        public void Init()
+        {
+            if (isInitialized)
+            {
+                return;
+            }
+
+            cache.CacheFromBinder(this);
+
+            if (aots != null)
+            {
+                for (int i = 0; i < aots.Count; i++)
+                {
+                    aots[i].Init(this);
+                }
+            }
+
+            isInitialized = true;
+        }
 
         #region IDisposable implementation 
 

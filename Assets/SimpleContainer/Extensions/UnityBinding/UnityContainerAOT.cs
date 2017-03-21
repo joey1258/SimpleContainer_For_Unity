@@ -22,6 +22,8 @@ namespace SimpleContainer.Container
 
         #endregion
 
+        public void Init(IInjectionContainer container) { }
+
         /// <summary>
         /// 如果当前 binding 的值是类型且是 MonoBehaviour 派生类就抛出异常
         /// </summary>
