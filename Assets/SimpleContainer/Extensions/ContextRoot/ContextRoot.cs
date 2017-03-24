@@ -112,12 +112,31 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 将 container添加到 containers List
+        /// 将 container 添加到 containers List
         /// </summary>
         virtual public IInjectionContainer AddContainer<T>(bool destroyOnLoad) where T : IInjectionContainer, new()
         {
             var container = Activator.CreateInstance<T>();
             return AddContainer(container, destroyOnLoad);
+        }
+
+        /// <summary>
+        /// 将 container 添加到 containers List 并设置 id
+        /// </summary>
+        public IInjectionContainer AddContainer<T>(object identifier) where T : IInjectionContainer
+        {
+            return this.AddContainer<T>(new Type[] { typeof(object) }, new object[] { identifier });
+        }
+
+        /// <summary>
+        /// 将 container 添加到 containers List 并设置 id
+        /// </summary>
+        private IInjectionContainer AddContainer<T>(Type[] parameterTypes, object[] parameterValues) where T : IInjectionContainer
+        {
+            var containerType = typeof(T);
+            var constructor = containerType.GetConstructor(parameterTypes);
+            var container = (IInjectionContainer)constructor.Invoke(parameterValues);
+            return AddContainer(container, true);
         }
 
         /// <summary>
