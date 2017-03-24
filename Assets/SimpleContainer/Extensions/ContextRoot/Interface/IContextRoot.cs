@@ -8,6 +8,16 @@
         IInjectionContainer AddContainer<T>() where T : IInjectionContainer, new();
 
         /// <summary>
+        /// 将 container 添加到 containers List 并设置 id
+        /// </summary>
+        IInjectionContainer AddContainer<T>(object identifier) where T : IInjectionContainer;
+
+        /// <summary>
+        /// 将 container 添加到 containers List 并设置 id
+        /// </summary>
+        IInjectionContainer AddContainer<T>(System.Type[] parameterTypes, object[] parameterValues) where T : IInjectionContainer;
+
+        /// <summary>
         /// 将 container添加到 containers List，并默认 destroyOnLoad 为真
         /// </summary>
         IInjectionContainer AddContainer(IInjectionContainer container);
