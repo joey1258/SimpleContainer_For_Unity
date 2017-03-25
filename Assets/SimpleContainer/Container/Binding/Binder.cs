@@ -160,6 +160,11 @@ namespace SimpleContainer.Container
                 throw new Exceptions(string.Format(Exceptions.PARAMETER_NUll, "id"));
             }
 
+            if (!typeBindings.ContainsKey(type))
+            {
+                return null;
+            }
+
             var bindings = typeBindings[type];
 
             int lenght = bindings.Count;
