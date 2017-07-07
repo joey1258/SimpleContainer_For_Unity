@@ -230,7 +230,7 @@ namespace SimpleContainer.Container
         /// </summary>
         virtual public IBinding To(object[] os)
         {
-            if (_bindingType == BindingType.ADDRESS)
+            if (_bindingType != BindingType.MULTITON)
             {
                 _bindingType = BindingType.MULTITON;
                 _constraint = ConstraintType.MULTIPLE;

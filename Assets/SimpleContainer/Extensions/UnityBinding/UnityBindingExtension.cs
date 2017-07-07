@@ -717,6 +717,36 @@ namespace SimpleContainer.Container
             return binding;
         }
 
+        /// <summary>
+        /// 绑定一个多例的资源但并不进行实例化（用于不需要立即实例化的场景或声音等非 prefab 资源）
+        /// </summary>
+        public static IBinding ToResources(this IBinding binding, string[] names)
+        {
+            if (!TypeUtils.IsAssignable(typeof(UnityEngine.Object), binding.type))
+            {
+                throw new Exceptions(
+                    string.Format(Exceptions.NON_SPECIFIED_TYPE, "UnityEngine.Object"));
+            }
+
+            binding.SetBindingType(BindingType.MULTITON);
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                var resource = Resources.Load(names[i]);
+                if (resource == null)
+                {
+                    throw new Exceptions(
+                        string.Format(Exceptions.RESOURCE_LOAD_FAILURE, names[i]));
+                }
+
+                binding.SetValue(resource);
+            }
+
+            binding.binder.Storing(binding);
+
+            return binding;
+        }
+
         #endregion
 
         #region Instantiate

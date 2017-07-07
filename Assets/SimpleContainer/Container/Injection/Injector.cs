@@ -719,7 +719,7 @@ namespace SimpleContainer.Container
                 }
                 else
                 {
-                    // 如果当前 binder 中没有重复的值才进行注入(避免重复注入)
+                    // 如果当前 binder 中没有重复的值(被注入目标)才进行注入(避免重复注入)
                     if (!InjectionUtil.IsExistOnBinder(binding.valueList[i], binder))
                     {
                         Inject(binding.valueList[i]);
