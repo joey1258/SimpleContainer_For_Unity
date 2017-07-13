@@ -401,7 +401,7 @@ namespace SimpleContainer.Container
             TypeFilter(binding, type, isGameObject);
 
             var prefabInfo = new PrefabInfo(path, type);
-            CoroutineUtils.Instance.StartCoroutine(prefabInfo.GetAsyncObject(_loaded, _progress));
+            CoroutineManager.singleton.StartCoroutine(prefabInfo.GetAsyncObject(_loaded, _progress));
 
             if (prefabInfo.prefab == null)
             {
@@ -469,7 +469,7 @@ namespace SimpleContainer.Container
             TypeFilter(binding, type, isGameObject);
 
             var prefabInfo = new PrefabInfo(path, type);
-            CoroutineUtils.Instance.StartCoroutine(prefabInfo.GetCoroutineObject(_loaded));
+            CoroutineManager.singleton.StartCoroutine(prefabInfo.GetCoroutineObject(_loaded));
 
             if (prefabInfo.prefab == null)
             {
@@ -549,7 +549,7 @@ namespace SimpleContainer.Container
             Action<float> _progress)
         {
             var assetBundleInfo = new AssetBundleInfo(url);
-            CoroutineUtils.Instance.StartCoroutine(assetBundleInfo.GetAsyncFromFile(_loaded, _progress));
+            CoroutineManager.singleton.StartCoroutine(assetBundleInfo.GetAsyncFromFile(_loaded, _progress));
 
             if (binding.bindingType != BindingType.ADDRESS)
             {
@@ -581,7 +581,7 @@ namespace SimpleContainer.Container
             Action<UnityEngine.Object> _loaded)
         {
             var assetBundleInfo = new AssetBundleInfo(url);
-            CoroutineUtils.Instance.StartCoroutine(assetBundleInfo.GetCoroutineFromFile(_loaded));
+            CoroutineManager.singleton.StartCoroutine(assetBundleInfo.GetCoroutineFromFile(_loaded));
             if (assetBundleInfo.asetBundle == null)
             {
                 throw new Exceptions(
@@ -668,7 +668,7 @@ namespace SimpleContainer.Container
             Action<UnityEngine.Object> _loaded)
         {
             var assetBundleInfo = new AssetBundleInfo(url);
-            CoroutineUtils.Instance.StartCoroutine(assetBundleInfo.LoadCoroutineFromCacheOrDownload(_loaded));
+            CoroutineManager.singleton.StartCoroutine(assetBundleInfo.LoadCoroutineFromCacheOrDownload(_loaded));
             if (assetBundleInfo.asetBundle == null)
             {
                 throw new Exceptions(
