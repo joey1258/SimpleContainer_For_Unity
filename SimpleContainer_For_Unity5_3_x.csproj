@@ -164,6 +164,7 @@
     <Compile Include="Assets\SimpleContainer\Extensions\UnityBinding\UnityBindingExtension.cs" />
     <Compile Include="Assets\SimpleContainer\Extensions\UnityBinding\UnityContainerAOT.cs" />
     <Compile Include="Assets\Util\CompareUtils.cs" />
+    <Compile Include="Assets\Util\ConstantDefine.cs" />
     <Compile Include="Assets\Util\CoroutineManager.cs" />
     <Compile Include="Assets\Util\CoroutineTask.cs" />
     <Compile Include="Assets\Util\Exceptions.cs" />

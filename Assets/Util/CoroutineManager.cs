@@ -107,8 +107,7 @@ public class CoroutineManager : MonoBehaviour
     {
         if (singleton == null)
         {
-            GameObject go = GameObject.Find("DDOLRoot");
-            singleton = Utils.ComponentUtils.GetComponent<CoroutineManager>(go);
+            singleton = Utils.UnityUtils.GetComponent<CoroutineManager>(ConstantDefine.DDOLRoot);
         }
         return new CoroutineState(coroutine);
     }
