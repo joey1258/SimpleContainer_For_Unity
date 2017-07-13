@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Utils
 {
-    public static class ComponentUtils
+    public static class UnityUtils
     {
         /// <summary>
         /// 获取组件，如果没有该组件就添加后再返回
