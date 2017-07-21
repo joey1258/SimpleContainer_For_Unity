@@ -55,6 +55,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 为指定类型的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例
         /// 返回结果可能是 object 或者数组，使用时应加以判断
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         virtual public T Resolve<T>()
         {
@@ -64,6 +65,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 为指定类型和 id 的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例
         /// 返回结果可能是 object 或者数组，使用时应加以判断
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         public T Resolve<T>(object identifier)
         {
@@ -73,6 +75,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 为指定类型和 id 的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例
         /// 返回结果可能是 object 或者数组，使用时应加以判断
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         public object Resolve(Type type, object identifier)
         {
@@ -82,6 +85,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 为指定类型的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例
         /// 返回结果可能是 object 或者数组，使用时应加以判断
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         virtual public object Resolve(Type type)
         {
@@ -91,6 +95,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 为指定 id 的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例
         /// 返回结果可能是 object 或者数组，使用时应加以判断
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         public object Resolve(object identifier)
         {
@@ -103,6 +108,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 为指定的多个类型的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例
         /// 返回结果可能是 object 或者数组，使用时应加以判断
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         virtual public T[] ResolveAll<T>()
         {
@@ -122,6 +128,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 为指定的多个类型的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例
         /// 返回结果可能是 object 或者数组，使用时应加以判断
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         virtual public object[] ResolveAll(Type type)
         {
@@ -144,6 +151,7 @@ namespace SimpleContainer.Container
 
         /// <summary>
         /// 为指定类型和 id 的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例数组
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         public T[] ResolveSpecified<T>(object identifier)
         {
@@ -162,6 +170,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 为指定类型的所有 binding 执行相应的实例化和注入操作，并返回所有新生成的实例
         /// 返回结果可能是 object 或者数组，使用时应加以判断
+        /// 无法在主线程之外正常运行，其他线程请使用 GetBinding 获取 Binding
         /// </summary>
         virtual protected object Resolve(
             Type type,
