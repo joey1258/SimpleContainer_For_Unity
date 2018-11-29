@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Examples/02_BindingGameObjects/BindingGameObjects.unity
+- path: Assets/Examples/06_BindingsSetup/BindingsSetup.unity
   isLoaded: 1
   isActive: 1

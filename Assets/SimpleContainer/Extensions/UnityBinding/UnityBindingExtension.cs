@@ -79,7 +79,7 @@ namespace SimpleContainer.Container
             }
             // 否则用参数 name 查找 GameObject
             else { gameObject = GameObject.Find(name); }
-            
+
             // 将 gameObject 设为 binding 的值
             SetValueAddComponent(binding, gameObject, type, isGameObject);
             binding.binder.Storing(binding);
@@ -150,7 +150,8 @@ namespace SimpleContainer.Container
                 MonoBehaviour.DontDestroyOnLoad(gameObject);
             }
             // 否则用参数 name 查找 GameObject
-            else {
+            else
+            {
                 gameObject = GameObject.Find(name);
                 MonoBehaviour.DontDestroyOnLoad(gameObject);
             }
@@ -259,7 +260,7 @@ namespace SimpleContainer.Container
         /// </summary>
         public static IBinding ToGameObjectsWithTag(this IBinding binding, Type type, string tag)
         {
-            if(binding.bindingType == BindingType.FACTORY)
+            if (binding.bindingType == BindingType.FACTORY)
             {
                 throw new Exceptions(
                     string.Format(
@@ -346,158 +347,6 @@ namespace SimpleContainer.Container
 
         #endregion
 
-        #region ToPrefabAsync
-
-        public static IBinding ToPrefabAsync(this IBinding binding, string path)
-        {
-            return binding.ToPrefabAsync(binding.type, path, null, null);
-        }
-
-        public static IBinding ToPrefabAsync(this IBinding binding, string path, Action<UnityEngine.Object> _loaded)
-        {
-            return binding.ToPrefabAsync(binding.type, path, _loaded, null);
-        }
-
-        public static IBinding ToPrefabAsync(this IBinding binding, string path, Action<float> _progress)
-        {
-            return binding.ToPrefabAsync(binding.type, path, null, _progress);
-        }
-
-        public static IBinding ToPrefabAsync<T>(this IBinding binding, string path) where T : Component
-        {
-            return binding.ToPrefabAsync(typeof(T), path, null, null);
-        }
-
-        public static IBinding ToPrefabAsync<T>(this IBinding binding, string path, Action<UnityEngine.Object> _loaded) where T : Component
-        {
-            return binding.ToPrefabAsync(typeof(T), path, _loaded, null);
-        }
-
-        public static IBinding ToPrefabAsync<T>(this IBinding binding, string path, Action<float> _progress) where T : Component
-        {
-            return binding.ToPrefabAsync(typeof(T), path, null, _progress);
-        }
-
-        public static IBinding ToPrefabAsync<T>(this IBinding binding, string path, Action<UnityEngine.Object> _loaded, Action<float> _progress) where T : Component
-        {
-            return binding.ToPrefabAsync(typeof(T), path, _loaded, _progress);
-        }
-
-        /// <summary>
-        /// 如果是 ADDRESS 类型，将 PrefabInfo 作为 binding 的值；否则将 PrefabInfo 的实例
-        /// 化结果作为 binding 的值，如果指定的类型不是 GameObject，将会为实例添加指定类型的实例。
-        /// 非 ADDRESS 类型的 binding 需要注意实例化的结果（也就是所储存的值）是否被销毁，因为这
-        /// 将导致空引用 ToPrefab 方法自身会进行一次实例化，单利类型直接在方法内实例化， ADDRESS 
-        /// 类型通过 beforeDefaultInstantiate 委托在 ResolveBinding 方法中设置实例化结果
-        /// </summary>
-        public static IBinding ToPrefabAsync(
-            this IBinding binding, 
-            Type type, 
-            string path,
-            Action<UnityEngine.Object> _loaded, 
-            Action<float> _progress)
-        {
-            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
-            TypeFilter(binding, type, isGameObject);
-
-            var prefabInfo = new PrefabInfo(path, type);
-            CoroutineManager.singleton.StartCoroutine(prefabInfo.GetAsyncObject(_loaded, _progress));
-
-            if (prefabInfo.prefab == null)
-            {
-                throw new Exceptions(
-                    string.Format(Exceptions.RESOURCES_LOAD_FAILURE, path));
-            }
-
-            if (binding.bindingType == BindingType.ADDRESS)
-            {
-                // 将 prefabInfo 设为 binding 的值
-                binding.SetValue(prefabInfo);
-            }
-            else if (binding.bindingType == BindingType.SINGLETON ||
-                binding.bindingType == BindingType.MULTITON)
-            {
-                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
-
-                // 将 gameObject 设为 binding 的值
-                SetValueAddComponent(binding, gameObject, type, isGameObject);
-            }
-
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        #endregion
-        
-        #region ToPrefabCoroutine
-
-        public static IBinding ToPrefabCoroutine(this IBinding binding, string path)
-        {
-            return binding.ToPrefabCoroutine(binding.type, path, null);
-        }
-
-        public static IBinding ToPrefabCoroutine(this IBinding binding, string path, Action<UnityEngine.Object> _loaded)
-        {
-            return binding.ToPrefabCoroutine(binding.type, path, _loaded);
-        }
-
-        public static IBinding ToPrefabCoroutine<T>(this IBinding binding, string path) where T : Component
-        {
-            return binding.ToPrefabCoroutine(typeof(T), path, null);
-        }
-
-        public static IBinding ToPrefabCoroutine<T>(this IBinding binding, string path, Action<UnityEngine.Object> _loaded) where T : Component
-        {
-            return binding.ToPrefabCoroutine(typeof(T), path, _loaded);
-        }
-
-        /// <summary>
-        /// 如果是 ADDRESS 类型，将 PrefabInfo 作为 binding 的值；否则将 PrefabInfo 的实例
-        /// 化结果作为 binding 的值，如果指定的类型不是 GameObject，将会为实例添加指定类型的实例。
-        /// 非 ADDRESS 类型的 binding 需要注意实例化的结果（也就是所储存的值）是否被销毁，因为这
-        /// 将导致空引用 ToPrefab 方法自身会进行一次实例化，单利类型直接在方法内实例化， ADDRESS 
-        /// 类型通过 beforeDefaultInstantiate 委托在 ResolveBinding 方法中设置实例化结果
-        /// </summary>
-        public static IBinding ToPrefabCoroutine(
-            this IBinding binding,
-            Type type,
-            string path,
-            Action<UnityEngine.Object> _loaded)
-        {
-            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
-            TypeFilter(binding, type, isGameObject);
-
-            var prefabInfo = new PrefabInfo(path, type);
-            CoroutineManager.singleton.StartCoroutine(prefabInfo.GetCoroutineObject(_loaded));
-
-            if (prefabInfo.prefab == null)
-            {
-                throw new Exceptions(
-                    string.Format(Exceptions.RESOURCES_LOAD_FAILURE, path));
-            }
-
-            if (binding.bindingType == BindingType.ADDRESS)
-            {
-                // 将 prefabInfo 设为 binding 的值
-                binding.SetValue(prefabInfo);
-            }
-            else if (binding.bindingType == BindingType.SINGLETON ||
-                binding.bindingType == BindingType.MULTITON)
-            {
-                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
-
-                // 将 gameObject 设为 binding 的值
-                SetValueAddComponent(binding, gameObject, type, isGameObject);
-            }
-
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        #endregion
-
         #region ToAssetBundleFromFile
 
         /// <summary>
@@ -507,86 +356,6 @@ namespace SimpleContainer.Container
         {
             var assetBundleInfo = new AssetBundleInfo(url);
             assetBundleInfo.LoadFromFile();
-
-            if (binding.bindingType != BindingType.ADDRESS)
-            {
-                binding.SetBindingType(BindingType.SINGLETON);
-            }
-
-            binding.SetValue(assetBundleInfo);
-
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        #endregion
-
-        #region ToAssetBundleAsyncFromFile
-
-        public static IBinding ToAssetBundleAsyncFromFile(this IBinding binding, string url)
-        {
-            return binding.ToAssetBundleAsyncFromFile(url, null, null);
-        }
-
-        public static IBinding ToAssetBundleAsyncFromFile(this IBinding binding, string url, Action<UnityEngine.Object> _loaded)
-        {
-            return binding.ToAssetBundleAsyncFromFile(url, _loaded, null);
-        }
-
-        public static IBinding ToAssetBundleAsyncFromFile(this IBinding binding, string url, Action<float> _progress)
-        {
-            return binding.ToAssetBundleAsyncFromFile(url, null, _progress);
-        }
-
-        /// <summary>
-        /// 异步绑定 AssetBundle 资源，将 AssetBundleInfo 作为 binding 的值
-        /// </summary>
-        public static IBinding ToAssetBundleAsyncFromFile(
-            this IBinding binding,
-            string url,
-            Action<UnityEngine.Object> _loaded,
-            Action<float> _progress)
-        {
-            var assetBundleInfo = new AssetBundleInfo(url);
-            CoroutineManager.singleton.StartCoroutine(assetBundleInfo.GetAsyncFromFile(_loaded, _progress));
-
-            if (binding.bindingType != BindingType.ADDRESS)
-            {
-                binding.SetBindingType(BindingType.SINGLETON);
-            }
-
-            binding.SetValue(assetBundleInfo);
-
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        #endregion
-
-        #region ToAssetBundleCoroutineFromFile
-
-        public static IBinding ToAssetBundleCoroutineFromFile(this IBinding binding, string url)
-        {
-            return binding.ToAssetBundleCoroutineFromFile(url, null);
-        }
-
-        /// <summary>
-        /// 携程绑定 AssetBundle 资源，将 AssetBundleInfo 作为 binding 的值
-        /// </summary>
-        public static IBinding ToAssetBundleCoroutineFromFile(
-            this IBinding binding,
-            string url,
-            Action<UnityEngine.Object> _loaded)
-        {
-            var assetBundleInfo = new AssetBundleInfo(url);
-            CoroutineManager.singleton.StartCoroutine(assetBundleInfo.GetCoroutineFromFile(_loaded));
-            if (assetBundleInfo.asetBundle == null)
-            {
-                throw new Exceptions(
-                    string.Format(Exceptions.ASSETBUNDLE_LOAD_FAILURE, url));
-            }
 
             if (binding.bindingType != BindingType.ADDRESS)
             {
@@ -636,44 +405,6 @@ namespace SimpleContainer.Container
         {
             var assetBundleInfo = new AssetBundleInfo(url);
             assetBundleInfo.LoadFromCacheOrDownload();
-            
-            if (binding.bindingType != BindingType.ADDRESS)
-            {
-                binding.SetBindingType(BindingType.SINGLETON);
-            }
-
-            binding.SetValue(assetBundleInfo);
-
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        #endregion
-
-        #region ToAssetBundleCoroutineFromCacheOrDownload
-
-        public static IBinding ToAssetBundleCoroutineFromCacheOrDownload(this IBinding binding, string url)
-        {
-            return binding.ToAssetBundleCoroutineFromCacheOrDownload(url, null);
-        }
-
-        /// <summary>
-        /// 携程通过 www.LoadFromCacheOrDownload 绑定 AssetBundle 资源，将 AssetBundleInfo 作为
-        /// binding 的值.
-        /// </summary>
-        public static IBinding ToAssetBundleCoroutineFromCacheOrDownload(
-            this IBinding binding,
-            string url,
-            Action<UnityEngine.Object> _loaded)
-        {
-            var assetBundleInfo = new AssetBundleInfo(url);
-            CoroutineManager.singleton.StartCoroutine(assetBundleInfo.LoadCoroutineFromCacheOrDownload(_loaded));
-            if (assetBundleInfo.asetBundle == null)
-            {
-                throw new Exceptions(
-                    string.Format(Exceptions.ASSETBUNDLE_LOAD_FAILURE, url));
-            }
 
             if (binding.bindingType != BindingType.ADDRESS)
             {
@@ -907,7 +638,7 @@ namespace SimpleContainer.Container
         /// </summary>
         public static void CleanCache()
         {
-            Caching.CleanCache();
+            Caching.ClearCache();
         }
 
         #endregion
