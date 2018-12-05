@@ -18,21 +18,21 @@ namespace SimpleContainer.Container
 {
     public static class UnityBindingExtension
     {
-        #region ToGameObject
+        #region ToGameObject & ToGameObjectDDOL
 
         public static IBinding ToGameObject(this IBinding binding)
         {
-            return binding.ToGameObject(binding.type, null);
+            return binding.ToGameObject(false, binding.type, null);
         }
 
         public static IBinding ToGameObject<T>(this IBinding binding) where T : Component
         {
-            return binding.ToGameObject(typeof(T), null);
+            return binding.ToGameObject(false, typeof(T), null);
         }
 
         public static IBinding ToGameObject(this IBinding binding, Type type)
         {
-            return binding.ToGameObject(type, null);
+            return binding.ToGameObject(false, type, null);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace SimpleContainer.Container
         /// </summary>
         public static IBinding ToGameObject(this IBinding binding, string name)
         {
-            return binding.ToGameObject(binding.type, name);
+            return binding.ToGameObject(false, binding.type, name);
         }
 
         /// <summary>
@@ -52,58 +52,22 @@ namespace SimpleContainer.Container
         /// </summary>
         public static IBinding ToGameObject<T>(this IBinding binding, string name) where T : Component
         {
-            return binding.ToGameObject(typeof(T), name);
+            return binding.ToGameObject(false, typeof(T), name);
         }
-
-        /// <summary>
-        /// 在场景中建立或获取一个指定名称的空物体并将指定类型的组件加载到空物体上，如果指定名称为空就以组件
-        /// 的名称来命名空物体，如果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 
-        /// binding 的值，为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
-        /// </summary>
-        public static IBinding ToGameObject(this IBinding binding, Type type, string name)
-        {
-            if (binding.bindingType == BindingType.ADDRESS)
-            {
-                binding.SetBindingType(BindingType.SINGLETON);
-                binding.SetConstraint(ConstraintType.SINGLE);
-            }
-
-            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
-            TypeFilter(binding, type, isGameObject);
-
-            // 如果参数 name 为空，使用参数 type 的字符串名称来命名新创建的 GameObject
-            GameObject gameObject = null;
-            if (string.IsNullOrEmpty(name))
-            {
-                gameObject = new GameObject(type.Name);
-            }
-            // 否则用参数 name 查找 GameObject
-            else { gameObject = GameObject.Find(name); }
-
-            // 将 gameObject 设为 binding 的值
-            SetValueAddComponent(binding, gameObject, type, isGameObject);
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        #endregion
-
-        #region ToGameObjectDDOL
 
         public static IBinding ToGameObjectDDOL(this IBinding binding)
         {
-            return binding.ToGameObjectDDOL(binding.type, null);
+            return binding.ToGameObject(true, binding.type, null);
         }
 
         public static IBinding ToGameObjectDDOL<T>(this IBinding binding) where T : Component
         {
-            return binding.ToGameObjectDDOL(typeof(T), null);
+            return binding.ToGameObject(true, typeof(T), null);
         }
 
         public static IBinding ToGameObjectDDOL(this IBinding binding, Type type)
         {
-            return binding.ToGameObjectDDOL(type, null);
+            return binding.ToGameObject(true, type, null);
         }
 
         /// <summary>
@@ -113,7 +77,7 @@ namespace SimpleContainer.Container
         /// </summary>
         public static IBinding ToGameObjectDDOL(this IBinding binding, string name)
         {
-            return binding.ToGameObjectDDOL(binding.type, name);
+            return binding.ToGameObject(true, binding.type, name);
         }
 
         /// <summary>
@@ -123,7 +87,7 @@ namespace SimpleContainer.Container
         /// </summary>
         public static IBinding ToGameObjectDDOL<T>(this IBinding binding, string name) where T : Component
         {
-            return binding.ToGameObjectDDOL(typeof(T), name);
+            return binding.ToGameObject(true, typeof(T), name);
         }
 
         /// <summary>
@@ -131,7 +95,7 @@ namespace SimpleContainer.Container
         /// 的名称来命名空物体，如果类型是 GameObject 就直接用空物体作为 binding 的值，否则用组件作为 
         /// binding 的值，为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
         /// </summary>
-        public static IBinding ToGameObjectDDOL(this IBinding binding, Type type, string name)
+        public static IBinding ToGameObject(this IBinding binding, bool DDOL, Type type, string name)
         {
             if (binding.bindingType == BindingType.ADDRESS)
             {
@@ -147,51 +111,18 @@ namespace SimpleContainer.Container
             if (string.IsNullOrEmpty(name))
             {
                 gameObject = new GameObject(type.Name);
-                MonoBehaviour.DontDestroyOnLoad(gameObject);
             }
             // 否则用参数 name 查找 GameObject
             else
             {
                 gameObject = GameObject.Find(name);
-                MonoBehaviour.DontDestroyOnLoad(gameObject);
             }
+
+            // 根据 DDOL 参数的值来决定是否设置切换场景时不销毁 gameObject
+            if (DDOL) { MonoBehaviour.DontDestroyOnLoad(gameObject); }
 
             // 将 gameObject 设为 binding 的值
             SetValueAddComponent(binding, gameObject, type, isGameObject);
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        #endregion
-
-        #region ToGameObjects
-
-        /// <summary>
-        /// 为多个 GameObject 添加指定类型的组件，如果 binding.type 是 Component 类型，就将 
-        /// Component 作为 binding 的值，同时如果 GameObject 上没有该组件，就为其添加该组件，
-        /// 为了保证运作正常该物体生成后不应该被从场景中删除，或将组件添加到会被删除的物体上
-        /// </summary>
-        public static IBinding ToGameObjects(
-            this IBinding binding,
-            Type type,
-            GameObject[] gameObjects)
-        {
-            if (binding.bindingType == BindingType.ADDRESS)
-            {
-                binding.SetBindingType(BindingType.MULTITON);
-                binding.SetConstraint(ConstraintType.MULTIPLE);
-            }
-
-            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
-            TypeFilter(binding, type, isGameObject);
-
-            for (int i = 0; i < gameObjects.Length; i++)
-            {
-                // 将 gameObject 设为 binding 的值
-                SetValueAddComponent(binding, gameObjects[i], type, isGameObject);
-            }
-
             binding.binder.Storing(binding);
 
             return binding;
@@ -233,60 +164,6 @@ namespace SimpleContainer.Container
 
             // 将 gameObject 设为 binding 的值
             SetValueAddComponent(binding, gameObject, type, isGameObject);
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        #endregion
-
-        #region ToGameObjectsWithTag
-
-        public static IBinding ToGameObjectsWithTag(this IBinding binding, string tag)
-        {
-            return binding.ToGameObjectsWithTag(binding.type, tag);
-        }
-
-        public static IBinding ToGameObjectsWithTag<T>(this IBinding binding, string tag) where T : Component
-        {
-            return binding.ToGameObjectsWithTag(typeof(T), tag);
-        }
-
-        /// <summary>
-        /// 获取所有带有指定 tag 的 GameObject，如果参数 type 是 GameObject 类型，就将 GameObject 作
-        /// 为 binding 的值；如果参数 type 是 Component 类型，就将 Component 作为 binding 的值，同时
-        /// 如果 GameObject 上没有该组件，就为其添加该组件。为了保证运作正常该物体生成后不应该被从场景中删
-        /// 除，或将组件添加到会被删除的物体上
-        /// </summary>
-        public static IBinding ToGameObjectsWithTag(this IBinding binding, Type type, string tag)
-        {
-            if (binding.bindingType == BindingType.FACTORY)
-            {
-                throw new Exceptions(
-                    string.Format(
-                        Exceptions.BINDINGTYPE_NOT_ASSIGNABLE,
-                        "ToGameObjectsWithTag",
-                        "FACTORY"));
-            }
-
-            var isGameObject = TypeUtils.IsAssignable(typeof(GameObject), type);
-            TypeFilter(binding, type, isGameObject);
-
-            if (binding.bindingType == BindingType.ADDRESS ||
-                binding.bindingType == BindingType.SINGLETON)
-            {
-                binding.SetBindingType(BindingType.MULTITON);
-                binding.SetConstraint(ConstraintType.MULTIPLE);
-            }
-
-            var gameObjects = GameObject.FindGameObjectsWithTag(tag);
-
-            for (int i = 0; i < gameObjects.Length; i++)
-            {
-                // 将 gameObject 设为 binding 的值
-                SetValueAddComponent(binding, gameObjects[i], type, isGameObject);
-            }
-
             binding.binder.Storing(binding);
 
             return binding;
@@ -474,127 +351,73 @@ namespace SimpleContainer.Container
             return binding;
         }
 
-        /// <summary>
-        /// 绑定一个多例的资源但并不进行实例化（用于不需要立即实例化的场景或声音等非 prefab 资源）
-        /// </summary>
-        public static IBinding ToResources(this IBinding binding, string[] names)
-        {
-            if (!TypeUtils.IsAssignable(typeof(UnityEngine.Object), binding.type))
-            {
-                throw new Exceptions(
-                    string.Format(Exceptions.NON_SPECIFIED_TYPE, "UnityEngine.Object"));
-            }
-
-            binding.SetBindingType(BindingType.MULTITON);
-
-            for (int i = 0; i < names.Length; i++)
-            {
-                var resource = Resources.Load(names[i]);
-                if (resource == null)
-                {
-                    throw new Exceptions(
-                        string.Format(Exceptions.RESOURCE_LOAD_FAILURE, names[i]));
-                }
-
-                binding.SetValue(resource);
-            }
-
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
-        /// <summary>
-        /// 绑定一个指定类型的多例的资源但并不进行实例化（用于不需要立即实例化的场景或声音等非 prefab 资源）
-        /// </summary>
-        public static IBinding ToResources(this IBinding binding, string[] names, Type type)
-        {
-            if (!TypeUtils.IsAssignable(typeof(UnityEngine.Object), binding.type))
-            {
-                throw new Exceptions(
-                    string.Format(Exceptions.NON_SPECIFIED_TYPE, "UnityEngine.Object"));
-            }
-
-            binding.SetBindingType(BindingType.MULTITON);
-
-            for (int i = 0; i < names.Length; i++)
-            {
-                var resource = Resources.Load(names[i], type);
-                if (resource == null)
-                {
-                    throw new Exceptions(
-                        string.Format(Exceptions.RESOURCE_LOAD_FAILURE, names[i]));
-                }
-
-                binding.SetValue(resource);
-            }
-
-            binding.binder.Storing(binding);
-
-            return binding;
-        }
-
         #endregion
 
         #region Instantiate
 
+        /// <summary>
+        /// 实例化符合条件的各类型 binding 的值，并可从委托中操作实例化的结果；
+        /// 参数 handle 委托的第一个参数为实例化后的 GameObject，第二个参数为实例化后的 Component;
+        /// 参数 gameObjectName 为生成后 gameobject 的名称；
+        /// AssetBundle 与 Resource 资源实例化之后无法挂载 Component，在这种情况下请自行选择合适的方式进行挂载；
+        /// （需注意，如在 ToPrefab 方法之后执行，ToPrefab 方法自身会进行一次实例化，
+        /// 因此 Instantiate 方法实际上进行的是第二次的实例化，所以场景中会产生两个实例）。
+        /// </summary>
         public static IBinding Instantiate(this IBinding binding)
         {
-            return Instantiate(binding, null, 1, null);
-        }
-
-        public static IBinding Instantiate(
-            this IBinding binding,
-            string name)
-        {
-            return Instantiate(binding, null, 1, name);
-        }
-
-        public static IBinding Instantiate(
-            this IBinding binding,
-            Action<object> handle)
-        {
-            return Instantiate(binding, handle, 1, null);
-        }
-
-        public static IBinding Instantiate(
-            this IBinding binding,
-            Action<object> handle,
-            string name)
-        {
-            return Instantiate(binding, handle, 1, name);
+            return Instantiate(binding, null, null);
         }
 
         /// <summary>
-        /// 实例化 binding 的 PrefabInfo 类型值指定次数，并提供一个可供操作实例化结果的委托
-        /// 需注意 ToPrefab 方法自身会进行一次实例化，在其后再调用 Instantiate 方法会实例化出多个物体
+        /// 实例化符合条件的各类型 binding 的值，并可从委托中操作实例化的结果；
+        /// 参数 handle 委托的第一个参数为实例化后的 GameObject，第二个参数为实例化后的 Component;
+        /// 参数 gameObjectName 为生成后 gameobject 的名称；
+        /// AssetBundle 与 Resource 资源实例化之后无法挂载 Component，在这种情况下请自行选择合适的方式进行挂载；
+        /// （需注意，如在 ToPrefab 方法之后执行，ToPrefab 方法自身会进行一次实例化，
+        /// 因此 Instantiate 方法实际上进行的是第二次的实例化，所以场景中会产生两个实例）。
         /// </summary>
         public static IBinding Instantiate(
             this IBinding binding,
-            Action<object> handle,
-            int times,
-            string name = null,
-            string gameobjectName = null)
+            string gameObjectName)
         {
-            if (binding.value is PrefabInfo)
-            {
-                InstantiatePrefabInfo(binding, handle, times, name, gameobjectName);
-            }
-            else if (binding.value is AssetBundleInfo)
-            {
-                InstantiateAssetBundleInfo(binding, handle, times, name, gameobjectName);
-            }
-            else
-            {
-                TryInstantiateObject(binding, handle, times, name, gameobjectName);
-            }
+            return Instantiate(binding, null, gameObjectName);
+        }
 
+        /// <summary>
+        /// 实例化符合条件的各类型 binding 的值，并可从委托中操作实例化的结果；
+        /// 参数 handle 委托的第一个参数为实例化后的 GameObject，第二个参数为实例化后的 Component;
+        /// 参数 gameObjectName 为生成后 gameobject 的名称；
+        /// AssetBundle 与 Resource 资源实例化之后无法挂载 Component，在这种情况下请自行选择合适的方式进行挂载；
+        /// （需注意，如在 ToPrefab 方法之后执行，ToPrefab 方法自身会进行一次实例化，
+        /// 因此 Instantiate 方法实际上进行的是第二次的实例化，所以场景中会产生两个实例）。
+        /// </summary>
+        public static IBinding Instantiate(
+            this IBinding binding,
+            Action<object, object> handle)
+        {
+            return Instantiate(binding, handle, null);
+        }
+
+        /// <summary>
+        /// 实例化符合条件的各类型 binding 的值，并可从委托中操作实例化的结果；
+        /// 参数 handle 委托的第一个参数为实例化后的 GameObject，第二个参数为实例化后的 Component;
+        /// 参数 gameObjectName 为生成后 gameobject 的名称；
+        /// AssetBundle 与 Resource 资源实例化之后无法挂载 Component，在这种情况下请自行选择合适的方式进行挂载；
+        /// （需注意，如在 ToPrefab 方法之后执行，ToPrefab 方法自身会进行一次实例化，
+        /// 因此 Instantiate 方法实际上进行的是第二次的实例化，所以场景中会产生两个实例）。
+        /// </summary>
+        public static IBinding Instantiate(
+            this IBinding binding,
+            Action<object, object> handle,
+            string gameObjectName)
+        {
+            ResolveResources(binding, handle, gameObjectName);
             return binding;
         }
 
         #endregion
 
-        #region ToUnload
+        #region Unload
 
         /// <summary>
         /// 从内存和 binding 中移除指定资源
@@ -691,185 +514,66 @@ namespace SimpleContainer.Container
 
         #region Instantiate assist
 
-        private static void InstantiatePrefabInfo(
+        private static void ResolveResources(
             this IBinding binding,
-            Action<object> handle,
-            int times,
-            string name = null,
-            string gameobjectName = null)
+            Action<object, object> handle,
+            string gameObjectName)
         {
-            var prefabInfo = (PrefabInfo)binding.value;
-            prefabInfo.useCount++;
+            GameObject gameObject = InstantiateGameObject(binding, gameObjectName);
 
-            if (prefabInfo.type.Equals(typeof(GameObject)))
+            Component component = null;
+
+            if (!(binding.value is AssetBundleInfo))
             {
-                GameObject[] gameObjectList = new GameObject[times];
+                // 如果没有获取到符合类型的 Component 就忽略，留给外部方法在委托中判断。
+                component = gameObject.GetComponent(binding.type);
+            }
 
-                for (int i = 0; i < times; i++)
+            if (!String.IsNullOrEmpty(gameObjectName))
+            {
+                gameObject.name = gameObjectName;
+            }
+
+            if (handle != null) { handle(gameObject, component); }
+        }
+
+        private static GameObject InstantiateGameObject(IBinding binding, string gameObjectName)
+        {
+            GameObject gameObject = null;
+            if (binding.value is PrefabInfo)
+            {
+                var prefabInfo = (PrefabInfo)binding.value;
+                prefabInfo.useCount++;
+                gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
+            }
+            else if (binding.value is AssetBundleInfo)
+            {
+                if (String.IsNullOrEmpty(gameObjectName))
                 {
-                    var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
-                    gameObjectList[i] = gameObject;
+                    throw new Exceptions("asetBundle ObjectName can not be Null!");
                 }
-
-                if (handle != null) { handle(gameObjectList); }
+                AssetBundleInfo asi = (AssetBundleInfo)binding.value;
+                gameObject = (GameObject)MonoBehaviour.Instantiate(asi.asetBundle.LoadAsset(gameObjectName));
             }
             else
             {
-                Component[] componentList = new Component[times];
-
-                for (int i = 0; i < times; i++)
+                if (binding.value is UnityEngine.Object)
                 {
-                    var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
-                    var component = gameObject.GetComponent(prefabInfo.type);
-
-                    if (component == null)
-                    {
-                        component = gameObject.AddComponent(prefabInfo.type);
-                        componentList[i] = component;
-                    }
-                }
-
-                if (handle != null) { handle(componentList); }
-            }
-        }
-
-        private static void InstantiateAssetBundleInfo(
-            this IBinding binding,
-            Action<object> handle,
-            int times,
-            string name = null,
-            string gameobjectName = null)
-        {
-            AssetBundleInfo asi = (AssetBundleInfo)binding.value;
-
-            if (!binding.type.Equals(typeof(AssetBundleInfo)))
-            {
-                Component[] componentList = new Component[times];
-
-                for (int i = 0; i < times; i++)
-                {
-                    var gameObject = (GameObject)MonoBehaviour.Instantiate(asi.asetBundle.LoadAsset(name));
-
-                    if (string.IsNullOrEmpty(gameobjectName))
-                    {
-                        gameObject.name = name;
-                    }
-                    else if (string.IsNullOrEmpty(gameobjectName) && !string.IsNullOrEmpty(name))
-                    {
-                        gameObject.name = gameobjectName;
-                    }
-
-                    var component = gameObject.GetComponent(binding.type);
-
-                    if (component == null)
-                    {
-                        component = gameObject.AddComponent(binding.type);
-                        componentList[i] = component;
-                    }
-                }
-
-                if (handle != null) { handle(componentList); }
-            }
-            else
-            {
-                GameObject[] gameObjectList = new GameObject[times];
-
-                for (int i = 0; i < times; i++)
-                {
-                    var gameObject = (GameObject)MonoBehaviour.Instantiate(asi.asetBundle.LoadAsset(name));
-
-                    if (string.IsNullOrEmpty(gameobjectName))
-                    {
-                        gameObject.name = name;
-                    }
-                    else if (string.IsNullOrEmpty(gameobjectName) && !string.IsNullOrEmpty(name))
-                    {
-                        gameObject.name = gameobjectName;
-                    }
-
-                    gameObjectList[i] = gameObject;
-                }
-
-                if (handle != null) { handle(gameObjectList); }
-            }
-        }
-
-        private static void TryInstantiateObject(
-            this IBinding binding,
-            Action<object> handle,
-            int times,
-            string name = null,
-            string gameobjectName = null)
-        {
-            if (binding.value is UnityEngine.Object)
-            {
-                if (!binding.type.Equals(typeof(GameObject)))
-                {
-                    try
-                    {
-                        Component[] componentList = new Component[times];
-
-                        for (int i = 0; i < times; i++)
-                        {
-                            var gameObject = (GameObject)MonoBehaviour.Instantiate((UnityEngine.Object)binding.value);
-
-
-                            if (string.IsNullOrEmpty(gameobjectName))
-                            {
-                                gameObject.name = name;
-                            }
-                            else if (string.IsNullOrEmpty(gameobjectName) && !string.IsNullOrEmpty(name))
-                            {
-                                gameObject.name = gameobjectName;
-                            }
-
-                            var component = gameObject.GetComponent(binding.type);
-
-                            if (component == null)
-                            {
-                                component = gameObject.AddComponent(binding.type);
-                                componentList[i] = component;
-                            }
-                        }
-
-                        if (handle != null) { handle(componentList); }
-                    }
-                    catch (Exception e) { throw (e); }
+                    gameObject = (GameObject)MonoBehaviour.Instantiate((UnityEngine.Object)binding.value);
                 }
                 else
                 {
-                    try
-                    {
-                        GameObject[] gameObjectList = new GameObject[times];
-
-                        for (int i = 0; i < times; i++)
-                        {
-                            var gameObject = (GameObject)MonoBehaviour.Instantiate((UnityEngine.Object)binding.value);
-
-
-                            if (string.IsNullOrEmpty(gameobjectName))
-                            {
-                                gameObject.name = name;
-                            }
-
-                            else if (string.IsNullOrEmpty(gameobjectName) && !string.IsNullOrEmpty(name))
-                            {
-                                gameObject.name = gameobjectName;
-                            }
-
-                            gameObjectList[i] = gameObject;
-                        }
-
-                        if (handle != null) { handle(gameObjectList); }
-                    }
-                    catch (Exception e) { throw (e); }
+                    throw new Exceptions(
+                        string.Format(Exceptions.NON_SPECIFIED_TYPE, "UnityEngine.Object"));
                 }
             }
-            else
+
+            if (gameObject == null)
             {
-                throw new Exceptions(
-                    string.Format(Exceptions.NON_SPECIFIED_TYPE, "UnityEngine.Object"));
+                throw new Exceptions("Instantiate Failed!");
             }
+
+            return gameObject;
         }
 
         #endregion

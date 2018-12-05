@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Examples/06_BindingsSetup/BindingsSetup.unity
+- path: Assets/Examples/04_Prefabs/Prefabs.unity
   isLoaded: 1
   isActive: 1
