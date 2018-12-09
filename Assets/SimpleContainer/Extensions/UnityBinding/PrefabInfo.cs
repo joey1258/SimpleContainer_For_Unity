@@ -44,8 +44,7 @@ namespace SimpleContainer.Container
         {
             get
             {
-                if (_prefab == null) { ResourcesLoad(); }
-                return _prefab;
+                return _prefab ?? ResourcesLoad();
             }
         }
         private UnityEngine.Object _prefab;
@@ -80,7 +79,7 @@ namespace SimpleContainer.Container
         /// <summary>
         /// 加载资源
         /// </summary>
-        private void ResourcesLoad()
+        private UnityEngine.Object ResourcesLoad()
         {
             _prefab = UnityEngine.Resources.Load(path);
             if (_prefab == null)
@@ -88,6 +87,8 @@ namespace SimpleContainer.Container
                 throw new Exceptions(
                     string.Format(Exceptions.RESOURCES_LOAD_FAILURE, path));
             }
+            useCount++;
+            return _prefab;
         }
 
         /// <summary>
@@ -100,12 +101,13 @@ namespace SimpleContainer.Container
                 yield return null;
                 if (_prefab == null) { ResourcesLoad(); yield return null; }
                 if (handle != null) { handle(_prefab); }
+                useCount++;
                 yield break;
             }
         }
 
         /// <summary>
-        /// 异步加载资源
+        /// 异步加载资源(带进度条功能)
         /// </summary>
         public IEnumerator GetAsyncObject(Action<UnityEngine.Object> handle)
         {
@@ -119,7 +121,7 @@ namespace SimpleContainer.Container
         {
             // 如果 _prefab 不为空说明已经读取完成，执行 yield break 之后不再执行下面语句  
             if (_prefab != null) { handle(_prefab); yield break; }
-            
+
             UnityEngine.ResourceRequest resRequest = UnityEngine.Resources.LoadAsync(path);
 
             while (!resRequest.isDone)
@@ -130,6 +132,7 @@ namespace SimpleContainer.Container
             _prefab = resRequest.asset;
 
             if (handle != null) { handle(_prefab); }
+            useCount++;
             yield return resRequest;
         }
 
@@ -140,6 +143,7 @@ namespace SimpleContainer.Container
         {
             UnityEngine.Resources.UnloadAsset(_prefab);
             _prefab = null;
+            useCount--;
         }
 
         #endregion
