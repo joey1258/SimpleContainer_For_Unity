@@ -6,7 +6,7 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright Joey1258
- * @link https://github.com/joey1258/SimpleContainer
+ * @link https://github.com/joey1258/SimpleContainer_For_Unity
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -89,51 +89,6 @@ namespace SimpleContainer.Container
             }
             useCount++;
             return _prefab;
-        }
-
-        /// <summary>
-        /// 协程加载资源
-        /// </summary>
-        public IEnumerator GetCoroutineObject(Action<UnityEngine.Object> handle)
-        {
-            while (true)
-            {
-                yield return null;
-                if (_prefab == null) { ResourcesLoad(); yield return null; }
-                if (handle != null) { handle(_prefab); }
-                useCount++;
-                yield break;
-            }
-        }
-
-        /// <summary>
-        /// 异步加载资源(带进度条功能)
-        /// </summary>
-        public IEnumerator GetAsyncObject(Action<UnityEngine.Object> handle)
-        {
-            return GetAsyncObject(handle, null);
-        }
-
-        /// <summary>
-        /// 异步加载资源(带进度条功能)
-        /// </summary>
-        public IEnumerator GetAsyncObject(Action<UnityEngine.Object> handle, Action<float> progress)
-        {
-            // 如果 _prefab 不为空说明已经读取完成，执行 yield break 之后不再执行下面语句  
-            if (_prefab != null) { handle(_prefab); yield break; }
-
-            UnityEngine.ResourceRequest resRequest = UnityEngine.Resources.LoadAsync(path);
-
-            while (!resRequest.isDone)
-            {
-                if (progress != null) { progress(resRequest.progress); }
-                yield return null;
-            }
-            _prefab = resRequest.asset;
-
-            if (handle != null) { handle(_prefab); }
-            useCount++;
-            yield return resRequest;
         }
 
         /// <summary>
