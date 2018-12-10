@@ -6,7 +6,7 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright Joey1258
- * @link https://github.com/joey1258/SimpleContainer_For_Unity
+ * @link https://github.com/joey1258
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -42,21 +42,6 @@ namespace SimpleContainer.Container
 {
     public class AssetBundleInfo
     {
-        #region constructor
-
-        public AssetBundleInfo(AssetBundle asetBundle, string url)
-        {
-            _asetBundle = asetBundle;
-            this.url = url;
-        }
-
-        public AssetBundleInfo(string url)
-        {
-            this.url = url;
-        }
-
-        #endregion
-
         #region property
 
         /// <summary>
@@ -87,6 +72,21 @@ namespace SimpleContainer.Container
 
         #endregion
 
+        #region constructor
+
+        public AssetBundleInfo(AssetBundle asetBundle, string url)
+        {
+            _asetBundle = asetBundle;
+            this.url = url;
+        }
+
+        public AssetBundleInfo(string url)
+        {
+            this.url = url;
+        }
+
+        #endregion
+
         #region functions
 
         #region Load from file
@@ -102,56 +102,6 @@ namespace SimpleContainer.Container
                 throw new Exceptions(
                     string.Format(Exceptions.ASSETBUNDLE_LOAD_FAILURE, url));
             }
-        }
-
-        /// <summary>
-        /// 从 IO 协程加载 AssetBundle
-        /// </summary>
-        public IEnumerator GetCoroutineFromFile(Action<UnityEngine.Object> handle)
-        {
-            while (true)
-            {
-                yield return null;
-                if (_asetBundle == null) { LoadFromFile(); yield return null; }
-                if (handle != null) { handle(_asetBundle); }
-                yield break;
-            }
-        }
-
-        /// <summary>
-        /// 从 IO 异步加载 AssetBundle
-        /// </summary>
-        public IEnumerator GetAsyncFromFile(Action<UnityEngine.Object> handle)
-        {
-            return GetAsyncFromFile(handle, null);
-        }
-
-        /// <summary>
-        /// 从 IO 异步加载 AssetBundle
-        /// </summary>
-        public IEnumerator GetAsyncFromFile(Action<UnityEngine.Object> handle, Action<float> progress)
-        {
-            // 如果 _asetBundle 不为空说明已经读取完成，执行 yield break 之后不再执行下面语句  
-            if (_asetBundle != null) { handle(_asetBundle); yield break; }
-
-            var bundleLoadRequest = AssetBundle.LoadFromFileAsync(url);
-
-            while (!bundleLoadRequest.isDone)
-            {
-                if (progress != null) { progress(bundleLoadRequest.progress); }
-                yield return null;
-            }
-
-            _asetBundle = bundleLoadRequest.assetBundle;
-            if (_asetBundle == null)
-            {
-                throw new Exceptions(
-                    string.Format(Exceptions.ASSETBUNDLE_LOAD_FAILURE, url));
-            }
-
-            if (handle != null) { handle(_asetBundle); }
-
-            yield return bundleLoadRequest;
         }
 
         #endregion
@@ -199,20 +149,6 @@ namespace SimpleContainer.Container
             {
                 throw new Exceptions(
                     string.Format(Exceptions.ASSETBUNDLE_LOAD_FAILURE, url));
-            }
-        }
-
-        /// <summary>
-        /// 从内存协程加载 AssetBundle(WWW.LoadFromCacheOrDownload)
-        /// </summary>
-        public IEnumerator LoadCoroutineFromCacheOrDownload(Action<UnityEngine.Object> handle)
-        {
-            while (true)
-            {
-                yield return null;
-                if (_asetBundle == null) { LoadFromCacheOrDownload(); yield return null; }
-                if (handle != null) { handle(_asetBundle); }
-                yield break;
             }
         }
 

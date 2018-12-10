@@ -6,7 +6,7 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright Joey1258
- * @link https://github.com/joey1258/SimpleContainer_For_Unity
+ * @link https://github.com/joey1258
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -18,23 +18,6 @@ namespace SimpleContainer.Container
 {
     public class PrefabInfo
     {
-        #region constructor
-
-        public PrefabInfo(UnityEngine.Object prefab, string path, Type type)
-        {
-            _prefab = prefab;
-            this.path = path;
-            this.type = type;
-        }
-
-        public PrefabInfo(string path, Type type)
-        {
-            this.path = path;
-            this.type = type;
-        }
-
-        #endregion
-
         #region property
 
         /// <summary>
@@ -60,16 +43,28 @@ namespace SimpleContainer.Container
         public string path { get; set; }
 
         /// <summary>
-        /// 资源生成次数计数
-        /// </summary>
-        public int useCount { get; set; }
-
-        /// <summary>
         /// 资源对象是否已经加载
         /// </summary>
         public bool isLoaded
         {
             get { return _prefab != null; }
+        }
+
+        #endregion
+
+        #region constructor
+
+        public PrefabInfo(UnityEngine.Object prefab, string path, Type type)
+        {
+            _prefab = prefab;
+            this.path = path;
+            this.type = type;
+        }
+
+        public PrefabInfo(string path, Type type)
+        {
+            this.path = path;
+            this.type = type;
         }
 
         #endregion
@@ -87,7 +82,6 @@ namespace SimpleContainer.Container
                 throw new Exceptions(
                     string.Format(Exceptions.RESOURCES_LOAD_FAILURE, path));
             }
-            useCount++;
             return _prefab;
         }
 
@@ -98,7 +92,6 @@ namespace SimpleContainer.Container
         {
             UnityEngine.Resources.UnloadAsset(_prefab);
             _prefab = null;
-            useCount--;
         }
 
         #endregion
