@@ -62,14 +62,6 @@ namespace SimpleContainer.Container
         /// </summary>
         public string url { get; set; }
 
-        /// <summary>
-        /// 资源对象是否已经加载
-        /// </summary>
-        public bool isLoaded
-        {
-            get { return _asetBundle != null; }
-        }
-
         #endregion
 
         #region constructor

@@ -184,11 +184,8 @@ namespace SimpleContainer.Container
         }
 
         /// <summary>
-        /// 如果是 ADDRESS 类型，将 PrefabInfo 作为 binding 的值；否则将 PrefabInfo 的实例
-        /// 化结果作为 binding 的值，如果指定的类型不是 GameObject，将会为实例添加指定类型的实例。
-        /// 非 ADDRESS 类型的 binding 需要注意实例化的结果（也就是所储存的值）是否被销毁，因为这
-        /// 将导致空引用 ToPrefab 方法自身会进行一次实例化，单利类型直接在方法内实例化， ADDRESS 
-        /// 类型通过 beforeDefaultInstantiate 委托在 ResolveBinding 方法中设置实例化结果
+        /// 绑定 PrefabInfo 作为 binding 的值；其中 ADDRESS 类型通过 
+        /// beforeDefaultInstantiate 委托在 ResolveBinding 方法中设置实例化结果
         /// </summary>
         public static IBinding ToPrefab(this IBinding binding, Type type, string path)
         {
@@ -202,20 +199,8 @@ namespace SimpleContainer.Container
                     string.Format(Exceptions.RESOURCES_LOAD_FAILURE, path));
             }
 
-            if (binding.bindingType == BindingType.ADDRESS)
-            {
-                // 将 prefabInfo 设为 binding 的值
-                binding.SetValue(prefabInfo);
-            }
-            else if (binding.bindingType == BindingType.SINGLETON ||
-                binding.bindingType == BindingType.MULTITON)
-            {
-                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
-                prefabInfo.useCount++;
-
-                // 将 gameObject 设为 binding 的值
-                SetValueAddComponent(binding, gameObject, type, isGameObject);
-            }
+            // 将 prefabInfo 设为 binding 的值
+            binding.SetValue(prefabInfo);
 
             binding.binder.Storing(binding);
 
@@ -355,27 +340,11 @@ namespace SimpleContainer.Container
 
         #region Instantiate
 
-        /// <summary>
-        /// 实例化符合条件的各类型 binding 的值，并可从委托中操作实例化的结果；
-        /// 参数 handle 委托的第一个参数为实例化后的 GameObject，第二个参数为实例化后的 Component;
-        /// 参数 gameObjectName 为生成后 gameobject 的名称；
-        /// AssetBundle 与 Resource 资源实例化之后无法挂载 Component，在这种情况下请自行选择合适的方式进行挂载；
-        /// （需注意，如在 ToPrefab 方法之后执行，ToPrefab 方法自身会进行一次实例化，
-        /// 因此 Instantiate 方法实际上进行的是第二次的实例化，所以场景中会产生两个实例）。
-        /// </summary>
         public static IBinding Instantiate(this IBinding binding)
         {
             return Instantiate(binding, null, null);
         }
 
-        /// <summary>
-        /// 实例化符合条件的各类型 binding 的值，并可从委托中操作实例化的结果；
-        /// 参数 handle 委托的第一个参数为实例化后的 GameObject，第二个参数为实例化后的 Component;
-        /// 参数 gameObjectName 为生成后 gameobject 的名称；
-        /// AssetBundle 与 Resource 资源实例化之后无法挂载 Component，在这种情况下请自行选择合适的方式进行挂载；
-        /// （需注意，如在 ToPrefab 方法之后执行，ToPrefab 方法自身会进行一次实例化，
-        /// 因此 Instantiate 方法实际上进行的是第二次的实例化，所以场景中会产生两个实例）。
-        /// </summary>
         public static IBinding Instantiate(
             this IBinding binding,
             string gameObjectName)
@@ -383,14 +352,6 @@ namespace SimpleContainer.Container
             return Instantiate(binding, null, gameObjectName);
         }
 
-        /// <summary>
-        /// 实例化符合条件的各类型 binding 的值，并可从委托中操作实例化的结果；
-        /// 参数 handle 委托的第一个参数为实例化后的 GameObject，第二个参数为实例化后的 Component;
-        /// 参数 gameObjectName 为生成后 gameobject 的名称；
-        /// AssetBundle 与 Resource 资源实例化之后无法挂载 Component，在这种情况下请自行选择合适的方式进行挂载；
-        /// （需注意，如在 ToPrefab 方法之后执行，ToPrefab 方法自身会进行一次实例化，
-        /// 因此 Instantiate 方法实际上进行的是第二次的实例化，所以场景中会产生两个实例）。
-        /// </summary>
         public static IBinding Instantiate(
             this IBinding binding,
             Action<object, object> handle)
@@ -402,9 +363,7 @@ namespace SimpleContainer.Container
         /// 实例化符合条件的各类型 binding 的值，并可从委托中操作实例化的结果；
         /// 参数 handle 委托的第一个参数为实例化后的 GameObject，第二个参数为实例化后的 Component;
         /// 参数 gameObjectName 为生成后 gameobject 的名称；
-        /// AssetBundle 与 Resource 资源实例化之后无法挂载 Component，在这种情况下请自行选择合适的方式进行挂载；
-        /// （需注意，如在 ToPrefab 方法之后执行，ToPrefab 方法自身会进行一次实例化，
-        /// 因此 Instantiate 方法实际上进行的是第二次的实例化，所以场景中会产生两个实例）。
+        /// Prefab、AssetBundle 与 Resource 资源实例化之后无法挂载 Component，可在委托中手动挂载；
         /// </summary>
         public static IBinding Instantiate(
             this IBinding binding,
@@ -543,7 +502,6 @@ namespace SimpleContainer.Container
             if (binding.value is PrefabInfo)
             {
                 var prefabInfo = (PrefabInfo)binding.value;
-                prefabInfo.useCount++;
                 gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
             }
             else if (binding.value is AssetBundleInfo)

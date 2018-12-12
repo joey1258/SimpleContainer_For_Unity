@@ -37,11 +37,17 @@ namespace Utils
         // 注入相关
         public const string NO_CONSTRUCTORS = "There are no constructors on the type {0}, Is it an interface?";
         public const string CANNOT_RESOLVE_MONOBEHAVIOUR = "A MonoBehaviour cannot be resolved directly.";
+        public const string CANNOT_RESOLVE_NOT_ADDRESS_PREFAB = "A singlrton or multion type prefab cannot be resolved.";
 
         // binding 的值相关
         public const string GAMEOBJECT_IS_NULL = "GameObject is null";
         public const string VALUE_ISNOT_PREFAB = "The value must be PrefabInfo.";
         public const string SAME_OBJECT = "The object with the same key and id already exists.";
+
+        // command 相关
+        public const string TYPE_NOT_A_COMMAND = "The type is not a command.";
+        public const string MAX_POOL_SIZE = "Reached max pool size for command {0}.";
+        public const string NO_COMMAND_FOR_TYPE = "no command registered for the type {0}.";
 
         public Exceptions() : base() { }
         public Exceptions(string message) : base(message) { }

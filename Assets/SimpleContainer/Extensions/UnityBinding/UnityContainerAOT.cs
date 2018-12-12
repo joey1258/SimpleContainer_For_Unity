@@ -41,35 +41,36 @@ namespace SimpleContainer.Container
         /// ResolveBinding 方法中触发)
         /// </summary>
         protected object OnBindingEvaluation(
-            IInjector source, 
+            IInjector source,
             ref IBinding binding)
         {
-            if (binding.value is PrefabInfo &&
-                binding.bindingType == BindingType.ADDRESS)
+            if (binding.value is PrefabInfo)
             {
-                var prefabInfo = (PrefabInfo)binding.value;
-                var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
-
-                if (prefabInfo.type.Equals(typeof(GameObject)))
+                if (binding.bindingType == BindingType.ADDRESS)
                 {
-                    return gameObject;
+                    var prefabInfo = (PrefabInfo)binding.value;
+                    var gameObject = (GameObject)MonoBehaviour.Instantiate(prefabInfo.prefab);
+
+                    if (prefabInfo.type.Equals(typeof(GameObject))) { return gameObject; }
+                    else
+                    {
+                        var component = gameObject.GetComponent(prefabInfo.type);
+
+                        if (component == null)
+                        {
+                            component = gameObject.AddComponent(prefabInfo.type);
+                        }
+
+                        return component;
+                    }
                 }
                 else
                 {
-                    var component = gameObject.GetComponent(prefabInfo.type);
-
-                    if (component == null)
-                    {
-                        component = gameObject.AddComponent(prefabInfo.type);
-                    }
-
-                    return component;
+                    throw new Exceptions(
+                        string.Format(Exceptions.CANNOT_RESOLVE_NOT_ADDRESS_PREFAB, "UnityEngine.Object"));
                 }
             }
-            else
-            {
-                return null;
-            }
+            else { return null; }
         }
     }
 }

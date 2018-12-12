@@ -9,7 +9,9 @@ public class AssetBundleRoot : ContextRoot
         AddContainer<InjectionContainer>()
             .RegisterAOT<UnityContainerAOT>()
             // 绑定指定 AssetBundleInfo 资源并实例化为游戏物体
-            .Bind<AssetBundleInfo>().ToAssetBundleFromFile(Application.dataPath + "/Examples/05_AssetBundle/Resources/cube.prefab.unity3d").Instantiate("cube")
+            .Bind<AssetBundleInfo>()
+            .ToAssetBundleFromFile(Application.dataPath + "/Examples/05_AssetBundle/Resources/cube.prefab.unity3d")
+            .Instantiate("cube")
             // 获取实例化的物体组件并指定 id、执行注入
             .Bind<Transform>().ToGameObject("cube").As("cube")
             // 实例化地面

@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Examples/04_Prefabs/Prefabs.unity
+- path: Assets/Examples/05_AssetBundle/assetBundle.unity
   isLoaded: 1
   isActive: 1

@@ -42,14 +42,6 @@ namespace SimpleContainer.Container
         /// </summary>
         public string path { get; set; }
 
-        /// <summary>
-        /// 资源对象是否已经加载
-        /// </summary>
-        public bool isLoaded
-        {
-            get { return _prefab != null; }
-        }
-
         #endregion
 
         #region constructor
